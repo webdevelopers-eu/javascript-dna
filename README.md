@@ -55,7 +55,7 @@ There are many ways how to leverage the strength of DNA in your project.
 
 You can make DNA calls even before DNA was loaded.
 
-Create simple ```[]``` array if DNA is not loaded yet and call the ```dna.push([arguments])``` method on it as it were ```dna(arguments)``` method.
+Create simple ```[]``` array if DNA is not loaded yet and call the ```dna.push([arguments])``` method on it as it was ```dna(arguments)``` method.
 
 ```
 var dna = dna || [];
@@ -134,16 +134,24 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ):N
 ```
 
 * `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
-* `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#Configuration) section.
+* `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration) section.
 * `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file.
-* `CALLBACK`:`Function` any callback(s) to be executed on successful resolution dependency resolution. Same as specifying callback using `$(...).done(CALLBACK);`
+* `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY`.
 
 Returned values
-* `Promise` -  the call to `dna(...)` always returns jQuery [Deferred](https://api.jquery.com/category/deferred-object/) object that you can use to hook your callbacks onto immediately or anytime later.
+* `Promise` -  the call to `dna(...)` always returns jQuery [Promise](https://api.jquery.com/category/deferred-object/) object that you can use to hook your callbacks onto immediately or anytime later.
 * `Number` - the call to `dna.push(...)` returns the size of queue of commands waiting for resolution.
 
-Call ```dna.push()``` only if you are not sure if DNA is loaded. See section [Call DNA Before It Is Loaded](#Call-DNA-Before-It-Is-Loaded).
+Call ```dna.push()``` only if you are not sure if DNA is loaded. See section [Call DNA Before It Is Loaded](#call-dna-before-it-is-loaded). Good practice is to call it with a callback without any dependencies specified. This will call the callback immediatelly after DNA is loaded.
+
+```javascript
+var dna = dna || [];
+dna.push(function() { // On DNA load
+    dna(…);
+    …;
+});
+```
 
 ### Configuration
 
@@ -157,8 +165,7 @@ Configuration Objects are used to define dependencies and requirements.
     'proto': PROTO,
     'service': SERVICE,
     'require': REQUIRE,
-    'load': LOAD,
-    'type': TYPE
+    'load': LOAD
 }
 ```
 Where
@@ -166,14 +173,13 @@ Where
 * `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution.
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in core it will do `dna[SERVICE]=new PROTO;`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
-* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#Load-Optimizations)) files to be loaded and parsed/executed.
-* `TYPE`:`String` NOT IMPLEMENTED YET. Default: "`dna`". Keyword "`amd`" will indicate that scripts described by this Configuration conform to [AMD Specification](https://github.com/amdjs/amdjs-api/wiki/AMD).
+* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
 #### Registering Configurations
 
-Just pass the Configuration Object or URL pointing to JSON file with Configuration Objects to `dna()` method. See [syntax](#Syntax) section for more. Examples:
+Just pass the Configuration Object or URL pointing to JSON file with Configuration Objects to `dna()` method. See [syntax](#syntax) section for more. Examples:
 
 ```javascript
 dna( '/dna.json' );
