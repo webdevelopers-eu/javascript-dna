@@ -29,8 +29,8 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 
 ## Usage
 
-1. Include this script in your page `<script src=".../dna.js"></script>`
-2. Define your javascript objects and dependencies
+- Include this script in your page `<script src=".../dna.js"></script>`
+- Define your javascript objects and dependencies
 ```javascript
 dna({
      'id': 'my:object1',
@@ -41,7 +41,7 @@ dna({
      'load': '/myobject2.js'
   });
 ```
-3. Execute your callback after everything is loaded and executed
+- Execute your callback after everything is loaded and executed
 ```javascript
 dna('my:object1', function() {do();});
 ```
