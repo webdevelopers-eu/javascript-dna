@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script id="test11" type="text/javascript">
+      window.loadRegistry = window.loadRegistry || {};
+
+      function Test11() {
+          console.log('TEST: Service of class Test11 initialized.');
+      }
+
+      console.log('TEST: Proto Test11 loaded.');
+      if (window.loadRegistry[11]) {
+          window.testError('ERROR: Resource Test11 loaded twice!');
+      }
+      window.loadRegistry[11] = true;
+
+      dna('Test11'); // Recursive requirement test
+    </script>
+    <script id="test12" src="generator.php?12" type="text/javascript"> </script>
+  </body>
+</html>

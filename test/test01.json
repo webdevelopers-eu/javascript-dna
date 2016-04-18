@@ -1,0 +1,26 @@
+[
+    {
+        "service": "test6",
+        "proto": "Test6",
+        "require": [
+            "Test7"
+        ],
+        "load": [
+            "generator.php?6"
+        ]
+    },
+    {
+        "service": "test7",
+        "proto": "Test7",
+        "require": [
+            "test:8"
+        ],
+        "load": [
+            "./generator.php?7"
+        ]
+    },
+    {
+        "id": "test:8",
+        "load": "../test/generator.php?8"
+    }
+]
