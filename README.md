@@ -21,7 +21,6 @@ __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
   1. [Registering Configurations](#registering-configurations)
  1. [Examples](#examples)
 1. [Troubleshooting](#troubleshooting)
-1. [TODO](#todo)
 
 ## Motivation
 
@@ -267,6 +266,3 @@ MyApplication.prototype.start = function() {
 
 Watch the Javascript Console.
 
-## TODO
-- [ ] AMD compatibility
-- [ ] different evaluation context based on Configuration parameters (`{..., 'type': 'amd'}` etc.)
