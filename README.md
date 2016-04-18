@@ -33,7 +33,7 @@ Q: Why yet another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJ
 2. Define your javascript objects and dependencies
 ```javascript
 dna({
-     'id: 'my:object1',
+     'id': 'my:object1',
      'require': 'my:object2',
      'load': '/myobject1.js'
   }, {
