@@ -25,7 +25,7 @@ __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 
 ## Motivation
 
-Q: Why yet another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
+Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > A: In short because of FUCR (see the stated Goal above). Javascript DNA does not conform to AMD specification - it tries to make things much easier and more flexible.
 
 ## Usage
