@@ -176,7 +176,7 @@ Where
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
-#### Registering Configurations
+#### Register Configurations
 
 Just pass the Configuration Object or URL pointing to JSON file with Configuration Objects to `dna()` method. See [syntax](#syntax) section for more. Examples:
 
@@ -192,12 +192,14 @@ dna(
 
 ### Examples
 
+Mixed confugration using JSON file and inline Configuration Object + requiring service `dna.svc2` and prototype `dna.Svc1`:
 ```javascript
 dna('Svc1', 'svc2', '/configs/svcs.json', {'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']})
     .done(run)
     .fail(ups);
 ```
 
+Mixed order: first requiring `dna.Svc1` and `dna.svc2` and later loading required configurations.
 ```javascript
 dna(['Svc1', 'svc2'], run);
 
@@ -206,6 +208,7 @@ dna('/configs/svcs.json');
 dna({'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']});
 ```
 
+Making DNA calls before `dna.js` gets loaded using asynchronous `script` tag.
 ```
 <script>
   var dna = dna || [];
