@@ -213,7 +213,7 @@ Making DNA calls before `dna.js` gets loaded using asynchronous `script` tag.
 <script>
   var dna = dna || [];
   dna.push(function() { alert('DNA just loaded!'); });
-  dna.push([ 'svc', function(svc) { alert('Service "svc" is ready!'); } ]);
+  dna.push([ 'svc', function(svc) { alert('Service `dna.svc` is ready!'); } ]);
 </script>
 ...
 <script async src="/dna.js"></script>
