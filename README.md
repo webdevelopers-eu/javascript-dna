@@ -1,6 +1,6 @@
 # Javascript DNA
 
-Minimalist, jQuery based, simple to use, asynchronous script loader, dependency resolver and little bit more.
+Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver.
 
 It is sometimes referred to as *jDNA* or just *DNA*.
 
