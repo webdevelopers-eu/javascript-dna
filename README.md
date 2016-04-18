@@ -38,7 +38,7 @@ dna({
      'require': 'my:object2',
      'load': '/myobject1.js'
   }, {
-     'id: 'my:object2',
+     'id': 'my:object2',
      'load': '/myobject2.js'
   });
 ```
