@@ -4,22 +4,8 @@
  * Minimalistic asynchronous script loader, dependency resolver and
  * framework base. No bullshits.
  *
- * @author Daniel Sevcik <sevcik@webdevelopers.cz>
- *
- * TODO module.exports compatibility?
- * TODO don't eval in window context?
- *
- * dna.push() is alias for dna() to allow calls to dna() before it loads: var dna = dna || [];
- * dna('registry', 'widgets').done(function(reg, wdg) {...});
- * dna('registry').done(function(svc) {...});
- * dna('registry', reg => reg.load());
- * dna('registry', 'otherservice', (reg, srv) => {srv.load(); reg.load();});
- * dna(dnaJSON);
- * dna('service');
- * dna('/definitions.json', 'service1', [...def], {def}, callback);
- * dna.service;
- * dna.Proto;
- * dna['#id'];
+ * The MIT License (MIT)
+ * Copyright (c) 2016 Daniel Ševčík, www.webdevelopers.eu
  */
 'use strict';
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
