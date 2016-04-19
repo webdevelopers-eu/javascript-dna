@@ -10,7 +10,7 @@ dna.push({
 // Start standard tests
 dna.push(function() {
     var $table = $('<div class="list-group"></div>').appendTo('body');
-    var $main = $('<a href="?' + (new Date) + '#" class="list-group-item"><span class="label label-info" style="font-size: 3em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
+    var $main = $('<a href="?' + (new Date) + '#" class="list-group-item"><span class="label label-info" style="font-size: 2em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
     window.testError = function(text) {
         $('<div class="alert alert-danger"></div>').text(text).insertAfter($table);
     };
@@ -21,7 +21,7 @@ dna.push(function() {
         }
 
         seconds = seconds || 2;
-        var $result = $('<span class="label label-info" style="font-size: 1.5em;">⌛</span>');
+        var $result = $('<span class="label label-info" style="font-size: 1.2em;">⌛</span>');
         var $name = $('<span></span>').text(name);
         var details = 'timeout: ' + seconds + 's';
         var $li = $('<a class="list-group-item list-group-item-info"></a>')
