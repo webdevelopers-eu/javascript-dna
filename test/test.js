@@ -198,7 +198,7 @@ dna.push(function() {
     }
 
     // ------------------------------------------------------------------------
-    test = addTest('"dna" evaluation test.');
+    test = addTest('Evaluation test - dna');
     if (test) {
         var cb17 = [ test(false), test(true) ];
         window.dna({
@@ -213,7 +213,7 @@ dna.push(function() {
     }
 
     // ------------------------------------------------------------------------
-    test = addTest('"window" evaluation test.');
+    test = addTest('Evaluation test - window');
     if (test) {
         var cb18 = [ test(false), test(true) ];
         window.dna({
