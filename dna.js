@@ -148,8 +148,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *      [ "service": QNAME, ] // requires `proto` specified
      *      [ "proto": QNAME, ]
      *      [ "require": QNAME | ID | [ QNAME | ID, ... ], ]
-     *      [ "load": URL | URL#ID | [ URL | URL#ID, ... ] ]
-     *  },
+     *      [ "load": URL | URL#ID | [ URL | URL#ID, ... ], ]
+     *      [ "eval": "dna" | "window" ]
+     *  }
      */
     DNACore.prototype.configure = function(config, baseURL) {
         var idOK = false;
@@ -160,7 +161,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_]+$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
 
         if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
-        if (config.service && !config.proto) $.error('Service requires the `proto` property be specified: ' + JSON.stringify(config));
+        if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
 
         var initNames = [config.id, config.proto, config.service];
 
@@ -430,6 +431,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         default:
             $.error('Cannot parse opts. Unexpected match type "' + typeof match + '"');
         }
+        return false;
     };
 
 
@@ -466,15 +468,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
         config._dfd = dfd.promise();
 
+        promises.push(this.load(config, config.load || [])); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
         promises.push(requireMulti.call(this, [config.require], stack));
-        promises.push(this.load(config.load || []));
 
-        $.when.apply(this, promises).done(function() {
+        $.when.apply(this, promises).done(function(proto) {
             var val;
+
             // Install objects
             if (config.proto) {
-                if (window[config.proto]) {
-                    dna[config.proto] = window[config.proto];
+                if (proto) {
+                    dna[config.proto] = proto;
                 } else {
                     dfd.reject(new Error('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config)));
                 }
@@ -501,23 +504,45 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     };
 
 
-    DNACore.prototype.load = function() {
-        var urls = this.getOpts(arguments, [['urls', 'string'], 'recursive']).urls;
+    DNACore.prototype.load = function(config, urls) {
+        urls = this.getOpts(urls, [['urls', 'string'], 'recursive']).urls;
 
         var promises = [];
         urls.forEach(function(url) {
             promises.push(loadGetResource(url));
         });
 
-        var dfd = $.when.apply(this, promises)
-                .done(function() {
-                    $.makeArray(arguments).forEach(function(jsString) {
-                        window.eval(jsString);
-                    });
-                })
-                .fail(function() {
-                    console.log('Load failed', urls, arguments);
-                });
+        var evaluator, retStatement;
+        switch (config['eval'] || 'dna') {
+        case 'window':
+            evaluator = function(jsString) {
+                return window.eval(jsString);
+            };
+            retStatement = '\n; ' + (config.proto ? 'window["' + config.proto + '"]' : 'undefined');
+            break;
+        case 'dna':
+            evaluator = function(jsString) {
+                return eval(jsString);
+            };
+            retStatement = '\n; ' + (config.proto || 'undefined');
+            break;
+        default:
+            throw new Exception('Unknown evaluation type "' + config['eval'] + '" in config: ' + JSON.stringify(config));
+        }
+
+        var dfd = $.Deferred();
+        $.when.apply(this, promises)
+            .done(function() {
+                var proto = undefined;
+                for (var i = 0; i < arguments.length; i++) {
+                    proto = (evaluator(arguments[i] + retStatement)) || proto;
+                }
+                dfd.resolve(proto);
+            })
+            .fail(function() {
+                console.log('Load failed', urls, arguments);
+                dfd.reject.apply(this, arguments);
+            });
 
         return dfd;
     };

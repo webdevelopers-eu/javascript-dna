@@ -35,10 +35,12 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 dna({
      'id': 'my:object1',
      'require': 'my:object2',
-     'load': '/myobject1.js'
+     'load': '/myobject1.js',
+     'eval': 'window'
   }, {
      'id': 'my:object2',
-     'load': '/myobject2.js'
+     'load': '/myobject2.js',
+     'eval': 'window'
   });
 ```
 - Execute your callback after everything is loaded and executed
@@ -84,11 +86,13 @@ You can use `dna()` to load any script that was not directly written for DNA.
 ```javascript
 dna({
         'id': 'jquery',
-        'load': '/libs/jquery.min.js'
+        'load': '/libs/jquery.min.js',
+        'eval': 'window'
     }, {
         'id': 'jquery:iPop',
         'require': 'jquery',
-        'load': '/libs/jquery.ipop.js'
+        'load': '/libs/jquery.ipop.js',
+        'eval': 'window'
     });
 
 dna('jquery:iPop', callback);
@@ -100,7 +104,7 @@ You can define callbacks before you load configurations. DNA will delay your cal
 ```javascript
 dna('MyService').done(doSomething);
 
-dna({'id': 'MyService', 'load': ['my1.js', 'my2.js']}); // This will doSomething()
+dna({'proto': 'MyService', 'load': ['my1.js', 'my2.js']}); // This will doSomething()
 ```
 
 ## Load Optimizations
@@ -164,7 +168,8 @@ Configuration Objects are used to define dependencies and requirements.
     'proto': PROTO,
     'service': SERVICE,
     'require': REQUIRE,
-    'load': LOAD
+    'load': LOAD,
+    'eval': EVAL
 }
 ```
 Where
@@ -173,6 +178,7 @@ Where
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in core it will do `dna[SERVICE]=new PROTO;`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed.
+* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window`. Evaluation type `dna` evaluates the script in closure and expects the script to define variable of name specified in configuration's `proto` property. The value `window` evaluates the script using `window.eval()` method. Note: we can add `commonJS` and `requireJS` keywords later that will evaluate scripts to allow executing scripts from respective frameworks.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
@@ -182,10 +188,10 @@ Just pass the Configuration Object or URL pointing to JSON file with Configurati
 
 ```javascript
 dna( '/dna.json' );
-dna( {'id': 'test', 'load': '/file.js'} );
+dna( {'proto': 'Test', 'load': '/file.js'} );
 dna(
     '/dna.json',
-    {'id': 'test', 'load': '/file.js'},
+    {'proto': 'Test', 'load': '/file.js'},
     [ '/other.json', '/otherother.json' ]
 );
 ```
@@ -249,7 +255,8 @@ Contents of `/app/config.json` (relative paths are resolved relatively to JSON's
         'load': './my.js'
     }, {
         'id': 'app:base',
-        'load': ['./base/jquery.js', '/lib/bootstrap.js']
+        'load': ['./base/jquery.js', '/lib/bootstrap.js'],
+        'eval': 'window'
     }
 ]
 ```
@@ -269,4 +276,3 @@ MyApplication.prototype.start = function() {
 ## Troubleshooting
 
 Watch the Javascript Console.
-

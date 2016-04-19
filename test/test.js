@@ -197,4 +197,34 @@ dna.push(function() {
             .fail(test(false));
     }
 
+    // ------------------------------------------------------------------------
+    test = addTest('"dna" evaluation test.');
+    if (test) {
+        var cb17 = [ test(false), test(true) ];
+        window.dna({
+            'proto': 'Test17',
+            'load': distPath + 'test/generator.php?17',
+            'eval': 'dna'
+        }, 'Test17')
+            .done(function() {
+                dna.Test17 && !window.Test17 ? cb17[1]() : cb17[0]();
+            })
+            .fail(test(false));
+    }
+
+    // ------------------------------------------------------------------------
+    test = addTest('"window" evaluation test.');
+    if (test) {
+        var cb18 = [ test(false), test(true) ];
+        window.dna({
+            'proto': 'Test18',
+            'load': distPath + 'test/generator.php?18',
+            'eval': 'window'
+        }, 'Test18')
+            .done(function() {
+                dna.Test18 && window.Test18 ? cb18[1]() : cb18[0]();
+            })
+            .fail(test(false));
+    }
+
 });
