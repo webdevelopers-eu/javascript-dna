@@ -9,9 +9,10 @@ dna.push({
 
 // Start standard tests
 dna.push(function() {
-    var $table = $('<table border="1" style="max-width: 100%" style="white-space: nowrap;"><caption>DNA Test (<a href="?' + (new Date) + '#">all</a>)</caption></table>').appendTo('body');
+    var $table = $('<div class="list-group"></div>').appendTo('body');
+    var $main = $('<a href="?' + (new Date) + '#" class="list-group-item"><span class="label label-info" style="font-size: 3em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
     window.testError = function(text) {
-        $('<div style="color: red;"></div>').text(text).insertAfter($table);
+        $('<div class="alert alert-danger"></div>').text(text).insertAfter($table);
     };
 
     function addTest(name, seconds) {
@@ -20,14 +21,15 @@ dna.push(function() {
         }
 
         seconds = seconds || 2;
-        var $result = $('<td class="status" style="white-space: nowrap; font-weight: bold;"><i style="color: silver;">Waiting ' + seconds + ' sec...</i></td>');
-        var $name = $('<td style="white-space: nowrap;" class="name"></td>').append($('<a href="?' + (new Date) + '#!test=' + name + '"></a>').text(name));
-        var $details = $('<td class="details" style="color: gray; white-space: pre-wrap; font-style: fixed;"></td>').text('timeout: ' + seconds + 's');
-        var $tr = $('<tr></tr>')
+        var $result = $('<span class="label label-info" style="font-size: 1.5em;">⌛</span>');
+        var $name = $('<span></span>').text(name);
+        var details = 'timeout: ' + seconds + 's';
+        var $li = $('<a class="list-group-item list-group-item-info"></a>')
+                .attr('href', '?' + (new Date) + '#!test=' + name)
+                .attr('title', details)
                 .appendTo($table)
-                .append($result)
                 .append($name)
-                .append($details)
+                .append($result)
         ;
         var timer = setTimeout(function() {
             $result.css({'color': 'red'}).text('FAILED (timed out)');
@@ -36,12 +38,47 @@ dna.push(function() {
         var cb = function (retVal, args) {
             // console.log('Test callback "' + name + '": ' + JSON.stringify(retVal));
             clearTimeout(timer);
-            $details.text($details.text() + '; received value: ' + JSON.stringify(retVal));
-            $details.text($details.text() + '; arguments/types: ' + $.makeArray(args).map(function(x) {return $.type(x) == 'error' ? x.name + '[' + x.message + ']' : $.type(x);}).join(', ') + '; arguments/JSON: ' + JSON.stringify(args) + '');
+            $li.attr('title',
+                     $li.attr('title') + '; ' +
+                     'received value: ' + JSON.stringify(retVal) + '; ' +
+                     'arguments/types: ' + $.makeArray(args).map(function(x) {return $.type(x) == 'error' ? x.name + '[' + x.message + ']' : $.type(x);}).join(', ') + '; ' +
+                     'arguments/JSON: ' + JSON.stringify(args) +
+                     ''
+                    );
             if (retVal !== true) {
-                $result.css({'color': 'red'}).text('FAILED');
+                $result.text('✗');
+                $li
+                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
+                    .addClass('list-group-item-danger')
+                    .find('.label')
+                    .removeClass('label-info label-danger label-success')
+                    .addClass('label-danger')
+                    .text('✗');
             } else {
-                $result.css({'color': 'green'}).text('SUCCESS');
+                $li
+                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
+                    .addClass('list-group-item-success')
+                    .find('.label')
+                    .removeClass('label-info label-danger label-success')
+                    .addClass('label-success')
+                    .text('✓');
+            }
+            if ($('.list-group-item-danger, .alert-danger').length) {
+                $main
+                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
+                    .addClass('list-group-item-danger')
+                    .find('.label')
+                    .removeClass('label-info label-danger label-success')
+                    .addClass('label-danger')
+                    .text('✗');
+            } else if (!$('.list-group-item-info').length) {
+                $main
+                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
+                    .addClass('list-group-item-success')
+                    .find('.label')
+                    .removeClass('label-info label-danger label-success')
+                    .addClass('label-success')
+                    .text('✓');
             }
         };
 
