@@ -248,4 +248,22 @@ dna.push(function() {
             .fail(test(false));
     }
 
+    // ------------------------------------------------------------------------
+    test = addTest('Order of evaluations.');
+    if (test) {
+        var cb19 = [ test(false), test(true) ];
+        window.dna({
+            'id': 'Test19',
+            'load': [
+                distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=1.5',
+                distPath + 'test/generator.php?20&order[var]=orderTest19&order[id]=2&delay=0.0',
+                distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=1.5'
+                ]
+        }, 'Test19')
+            .done(function() {
+                cb19[window.orderTest19.join(' ') == '1 2 3' ? 1 : 0](window.orderTest19);
+            })
+            .fail(test(false));
+    }
+
 });
