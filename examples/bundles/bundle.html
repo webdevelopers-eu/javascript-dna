@@ -18,12 +18,8 @@
       message('Script #script2 evaluated from bundle.html file.');
     </script>
 
-    <script id="script3">
-      function Prototype3() {
-        message('Object created using function `Prototype3`');
-      }
-      message('Script #script3 evaluated from bundle.html file.');
-    </script>
+    <!-- You don't need to embed files here during production phase, just link them to devel folder. Embed scripts into this HTML file only when going to production. -->
+    <script id="script3" src="./script3.js"></script>
 
   </body>
 </html>
