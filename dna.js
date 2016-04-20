@@ -20,10 +20,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * @return {Promise}
      */
     var dna = function() {
+        var args = arguments;
         var dfd = $.Deferred()
-                .done(function() {$(window).trigger('dna:done', arguments);})
-                .fail(function() {$(window).trigger('dna:fail', arguments);})
-                .always(function() {$(window).trigger('dna:always', arguments);})
+                .done(function() {$(window).trigger('dna:done', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
+                .fail(function() {$(window).trigger('dna:fail', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
+                .always(function() {$(window).trigger('dna:always', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
         ;
         var opts = dna.core.getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
