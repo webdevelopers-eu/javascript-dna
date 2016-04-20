@@ -10,7 +10,7 @@ $(window).on('dna:fail', onError);
 $(function() {
     if (!$('.list-group.messages').length) {
         ($('.panel-body').length ? $('.panel-body') : $('body'))
-            .append('<div class="message-block"><h3>What\'s Going On In Here?</h3><ol class="list-group messages"></ol></div>');
+            .append('<div class="message-block"><h3>What Is Going On?</h3><ol class="list-group messages"></ol></div>');
     }
 
     message(); // flush buffer
