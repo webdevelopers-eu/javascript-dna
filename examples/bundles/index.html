@@ -29,7 +29,7 @@
                         '</ul>'
                         );
          });
-         message('Registered callback.', '<code>dna(\'service1\', function() {...});</code>');
+         message('Registered function requiring `dna.service1` object.', '<code>dna(\'service1\', function() {...});</code>');
 
         var config = [{
                 'service': 'service1',
@@ -45,7 +45,7 @@
                 'load': './bundle.html#script3'
         }];
         dna(config);
-        message('Registered config for "service1".', '<code>dna(' + JSON.stringify(config) + ')</code>');
+        message('Registered config defining "service1" and 2 its dependencies.', '<code>dna(' + JSON.stringify(config) + ')</code>');
 
       });
 

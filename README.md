@@ -178,7 +178,7 @@ Where
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in core it will do `dna[SERVICE]=new PROTO;`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed.
-* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window`. Evaluation type `dna` evaluates the script in closure and expects the script to define variable of name specified in configuration's `proto` property. The value `window` evaluates the script using `window.eval()` method. Note: we can add `commonJS` and `requireJS` keywords later that will evaluate scripts to allow executing scripts from respective frameworks.
+* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window`. Script evaluation type `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property. The value `window` evaluates the script using `window.eval()` method. Note: we can add `commonJS` and `requireJS` keywords later that will evaluate scripts to allow executing scripts from respective frameworks.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
@@ -276,3 +276,6 @@ MyApplication.prototype.start = function() {
 ## Troubleshooting
 
 Watch the Javascript Console.
+
+## ToDo
+- [ ] Document $(window) events 'dna:fail', 'dna:done', 'dna:always'

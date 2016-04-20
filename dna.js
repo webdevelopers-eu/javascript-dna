@@ -474,8 +474,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
         config._dfd = dfd.promise();
 
+        var requirePromises = requireMulti.call(this, [config.require], stack); // must be called before this.load(config), but promise added after it to load/execute scripts form deepest requirement first
         promises.push(this.load(config, config.load || [])); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
-        promises.push(requireMulti.call(this, [config.require], stack));
+        promises.push(requirePromises);
 
         $.when.apply(this, promises).done(function(proto) {
             var val;
@@ -569,7 +570,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             var $script = $('#' + parts[1], doc);
             var jsString = $.trim($script.text());
 
-            if (!jsString.length && $script.attr('src')) {
+            if (jsString.length) {
+                dfd.resolve(jsString + ' //# sourceURL=' + url);
+            } else if ($script.attr('src')) {
                 var linkURL = $script.get(0).src || $script.attr('src') ||
                         $script.get(0).href || $script.attr('href');
                 if (!linkURL) {
@@ -583,7 +586,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         dfd.reject.apply(this, $.makeArray(arguments));
                     });
             } else {
-                dfd.resolve(jsString + ' //# sourceURL=' + url);
+                dfd.reject(404, 'Cannot load script "' + url + '"');
             }
         };
 
