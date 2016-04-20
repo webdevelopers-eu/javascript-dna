@@ -474,12 +474,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
         config._dfd = dfd.promise();
 
-        var requirePromises = requireMulti.call(this, [config.require], stack); // must be called before this.load(config), but promise added after it to load/execute scripts form deepest requirement first
         promises.push(this.load(config, config.load || [])); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
-        promises.push(requirePromises);
+        promises.push(requireMulti.call(this, [config.require], stack));
 
-        $.when.apply(this, promises).done(function(proto) {
+        // @todo the proto must be array jsStrings - not object and we must evaluate them in order
+        $.when.apply(this, promises).done(function(scripts) {
             var val;
+            var proto = evaluateScripts(scripts);
 
             // Install objects
             if (config.proto) {
@@ -519,32 +520,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             promises.push(loadGetResource(url));
         });
 
-        var evaluator, retStatement;
-        switch (config['eval'] || 'dna') {
-        case 'window':
-            evaluator = function(jsString) {
-                return window.eval(jsString);
-            };
-            retStatement = '\n; ' + (config.proto ? 'window["' + config.proto + '"]' : 'undefined');
-            break;
-        case 'dna':
-            evaluator = function(jsString) {
-                return eval(jsString);
-            };
-            retStatement = '\n; ' + (config.proto || 'undefined');
-            break;
-        default:
-            throw new Exception('Unknown evaluation type "' + config['eval'] + '" in config: ' + JSON.stringify(config));
-        }
-
         var dfd = $.Deferred();
         $.when.apply(this, promises)
             .done(function() {
-                var proto = undefined;
+                var scripts = [];
                 for (var i = 0; i < arguments.length; i++) {
-                    proto = (evaluator(arguments[i] + retStatement)) || proto;
+                    scripts.push({'jsString': arguments[i], 'config': config});
                 }
-                dfd.resolve(proto);
+                dfd.resolve(scripts);
             })
             .fail(function() {
                 console.log('DNA: Load failed', urls, arguments);
@@ -553,6 +536,36 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         return dfd;
     };
+
+    function evaluateScripts(scripts) {
+        var proto;
+        for (var i = 0; i < scripts.length; i++) {
+            proto = evaluate(scripts[i].jsString, scripts[i].config.eval, scripts[i].config.proto) || proto;
+        }
+        return proto;
+    }
+
+    function evaluate(jsString, type, protoName) {
+        var evaluator, retStatement;
+
+        switch (type || 'dna') {
+        case 'window':
+            evaluator = function(jsString) {
+                return window.eval(jsString);
+            };
+            retStatement = '\n; ' + (protoName ? 'window["' + protoName + '"]' : 'undefined');
+            break;
+        case 'dna':
+            evaluator = function(jsString) {
+                return eval(jsString);
+            };
+            retStatement = '\n; ' + (protoName || 'undefined');
+            break;
+        default:
+            throw new Exception('Unknown evaluation type "' + type + '"');
+        }
+        return evaluator(jsString + retStatement);
+    }
 
     function loadGetResource(url) {
         var dfd = $.Deferred();
