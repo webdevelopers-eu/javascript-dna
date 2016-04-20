@@ -1,0 +1,32 @@
+.messages {
+ counter-reset: msgNo;
+}
+.message:before {
+  counter-increment: msgNo;
+  content: counter(msgNo);
+  color: silver;
+  display: block;
+  float: left;
+  width: 2em;
+  text-align: right;
+  margin-right: 1em;
+}
+
+.message-time {
+    float: right;
+    opacity: 0.3;
+}
+
+.message-main {
+    padding-right: 1em;
+}
+
+.message-detail {
+    padding-right: 1em;
+    opacity: 0.7;
+    margin-left: 6em;
+}
+
+.message-detail, .message-main {
+    display: block;
+}
