@@ -20,7 +20,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * @return {Promise}
      */
     var dna = function() {
-        var dfd = $.Deferred();
+        var dfd = $.Deferred()
+                .done(function() {$(window).trigger('dna:done', arguments);})
+                .fail(function() {$(window).trigger('dna:fail', arguments);})
+                .always(function() {$(window).trigger('dna:always', arguments);})
+        ;
         var opts = dna.core.getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
             ['jsonURLs', /[.\/]/],
@@ -154,6 +158,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      */
     DNACore.prototype.configure = function(config, baseURL) {
         var idOK = false;
+        config = $.extend({}, config); // clone it so later modification to the object does not do mass
 
         // IDs must not contain [./] because we recognize dna()'s URLs by those characters
         if (config.id) idOK = validateString(config.id, /^[a-z0-9:_-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
@@ -540,7 +545,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 dfd.resolve(proto);
             })
             .fail(function() {
-                console.log('Load failed', urls, arguments);
+                console.log('DNA: Load failed', urls, arguments);
                 dfd.reject.apply(this, arguments);
             });
 
