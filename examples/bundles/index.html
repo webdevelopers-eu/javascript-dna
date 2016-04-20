@@ -16,40 +16,45 @@
 
     <script type="text/javascript">
       /*<![CDATA[*/
-      var dna = dna || [];
-      dna.push(function() { // Run the code as soon as DNA loads
 
-         // Specify method that requires dna.service1 be loaded
-         dna('service1', function() {
-             message('Gotcha! Your code can run now - all dependencies resolved.',
+        var dna = dna || [];
+        dna.push(function() { // Run the code as soon as DNA loads
+        
+            // Specify method that requires dna.service1 be loaded
+            dna('service1', function() {
+                message('Gotcha! Your code can run now - all dependencies resolved.',
                         '<ul>' +
                         '<li><code>dna.service1 = new (' + dna.Prototype1.toString() + '):' + $.type(dna.service1) + '</code></li>' +
                         '<li><code>dna.Prototype1 = ' + dna.Prototype1.toString() + '</code></li>' +
                         '<li><code>dna.Prototype2 = ' + dna.Prototype2.toString() + '</code></li>' +
                         '<li><code>dna.Prototype3 = ' + dna.Prototype3.toString() + '</code></li>' +
                         '</ul>'
-                        );
-         });
-         message('Registered function requiring `dna.service1` object.', '<code>dna(\'service1\', function() {...});</code>');
-
-         // Throw in configurations that define dna.service1 and its dependencies
-         var config = [{
-                 'service': 'service1',
-                 'proto': 'Prototype1',
-                 'require': 'Prototype2',
-                 'load': './bundle.html#script1'
-         }, {
-                 'proto': 'Prototype2',
-                 'require': 'Prototype3',
-                 'load': './bundle.html#script2'
-         }, {
-                 'proto': 'Prototype3',
-                 'load': './bundle.html#script3'
-         }];
-         dna(config); // Feed it to DNA
-         message('Registered config defining "service1" and 2 its dependencies.', '<code>dna(' + JSON.stringify(config) + ')</code>');
-
-      });
+                       );
+            });
+            message('Registered function requiring `dna.service1` object.', '<code>dna(\'service1\', function() {...});</code>');
+        
+            // Throw in configurations that define dna.service1 and its dependencies
+            var config = [{
+                'service': 'service1',
+                'proto': 'Prototype1',
+                'require': 'Prototype2',
+                'load': './bundle.html#script1'
+            }, {
+                'proto': 'Prototype2',
+                'require': 'Prototype3',
+                'load': './bundle.html#script2'
+            }, {
+                'proto': 'Prototype3',
+                'load': './bundle.html#script3'
+            }];
+            dna(config); // Feed it to DNA
+            message('Registered config defining "service1" and 2 its dependencies.', 
+                    '<code>dna(' + JSON.stringify(config[0]) + ')</code><br/>' +
+                    '<code>dna(' + JSON.stringify(config[1]) + ')</code><br/>' +
+                    '<code>dna(' + JSON.stringify(config[2]) + ')</code><br/>'
+                   );
+        
+        });
 
      /*]]>*/
     </script>
