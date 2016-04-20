@@ -15,6 +15,24 @@ dna.push(function() {
         $('<div class="alert alert-danger"></div>').text(text).insertAfter($table);
     };
 
+    function markItem($item, success) {
+        $item
+            .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
+            .addClass(success ? 'list-group-item-success' : 'list-group-item-danger')
+            .find('.label')
+            .removeClass('label-info label-danger label-success')
+            .addClass(success ? 'label-success' : 'label-danger')
+            .text(success ? '✓' : '✗');
+
+        if (!$item.is($main)) {
+            if ($('.list-group-item-danger, .alert-danger').length) {
+                markItem($main, false);
+            } else if (!$('.list-group-item-info').length) {
+                markItem($main, true);
+            }
+        }
+    }
+
     function addTest(name, seconds) {
         if (location.hash.match(/^#!test=/) && location.hash != '#!test=' + name) {
             return false;
@@ -32,7 +50,7 @@ dna.push(function() {
                 .append($result)
         ;
         var timer = setTimeout(function() {
-            $result.css({'color': 'red'}).text('FAILED (timed out)');
+            markItem($li, false);
         }, seconds * 1000);
 
         var cb = function (retVal, args) {
@@ -45,41 +63,7 @@ dna.push(function() {
                      'arguments/JSON: ' + JSON.stringify(args) +
                      ''
                     );
-            if (retVal !== true) {
-                $result.text('✗');
-                $li
-                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
-                    .addClass('list-group-item-danger')
-                    .find('.label')
-                    .removeClass('label-info label-danger label-success')
-                    .addClass('label-danger')
-                    .text('✗');
-            } else {
-                $li
-                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
-                    .addClass('list-group-item-success')
-                    .find('.label')
-                    .removeClass('label-info label-danger label-success')
-                    .addClass('label-success')
-                    .text('✓');
-            }
-            if ($('.list-group-item-danger, .alert-danger').length) {
-                $main
-                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
-                    .addClass('list-group-item-danger')
-                    .find('.label')
-                    .removeClass('label-info label-danger label-success')
-                    .addClass('label-danger')
-                    .text('✗');
-            } else if (!$('.list-group-item-info').length) {
-                $main
-                    .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
-                    .addClass('list-group-item-success')
-                    .find('.label')
-                    .removeClass('label-info label-danger label-success')
-                    .addClass('label-success')
-                    .text('✓');
-            }
+            markItem($li, retVal);
         };
 
         return function(retVal, argTypes) {
