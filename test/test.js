@@ -249,15 +249,15 @@ dna.push(function() {
     }
 
     // ------------------------------------------------------------------------
-    test = addTest('Order of evaluations.');
+    test = addTest('Order of evaluations.', 5);
     if (test) {
         var cb19 = [ test(false), test(true) ];
         window.dna({
             'id': 'Test19',
             'load': [
-                distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=1.5',
+                distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=4.0',
                 distPath + 'test/generator.php?20&order[var]=orderTest19&order[id]=2&delay=0.0',
-                distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=1.5'
+                distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=3.0'
                 ]
         }, 'Test19')
             .done(function() {
