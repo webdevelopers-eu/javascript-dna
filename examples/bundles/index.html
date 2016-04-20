@@ -22,7 +22,7 @@
         
             // Specify method that requires dna.service1 be loaded
             dna('service1', function() {
-                message('Gotcha! Your code can run now - all dependencies resolved.',
+                message('Gotcha! Your code can run now - all dependencies resolved, service created, prototypes exported to `dna` object.',
                         '<ul>' +
                         '<li><code>dna.service1 = new (' + dna.Prototype1.toString() + '):' + $.type(dna.service1) + '</code></li>' +
                         '<li><code>dna.Prototype1 = ' + dna.Prototype1.toString() + '</code></li>' +

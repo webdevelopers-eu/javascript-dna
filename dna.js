@@ -157,7 +157,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *      [ "eval": "dna" | "window" ]
      *  }
      */
-    DNACore.prototype.configure = function(config, baseURL) {
+    DNACore.prototype.configure = function(config) {
         var idOK = false;
         config = $.extend({}, config); // clone it so later modification to the object does not do mass
 
@@ -285,7 +285,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     c.load = [c.load];
                 }
                 return c;
-                break;
             }
         }
         return null;
