@@ -552,18 +552,18 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             evaluator = function(jsString) {
                 return window.eval(jsString);
             };
-            retStatement = '\n; ' + (protoName ? 'window["' + protoName + '"]' : 'undefined');
+            retStatement = (protoName ? 'window["' + protoName + '"]' : 'undefined');
             break;
         case 'dna':
             evaluator = function(jsString) {
                 return eval(jsString);
             };
-            retStatement = '\n; ' + (protoName || 'undefined');
+            retStatement = (protoName || 'undefined');
             break;
         default:
             throw new Exception('Unknown evaluation type "' + type + '"');
         }
-        return evaluator(jsString + retStatement);
+        return evaluator(jsString + '\n;\n/* Javascript DNA: Compat Layer */\n' + retStatement);
     }
 
     function loadGetResource(url) {
