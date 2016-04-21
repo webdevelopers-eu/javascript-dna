@@ -8,6 +8,8 @@ __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 
 ## Table of Contents
 
+1. [Motivation](#motivation)
+1. [Features](#features)
 1. [Usage](#usage)
 1. [Tricks](#tricks)
  1. [Call DNA Before It Is Loaded](#call-dna-before-it-is-loaded)
@@ -26,6 +28,16 @@ __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 
 Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > A: In short because of FUCR (see the stated Goal above). Javascript DNA does not conform to AMD specification - it tries to make things much easier and more flexible.
+
+## Features
+
+- [x] jQuery based
+- [x] 100% asynchronous - scripts are loaded in random order yet evaluation order is guaranteed.
+- [x] Out-of-order calls - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
+- [x] Bundles - intuitive HTML-like bundling of many scripts into one HTML file for faster download while being able to parse/extract only selected scripts.
+- [x] Simple API - all you need is just one method `dna(...)` that's it. You can feed it arguments in any order or even arrays of arguments.
+- [x] Optimized - small and fast with minified size just about 9.5kB.
+- [x] Easy debugging - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 
 ## Usage
 
@@ -177,7 +189,7 @@ Where
 * `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution.
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in core it will do `dna[SERVICE]=new PROTO;`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
-* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed.
+* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window`. Script evaluation type `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property. The value `window` evaluates the script using `window.eval()` method. Note: we can add `commonJS` and `requireJS` keywords later that will evaluate scripts to allow executing scripts from respective frameworks.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
