@@ -266,4 +266,21 @@ dna.push(function() {
             .fail(test(false));
     }
 
+    // ------------------------------------------------------------------------
+    test = addTest('Proto aliases.', 5);
+    if (test) {
+        window.dna({
+            'proto': 'Test22=Alias22=Alias22:v2=Alias22:v1',
+            'load': distPath + 'test/generator.php?22'
+        }, 'Alias22:v2')
+            .done(function() {
+                if (!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1']) {
+                    test(true)();
+                } else {
+                    test(false)();
+                }
+            })
+            .fail(test(false));
+    }
+
 });

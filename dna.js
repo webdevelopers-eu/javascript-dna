@@ -164,30 +164,35 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         // IDs must not contain [./] because we recognize dna()'s URLs by those characters
         if (config.id) idOK = validateString(config.id, /^[a-z0-9:_-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
         if (config.service) idOK = validateString(config.service, /^[a-z][a-zA-Z0-9_]+$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
-        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_]+$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
+        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_:=]+$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
 
         if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
         if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
 
-        var initNames = [config.id, config.proto, config.service];
-
-        initNames.forEach(function (name) {
-            if (name) {
-                if (typeof dna[name] == 'undefined') {
-                    dna[name] = null;
-                } else {
-                    $.error('DNA: ' +
-                                    'Conflicting name `' + name + '` / ' +
-                                    'redundand Config registration while registering config: ' + JSON.stringify(config) + '; ' +
-                                    'conflicting config exists: ' + JSON.stringify(dna.core.getConfig(name)) + '. ' +
-                                    'Note: All `id`, `proto` and `service` names must be unique accross the board.'
-                                   );
-                }
-            }
-        });
-
-        // Cleanup - we reserve some properties for ourselves
+        // Cleanup - we reserve some properties for ourselves - not
+        // sure if .configure should have more cleanup I moved cleanup
+        // in .getConfig() because we may have hundreds of configs but
+        // only few may be really used on the page so only basic clean
+        // up here and more thorough in .getConfig()
         delete config._dfd;
+        config.proto = config.proto ? config.proto.split('=') : []; // support aliasing Proto=Alias=Alias2...
+
+        [config.id, config.service]
+            .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
+            .forEach(function (name) {
+                if (name) {
+                    if (typeof dna[name] == 'undefined') {
+                        dna[name] = null;
+                    } else {
+                        $.error('DNA: ' +
+                                'Conflicting name `' + name + '` / ' +
+                                'redundand Config registration while registering config: ' + JSON.stringify(config) + '; ' +
+                                'conflicting config exists: ' + JSON.stringify(dna.core.getConfig(name)) + '. ' +
+                                'Note: All `id`, `proto` and `service` names must be unique accross the board.'
+                               );
+                    }
+                }
+            });
 
         this.configs.push(config);
     };
@@ -207,7 +212,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         stack = stack || [];
         for (var i in requirements) {
             if ($.inArray(requirements[i], stack) !== -1) {
-                throw new Error('DNA: Recursive requirement loop: ' + stack.join(' > ') + ' > ' + requirements[i] );
+                throw new DNAError('DNA: Recursive requirement loop: ' + stack.join(' > ') + ' > ' + requirements[i] );
             }
             var config = this.getConfig(requirements[i]);
 
@@ -270,7 +275,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNACore.prototype.getConfig = function (name) {
         for (var i = 0; i < this.configs.length; i++) {
             var c = this.configs[i];
-            if (c.id == name || c.proto == name || c.service == name) {
+            if (c.id == name || c.service == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
                 if (c.baseURL) { // we will resolve it on get rather then on load because on load it may never be used so it could waste CPU resources
                     c.load = dna.core
                         .getOpts(c.load, [['urls', 'string'], 'recursive'])
@@ -482,15 +487,17 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             var proto = evaluateScripts(scripts);
 
             // Install objects
-            if (config.proto) {
+            if (config.proto[0]) {
                 if (proto) {
-                    dna[config.proto] = proto;
+                    $.each(config.proto.slice(config.proto.length > 1 ? 1 : 0), function(k, v) {
+                        dna[v] = proto;
+                    });
                 } else {
-                    dfd.reject(new Error('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config)));
+                    dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config)));
                 }
             }
-            if (config.proto && config.service) {
-                dna[config.service] = new dna[config.proto];
+            if (proto && config.service) {
+                dna[config.service] = new proto;
             }
             if (config.id == name) {
                 val = config;
@@ -501,7 +508,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             if (val) {
                 dfd.resolve(val);
             } else {
-                dfd.reject(new Error('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config)));
+                dfd.reject(new DNAError('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config)));
             }
         }).fail(function() {
             dfd.reject.apply(this, $.makeArray(arguments));
@@ -539,7 +546,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     function evaluateScripts(scripts) {
         var proto;
         for (var i = 0; i < scripts.length; i++) {
-            proto = evaluate(scripts[i].jsString, scripts[i].config.eval, scripts[i].config.proto) || proto;
+            proto = evaluate(scripts[i].jsString, scripts[i].config.eval, scripts[i].config.proto[0]) || proto;
         }
         return proto;
     }
@@ -561,7 +568,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             retStatement = (protoName || 'undefined');
             break;
         default:
-            throw new Exception('Unknown evaluation type "' + type + '"');
+            throw new DNAError('Unknown evaluation type "' + type + '"');
         }
         return evaluator(jsString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
     }
@@ -588,7 +595,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 var linkURL = $script.get(0).src || $script.attr('src') ||
                         $script.get(0).href || $script.attr('href');
                 if (!linkURL) {
-                    dfd.reject(new Error('The script "' + url + '" has no contents and no reference to other external resource.'));
+                    dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.'));
                 }
                 loadGetResource(dna.core.resolveURL(linkURL, url))
                     .done(function() {
@@ -635,6 +642,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         return dna.core.resources[url];
     };
+
+    function DNAError(message) {
+        this.name = 'DNAError';
+        this.message = message || 'Ups!';
+        this.stack = (new Error()).stack;
+        console.log('DNAError: ' + message, this.stack);
+    }
+    DNAError.prototype = Object.create(Error.prototype);
+    DNAError.prototype.constructor = DNAError;
+
 
     dna.DNACore = DNACore;
     dna.core = new DNACore;
