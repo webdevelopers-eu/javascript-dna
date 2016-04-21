@@ -31,13 +31,13 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 
 ## Features
 
-- [x] jQuery based
-- [x] 100% asynchronous - scripts are loaded in random order yet evaluation order is guaranteed.
-- [x] Out-of-order calls - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
-- [x] Bundles - intuitive HTML-like bundling of many scripts into one HTML file for faster download while being able to parse/extract only selected scripts.
-- [x] Simple API - all you need is just one method `dna(...)` that's it. You can feed it arguments in any order or even arrays of arguments.
-- [x] Optimized - small and fast with minified size just about 9.5kB.
-- [x] Easy debugging - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
+- [x] __jQuery__ based
+- [x] __100% asynchronous__ - scripts are loaded in random order yet evaluation order is guaranteed.
+- [x] __Out-of-order calls__ - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
+- [x] __Bundles__ - intuitive HTML-like bundling of many scripts into one HTML file for faster download while being able to parse/extract only selected scripts.
+- [x] __Simple API__ - all you need is just one method `dna(...)` that's it. You can feed it arguments in any order or even arrays of arguments.
+- [x] __Optimized__ - small and fast with minified size just about 9.5kB.
+- [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 
 ## Usage
 
