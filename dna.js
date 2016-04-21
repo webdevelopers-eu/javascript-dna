@@ -563,7 +563,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         default:
             throw new Exception('Unknown evaluation type "' + type + '"');
         }
-        return evaluator(jsString + '\n;\n/* Javascript DNA: Compat Layer */\n' + retStatement);
+        return evaluator(jsString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
     }
 
     function loadGetResource(url) {
