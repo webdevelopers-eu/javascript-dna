@@ -1,8 +1,6 @@
-# Javascript DNA
+# Javascript DNA / jDNA
 
 Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver.
-
-It is sometimes referred to as *jDNA* or just *DNA*.
 
 __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 
