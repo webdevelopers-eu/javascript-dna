@@ -90,7 +90,7 @@ function MyFunction1() { alert('Hello world! #1'); }
 ```
 File `/myfunction2.js`
 ```javascript
-function MyFunction1() { alert('Hello world! #2'); }
+function MyFunction2() { alert('Hello world! #2'); }
 ```
 Execute your callback after DNA exports your `MyFunction1` and `MyFunction2` function prototypes into `dna` object:
 ```javascript
