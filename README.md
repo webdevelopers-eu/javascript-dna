@@ -35,7 +35,7 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > A: In short because of FUCR (see the stated Goal above). Javascript DNA does not conform to AMD specification - it tries to make things much easier and more flexible.
 
 Q: That's it, really?
-> A: And I wanted clean system that will understand simple files containing clean (future) ECMA6 class declarations without any `define()` and `module.export=` trash code. Something you are used to from other languages. Something I can declare dependencies using required __class names__ rather then cryptic ids or paths or combinations. Something like:
+> A: And I wanted clean system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export=` trash code. Something you are used to from other languages. Something I can declare dependencies using required __class names__ rather then cryptic ids or paths or combinations. Something like:
 ```javascript
 // My file.js
 class Point extends Geometry {
