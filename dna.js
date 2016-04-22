@@ -481,7 +481,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         promises.push(this.load(config, config.load || [])); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
         promises.push(requireMulti.call(this, [config.require], stack));
 
-        // @todo the proto must be array jsStrings - not object and we must evaluate them in order
         $.when.apply(this, promises).done(function(scripts) {
             var val;
             var proto = evaluateScripts(scripts);
