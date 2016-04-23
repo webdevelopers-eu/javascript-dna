@@ -31,7 +31,7 @@ Minimalist, jQuery based, simple to use, asynchronous script loader and dependen
 ## Motivation
 
 Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
-> A: There was a need for clean system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or paths. Something like:
+> A: There was a need for clean system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or paths. Something like
 ```javascript
 // My file.js
 class Point extends Geometry {
@@ -43,7 +43,7 @@ class Point extends Geometry {
     }
 }
 ```
-> that can be used in code elegantly like this
+> that can be intuitively required in the code by
 ```javascript
 dna(
     'Point',
