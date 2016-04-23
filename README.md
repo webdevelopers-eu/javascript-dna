@@ -82,7 +82,7 @@ Create files with your javascript classes:
 
 File `/my/func1.js`
 ```javascript
-function MyFunc1() { new MyFunc2; }
+function MyFunc1() { new dna.MyFunc2; }
 ```
 File `/my/func2.js`
 ```javascript
@@ -90,7 +90,7 @@ function MyFunc2() { alert('Hello world!'); }
 ```
 Execute your callback after DNA exports your `MyFunc1` and `MyFunc2` function prototypes into `dna` object:
 ```javascript
-dna('MyFunc1', function() { console.log(dna.MyFunc1, dna.MyFunc2); });
+dna('MyFunc1', function() { new dna.MyFunc1; });
 ```
 
 ## Syntax
