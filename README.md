@@ -3,7 +3,7 @@
 Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver that will
 - dramatically __optimize__ the loading speed of many scripts
 - bring __order__ into your big web app
-- allow you to define __clean__ Javascript classes (prototypes) the way you always wanted it - without any `define()` or `module.exports` auxiliary trash
+- allow you to define __clean__ Javascript classes (prototypes) the way you always wanted to - without any `define()` or `module.exports` auxiliary trash
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
