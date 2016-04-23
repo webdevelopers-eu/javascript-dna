@@ -43,11 +43,12 @@ class Point extends Geometry {
     }
 }
 ```
-> that I will use elegantly like this
+> that can be used in code elegantly like this
 ```javascript
-dna('Point', function() {
-    console.log('My `Point` class is available:', new dna.Point(10, 20));
-});
+dna(
+    'Point',
+    function() { console.log('My `Point` class is available:', new dna.Point(10, 20)); }
+   );
 ```
 
 ## Features
