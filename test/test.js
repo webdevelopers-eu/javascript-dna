@@ -69,7 +69,7 @@ dna.push(function() {
         return function(retVal, argTypes) {
             if (!argTypes) argTypes = [];
             return function() {
-                for (let i in argTypes) {
+                for (var i in argTypes) {
                     if ($.type(arguments[i]) != argTypes[i]) {
                         cb('error: unexpected arguments - expected: ' + argTypes.join(', ') + '', arguments);
                         return;
