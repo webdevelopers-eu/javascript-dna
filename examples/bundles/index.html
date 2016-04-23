@@ -19,7 +19,7 @@
 
         var dna = dna || [];
         dna.push(function() { // Run the code as soon as DNA loads
-        
+
             // Specify method that requires dna.service1 be loaded
             dna('service1', function() {
                 message('Gotcha! Your code can run now - all dependencies resolved, service created, prototypes exported to `dna` object.',
@@ -32,7 +32,7 @@
                        );
             });
             message('Registered function requiring `dna.service1` object.', '<code>dna(\'service1\', function() {...});</code>');
-        
+
             // Throw in configurations that define dna.service1 and its dependencies
             var config = [{
                 'service': 'service1',
@@ -48,25 +48,16 @@
                 'load': './bundle.html#script3'
             }];
             dna(config); // Feed it to DNA
-            message('Registered config for "service1" and two its dependencies.', 
+            message('Registered config for "service1" and two its dependencies.',
                     '<code>dna(' + JSON.stringify(config[0]) + ')</code><br/>' +
                     '<code>dna(' + JSON.stringify(config[1]) + ')</code><br/>' +
                     '<code>dna(' + JSON.stringify(config[2]) + ')</code><br/>'
                    );
-        
+
         });
 
      /*]]>*/
     </script>
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Javascript DNA Example: Bundles</h3>
-      </div>
-      <div class="panel-body">
-
-      </div>
-    </div>
 
   </body>
 </html>

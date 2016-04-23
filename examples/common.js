@@ -9,7 +9,9 @@ $(window).on('dna:fail', onError);
 
 $(function() {
     if (!$('.list-group.messages').length) {
-        ($('.panel-body').length ? $('.panel-body') : $('body'))
+        $('body')
+            .append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">Javascript DNA / Examples</h3></div><div class="panel-body"></div></div>');
+        $('.panel-body')
             .append('<div class="message-block"><h3>What Is Going On?</h3><ol class="list-group messages"></ol></div>');
     }
 
