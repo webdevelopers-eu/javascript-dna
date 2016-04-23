@@ -101,7 +101,7 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ):N
 ```
 
 * `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
-* `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration) section.
+* `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration-object) section.
 * `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file.
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY`.
@@ -110,7 +110,7 @@ Returned values
 * `Promise` -  the call to `dna(...)` always returns jQuery [Promise](https://api.jquery.com/category/deferred-object/) object that you can use to hook your callbacks onto immediately or anytime later.
 * `Number` - the call to `dna.push(...)` returns the size of queue of commands waiting for resolution.
 
-Call ```dna.push()``` only if you are not sure if DNA is loaded. See section [Call DNA Before It Is Loaded](#call-dna-before-it-is-loaded). Good practice is to call it with a callback without any dependencies specified. This will call the callback immediatelly after DNA is loaded.
+Call ```dna.push()``` only if you are not sure if DNA is loaded. See section [Call DNA Before It Loads](#call-dna-before-it-loads). Good practice is to call it with a callback without any dependencies specified. This will call the callback immediatelly after DNA is loaded.
 
 ```javascript
 var dna = dna || [];
@@ -261,7 +261,7 @@ MyApplication.prototype.start = function() {
 
 There are many ways how to leverage the strength of DNA in your project.
 
-### Call DNA Before It Is Loaded
+### Call DNA Before It Loads
 
 You can make DNA calls even before DNA was loaded.
 
