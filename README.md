@@ -88,7 +88,7 @@ File `/my/func2.js`
 ```javascript
 function MyFunc2() { alert('Hello world!'); }
 ```
-Execute your callback after DNA exports your `MyFunc1` and `MyFunc2` function prototypes into `dna` object:
+Execute your function after DNA exports `MyFunc1` and its requirement `MyFunc2` prototypes as `dna` properties:
 ```javascript
 dna('MyFunc1', function() { new dna.MyFunc1; });
 ```
