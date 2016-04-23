@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Simple Example - Javascript DNA</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link type="text/css" rel="stylesheet" href="../common.css"/>
+    <link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="../common.js"></script>
+    <script defer="defer" src="../../dna.js"></script>
+  </head>
+
+  <body>
+
+    <script type="text/javascript">
+      /*<![CDATA[*/
+
+        var dna = dna || []; // If dna is not loaded yet then create surrogate object instead (DNA will later deal with it)
+        dna.push(function() { // Run the code as soon as DNA loads
+
+            dna('Class1', function() { // Say that this function requires 'Class1' to be loaded first
+                message('Gotcha! All classes loaded.', '<i>We requested <code>dna.Class1</code> which required <code>dna.Class2</code> which required <code>dna.Class3</code></i>');
+            });
+
+
+            var config = [{
+                'proto': 'Class1',
+                'require': 'Class2',
+                'load': './class1.js'
+            }, {
+                'proto': 'Class2',
+                'require': 'Class3',
+                'load': './class2.js'
+            }, {
+                'proto': 'Class3',
+                'load': './class3.js'
+            }];
+
+            dna(config); // Feed it to DNA
+        });
+
+     /*]]>*/
+    </script>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Javascript DNA Example: Bundles</h3>
+      </div>
+      <div class="panel-body">
+
+      </div>
+    </div>
+
+  </body>
+</html>
+</html>
