@@ -58,7 +58,7 @@ dna('Point', function() {
 ## Features
 
 - [x] __Simple API__ - all you need is just one method `dna(...)`. That's really it. There is not more to it.
-- [x] __Bundles__ - optional HTML-like script archives capable of accommodating dozens of scripts that are fast to download and don't carry unnecessary burden on browser script parsers.
+- [x] __Bundles__ - optional script archives capable of accommodating dozens of scripts that are fast to download and don't carry unnecessary burden on browser's internal script parser.
 - [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Out-of-order calls__ - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
 - [x] __Optimized__ - small and fast with minified size just about 9.5kB.
