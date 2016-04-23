@@ -5,8 +5,6 @@ Minimalist, jQuery based, simple to use, asynchronous script loader and dependen
 - bring __order__ into your big web app
 - allow you to define __clean__ Javascript classes (prototypes) the way you always wanted it - without any `define()` or `module.exports` auxiliary trash
 
-__Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
-
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
@@ -33,9 +31,6 @@ __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 ## Motivation
 
 Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
-> A: In short because of FUCR (see the stated Goal above). Javascript DNA does not conform to AMD specification - it tries to make things much more intuitive and easier to use.
-
-Q: That's it, really?
 > A: And I wanted clean system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where I can declare dependency on required __class names__ rather then express dependencies using cryptic ids or paths or combinations. Something like:
 ```javascript
 // My file.js
