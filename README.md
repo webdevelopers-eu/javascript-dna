@@ -63,34 +63,34 @@ dna(
 
 ## Quick Tutorial
 
-Include this script in your page `<script src=".../dna.js"></script>`
+Include DNA script on your page `<script src=".../dna.js"></script>`
 
 Define your javascript objects and dependencies
 
 ```javascript
 dna({
-     'proto': 'MyFunction1',
-     'require': 'MyFunction2',
-     'load': '/myfunction1.js'
+     'proto': 'MyFunc1',
+     'require': 'MyFunc2',
+     'load': '/my/func1.js'
   }, {
-     'proto': 'MyFunction2',
-     'load': '/myfunction2.js'
+     'proto': 'MyFunc2',
+     'load': '/my/func2.js'
   });
 ```
 
 Create files with your javascript classes:
 
-File `/myfunction1.js`
+File `/my/func1.js`
 ```javascript
-function MyFunction1() { alert('Hello world! #1'); }
+function MyFunc1() { alert('Hello world! #1'); }
 ```
-File `/myfunction2.js`
+File `/my/func2.js`
 ```javascript
-function MyFunction2() { alert('Hello world! #2'); }
+function MyFunc2() { alert('Hello world! #2'); }
 ```
-Execute your callback after DNA exports your `MyFunction1` and `MyFunction2` function prototypes into `dna` object:
+Execute your callback after DNA exports your `MyFunc1` and `MyFunc2` function prototypes into `dna` object:
 ```javascript
-dna('MyFunction1', function() { console.log(dna.MyFunction1, dna.MyFunction2); });
+dna('MyFunc1', function() { console.log(dna.MyFunc1, dna.MyFunc2); });
 ```
 
 ## Syntax
