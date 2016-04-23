@@ -1,16 +1,19 @@
 # Javascript DNA / jDNA
 
-Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver.
+Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver that will
+- dramatically __optimize__ the loading speed of many scripts
+- bring __order__ into your big web app
+- allow you to define __clean__ Javascript classes (prototypes) the way you always wanted it - without any `define()` or `module.exports` auxiliary trash
 
 __Goal__: *Focus on Usability and Comfort. (For short "FUC Rule" or "FUCR")*
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
-- [Javascript DNA](#javascript-dna)
+- [Javascript DNA / jDNA](#javascript-dna--jdna)
     - [Motivation](#motivation)
     - [Features](#features)
-    - [Quick Dive In](#quick-dive-in)
+    - [Quick Tutorial](#quick-tutorial)
     - [Syntax](#syntax)
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
@@ -38,32 +41,31 @@ Q: That's it, really?
 // My file.js
 class Point extends Geometry {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        this.coord = [x, y];
     }
     toString() {
-        return '(' + this.x + ', ' + this.y + ')';
+        return '[' + this.coord.join(' x ') + ']';
     }
 }
 ```
 > that I will use elegantly like this
 ```javascript
 dna('Point', function() {
-    console.log('My Point class is loaded, I can use it now!', new dna.Point(10, 20));
+    console.log('My `Point` class is available:', new dna.Point(10, 20));
 });
 ```
 
 ## Features
 
 - [x] __jQuery__ based
-- [x] __100% asynchronous__ - scripts are loaded in random order yet evaluation order is guaranteed.
+- [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Out-of-order calls__ - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
 - [x] __Bundles__ - intuitive HTML-like bundling of many scripts into one HTML file for faster download while being able to parse/extract only selected scripts.
 - [x] __Simple API__ - all you need is just one method `dna(...)` that's it. You can feed it arguments in any order or even arrays of arguments.
 - [x] __Optimized__ - small and fast with minified size just about 9.5kB.
 - [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 
-## Quick Dive In
+## Quick Tutorial
 
 Include this script in your page `<script src=".../dna.js"></script>`
 
