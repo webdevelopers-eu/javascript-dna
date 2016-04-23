@@ -65,7 +65,7 @@ dna(
 
 Include DNA script on your page `<script src=".../dna.js"></script>`
 
-Define your javascript objects and dependencies
+Define locations of your Javascript prototypes and their dependencies
 
 ```javascript
 dna({
@@ -82,11 +82,11 @@ Create files with your javascript classes:
 
 File `/my/func1.js`
 ```javascript
-function MyFunc1() { alert('Hello world! #1'); }
+function MyFunc1() { new MyFunc2; }
 ```
 File `/my/func2.js`
 ```javascript
-function MyFunc2() { alert('Hello world! #2'); }
+function MyFunc2() { alert('Hello world!'); }
 ```
 Execute your callback after DNA exports your `MyFunc1` and `MyFunc2` function prototypes into `dna` object:
 ```javascript
