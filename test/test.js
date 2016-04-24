@@ -88,203 +88,253 @@ dna.push(function() {
     }
 
     // ------------------------------------------------------------------------
-    var test;
+    (function() {
+        var test = addTest('Simple config registration');
+        if (test) {
+            window.dna({
+                'proto': 'Test1',
+                'require': 'Test2',
+                'load': distPath + 'test/generator.php?1'
+            },{
+                'proto': 'Test2',
+                'load': distPath + 'test/generator.php?2',
+                'eval': 'window'
+            }, 'Test1', 'Test2', test(true, ['function', 'function']))
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Simple config registration');
-    if (test) {
-        window.dna({
-            'proto': 'Test1',
-            'require': 'Test2',
-            'load': distPath + 'test/generator.php?1'
-        },{
-            'proto': 'Test2',
-            'load': distPath + 'test/generator.php?2',
-            'eval': 'window'
-        }, 'Test1', 'Test2', test(true, ['function', 'function']))
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('Non-existing resource Promise failure');
+        if (test) {
+            window.dna({
+                'proto': 'Test3',
+                'load': 'about:blank'
+            }, 'Test3', test(false))
+                .fail(test(true));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Non-existing resource Promise failure');
-    if (test) {
-        window.dna({
-            'proto': 'Test3',
-            'load': 'about:blank'
-        }, 'Test3', test(false))
-            .fail(test(true));
-    }
+    (function() {
+        var test = addTest('Non-existing dependency failure', 5);
+        if (test) {
+            window.dna({
+                'proto': 'Test4',
+                'require': 'Test5',
+                'load': distPath + 'test/generator.php?4'
+            }, 'Test4', test(true))
+                .fail(test(false));
+            setTimeout(function() {
+                dna({'id': 'Test5'});
+            }, 2000);
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Non-existing dependency failure', 5);
-    if (test) {
-        window.dna({
-            'proto': 'Test4',
-            'require': 'Test5',
-            'load': distPath + 'test/generator.php?4'
-        }, 'Test4', test(true))
-            .fail(test(false));
-        setTimeout(function() {
-            dna({'id': 'Test5'});
-        }, 2000);
-    }
+    (function() {
+        var test = addTest('JSON download'); // Test6-8
+        if (test) {
+            window.dna(distPath + 'test/test01.json', 'Test6')
+                .done(test(true, ['function']))
+                .fail(test(false))
+            ;
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('JSON download'); // Test6-8
-    if (test) {
-        window.dna(distPath + 'test/test01.json', 'Test6')
-            .done(test(true, ['function']))
-            .fail(test(false))
-        ;
-    }
+    (function() {
+        var test = addTest('Duplicate identifier');
+        if (test) {
+            window.dna({'proto': 'Test X'}, {'proto': 'Test X'})
+                .fail(test(true));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Duplicate identifier');
-    if (test) {
-        window.dna({'proto': 'Test X'}, {'proto': 'Test X'})
-            .fail(test(true));
-    }
+    (function() {
+        var test = addTest('Invalid identifier');
+        if (test) {
+            window.dna({'id': 'Test 7'})
+                .fail(test(true));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Invalid identifier');
-    if (test) {
-        window.dna({'id': 'Test 7'})
-            .fail(test(true));
-    }
+    (function() {
+        var test = addTest('Recursive requirements');
+        if (test) {
+            window.dna({
+                'proto': 'Test9',
+                'require': 'Test10',
+                'load': distPath + 'test/generator.php?9'
+            },{
+                'proto': 'Test10',
+                'require': 'Test9',
+                'load': distPath + 'test/generator.php?10'
+            }, 'Test9')
+                .done(test(false))
+                .fail(test(true));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Recursive requirements');
-    if (test) {
-        window.dna({
-            'proto': 'Test9',
-            'require': 'Test10',
-            'load': distPath + 'test/generator.php?9'
-        },{
-            'proto': 'Test10',
-            'require': 'Test9',
-            'load': distPath + 'test/generator.php?10'
-        }, 'Test9')
-            .done(test(false))
-            .fail(test(true));
-    }
+    (function() {
+        var test = addTest('HTML embeded resource');
+        if (test) {
+            window.dna({
+                'proto': 'Test11',
+                'load': distPath + 'test/test01.xml#test11'
+            }, 'Test11')
+                .done(test(true, ['function']))
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('HTML embeded resource');
-    if (test) {
-        window.dna({
-            'proto': 'Test11',
-            'load': distPath + 'test/test01.xml#test11'
-        }, 'Test11')
-            .done(test(true, ['function']))
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('HTML linked resource');
+        if (test) {
+            window.dna({
+                'proto': 'Test12',
+                'load': distPath + 'test/test01.xml#test12'
+            }, 'Test12')
+                .done(test(true, ['function']))
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('HTML linked resource');
-    if (test) {
-        window.dna({
-            'proto': 'Test12',
-            'load': distPath + 'test/test01.xml#test12'
-        }, 'Test12')
-            .done(test(true, ['function']))
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('Configuration after requirement call');
+        if (test) {
+            window.dna('Test13', test(true))
+                .fail(test(false));
 
+            window.dna({
+                'proto': 'Test13',
+                'load': distPath + 'test/generator.php?13'
+            });
+        }
+
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Configuration after requirement call');
-    if (test) {
-        window.dna('Test13', test(true))
-            .fail(test(false));
+    (function() {
+        var test = addTest('Inclusion by id');
+        if (test) {
 
-        window.dna({
-            'proto': 'Test13',
-            'load': distPath + 'test/generator.php?13'
-        });
-    }
+            window.dna({
+                'id': 'Test14',
+                'require': 'Test15',
+                'load': distPath + 'test/generator.php?14'
+            }, {
+                'id': 'Test15',
+                'load': distPath + 'test/generator.php?15'
+            }, 'Test14')
+                .done(test(true))
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Inclusion by id');
-    if (test) {
+    (function() {
+        var test = addTest('Calls before DNA load');
+        if (test) {
+            window.dna('Test16' /* called before DNA load */)
+                .done(test(true))
+                .fail(test(false));
+        }
 
-        window.dna({
-            'id': 'Test14',
-            'require': 'Test15',
-            'load': distPath + 'test/generator.php?14'
-        }, {
-            'id': 'Test15',
-            'load': distPath + 'test/generator.php?15'
-        }, 'Test14')
-            .done(test(true))
-            .fail(test(false));
-    }
-
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Calls before DNA load');
-    if (test) {
-        window.dna('Test16' /* called before DNA load */)
-            .done(test(true))
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('Evaluation test - dna');
+        if (test) {
+            var cb17 = [ test(false), test(true) ];
+            window.dna({
+                'proto': 'Test17',
+                'load': distPath + 'test/generator.php?17',
+                'eval': 'dna'
+            }, 'Test17')
+                .done(function() {
+                    dna.Test17 && !window.Test17 ? cb17[1].apply(this, arguments) : cb17[0].apply(this, arguments);
+                })
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Evaluation test - dna');
-    if (test) {
-        var cb17 = [ test(false), test(true) ];
-        window.dna({
-            'proto': 'Test17',
-            'load': distPath + 'test/generator.php?17',
-            'eval': 'dna'
-        }, 'Test17')
-            .done(function() {
-                dna.Test17 && !window.Test17 ? cb17[1].apply(this, arguments) : cb17[0].apply(this, arguments);
-            })
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('Evaluation test - window');
+        if (test) {
+            var cb18 = [ test(false), test(true) ];
+            window.dna({
+                'proto': 'Test18',
+                'load': distPath + 'test/generator.php?18',
+                'eval': 'window'
+            }, 'Test18')
+                .done(function() {
+                    dna.Test18 && window.Test18 ? cb18[1].apply(this, arguments) : cb18[0].apply(this, arguments);
+                })
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Evaluation test - window');
-    if (test) {
-        var cb18 = [ test(false), test(true) ];
-        window.dna({
-            'proto': 'Test18',
-            'load': distPath + 'test/generator.php?18',
-            'eval': 'window'
-        }, 'Test18')
-            .done(function() {
-                dna.Test18 && window.Test18 ? cb18[1].apply(this, arguments) : cb18[0].apply(this, arguments);
-            })
-            .fail(test(false));
-    }
-
-    // ------------------------------------------------------------------------
-    test = addTest('Order of evaluations.', 5);
-    if (test) {
-        var cb19 = [ test(false), test(true) ];
-        window.dna({
-            'id': 'Test19',
-            'load': [
-                distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=4.0',
-                distPath + 'test/generator.php?20&order[var]=orderTest19&order[id]=2&delay=0.0',
-                distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=3.0'
+    (function() {
+        var test = addTest('Order of evaluations.', 5);
+        if (test) {
+            var cb19 = [ test(false), test(true) ];
+            window.dna({
+                'id': 'Test19',
+                'load': [
+                    distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=4.0',
+                    distPath + 'test/generator.php?20&order[var]=orderTest19&order[id]=2&delay=0.0',
+                    distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=3.0'
                 ]
-        }, 'Test19')
-            .done(function() {
-                cb19[window.orderTest19.join(' ') == '1 2 3' ? 1 : 0](window.orderTest19);
-            })
-            .fail(test(false));
-    }
+            }, 'Test19')
+                .done(function() {
+                    cb19[window.orderTest19.join(' ') == '1 2 3' ? 1 : 0](window.orderTest19);
+                })
+                .fail(test(false));
+        }
 
+    }());
     // ------------------------------------------------------------------------
-    test = addTest('Proto aliases.', 5);
-    if (test) {
-        window.dna({
-            'proto': 'Test22=Alias22=Alias22:v2=Alias22:v1',
-            'load': distPath + 'test/generator.php?22'
-        }, 'Alias22:v2')
-            .done(function() {
-                test(!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1']).apply(this, arguments);
-            })
-            .fail(test(false));
-    }
+    (function() {
+        var test = addTest('Proto aliases.', 5);
+        if (test) {
+            window.dna({
+                'proto': 'Test22=Alias22=Alias22:v2=Alias22:v1',
+                'load': distPath + 'test/generator.php?22'
+            }, 'Alias22:v2')
+                .done(function() {
+                    test(!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1'], ['function']).apply(this, arguments);
+                })
+                .fail(test(false));
+        }
+    }());
+    // ------------------------------------------------------------------------
+    (function() {
+        var test = addTest('Dependency depth 32.', 10);
+        if (test) {
+            var testId = 23, depDepth = 32, depWidth = 1;
+            for (var depth = 0; depth < depDepth; depth++) {
+                var conf = {
+                    'proto': 'Test' + (testId + depth * depWidth),
+                    'require': depth + 1 < depDepth ? 'Test' + (testId + (depth  + 1) * depWidth) : [],
+                    'load': []
+                };
+                for (var width = 0; width < depWidth; width++) {
+                    conf.load.push(distPath + 'test/generator.php?' + (testId + depth * depWidth + width));
+                }
+                window.dna(conf);
+                console.log(JSON.stringify(conf));
+            }
+            window.dna('Test' + testId, test(true, ['function'])).fail(test(false));
+        }
+    }());
+
 
 });

@@ -328,3 +328,4 @@ Watch the Javascript Console.
 ## ToDo
 - [ ] Document $(window) events 'dna:fail', 'dna:done', 'dna:always'
 - [ ] Document aliasing: `config = {'proto': 'Proto1=Proto1:v2', ...}` to allow inclusion different scripts with the same prototype names. Will install `Proto1` as `dna["Proto1:v2"]` and optionally multiple aliases `Proto1=Proto1:v2=Proto1:latest=Proto1`
+- [ ] Document custom factory functions: `dna({'factory': {'my-amd': function(jString, protoName, dfd)}});` then `dna({'proto': 'My', 'load': 'file.js', 'eval': 'my-amd'});`

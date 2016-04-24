@@ -13,11 +13,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 (function($, window) {
     var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna.core.set(SETTINGS))
         'factory': { // Methods to evaluate scripts based on config.eval value
-            'window': function(jString, protoName) {
-                return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + (protoName ? 'window["' + protoName + '"]' : 'undefined'));
+            'window': function(jString, protoName, dfd) {
+                protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
+                var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
+                dfd.resolve(window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement));
             },
-            'dna': function(jString, protoName) {
-                return eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + (protoName || 'undefined'));
+            'dna': function(jString, protoName, dfd) {
+                protoName = protoName ? protoName : 'undefined';
+                var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
+                dfd.resolve(eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement));
             }
         }
     };
@@ -171,6 +175,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         $.each(obj, function(k, v) {
             switch (k) {
             case 'factory':
+                // we don't want people to mess with standard evals - they should define their own
+                delete v.dna;
+                delete v.window;
                 settings[k] = $.extend(settings[k], v);
                 break;
             default:
@@ -582,16 +589,33 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     function evaluateScripts(scripts) {
         var proto, dfd = $.Deferred();
 
-        // @todo let have deferred executions - we must call factory with new DFD one by one when first resolves, call another and so on.
-        while (scripts.length) {
-            var script = scripts.shift();
+        // Note - there is a risk of running too deep recursively - tested in Chromium with dep chain of 100 items with 32 loaded files for each item
+        function evaluate(script) {
+            if (!script) {
+                if (scripts.length) {
+                    return dfd.reject(new DNAError('Scripts queue is not empty and we got no data!', 607, {'script': script, 'queue': scripts}));
+                } else {
+                    return dfd.resolve(proto); // most / last script - resolve main dfd
+                }
+            }
+            var dfdEval = $.Deferred()
+                    .done(function(captured) {
+                        proto = captured || proto;
+                        evaluate(scripts.shift());
+                    });
             var factory = settings.factory[script.config.eval || 'dna'];
             if (typeof factory != 'function') {
-                throw new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script);
+                return dfdEval.reject(new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script));
             }
-            proto = factory(script.jString, script.config.proto[0]) || proto;
-        }
-        dfd.resolve(proto);
+            try {
+                factory(script.jString, script.config.proto[0], dfdEval);
+            } catch (e) {
+                return dfdEval.reject(new DNAError(e));
+            }
+            return dfdEval;
+        };
+        evaluate(scripts.shift());
+
         return dfd;
     }
 
