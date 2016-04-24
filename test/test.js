@@ -1,11 +1,20 @@
 var distPath = '../'; // document.querySelector('script[src*="test.js"]').src.replace(/test.js(\?.*)?$/, '');
+var dna = dna || [];
 
 // Test call before DNA is loaded
-var dna = dna || [];
-dna.push({
-    'id': 'Test16',
-    'load': distPath + 'test/generator.php?16'
-});
+if (isTestActive('Calls before DNA load')) {
+    dna.push({
+        'id': 'Test16',
+        'load': distPath + 'test/generator.php?16'
+    });
+}
+
+function isTestActive(name) {
+    if (location.hash.match(/^#!test=/) && location.hash != '#!test=' + name) {
+        return false;
+    }
+    return true;
+}
 
 // Start standard tests
 dna.push(function() {
@@ -34,9 +43,7 @@ dna.push(function() {
     }
 
     function addTest(name, seconds) {
-        if (location.hash.match(/^#!test=/) && location.hash != '#!test=' + name) {
-            return false;
-        }
+        if (!isTestActive(name)) return false;
 
         seconds = seconds || 2;
         var $result = $('<span class="label label-info" style="font-size: 1.2em;">⌛</span>');
@@ -58,9 +65,9 @@ dna.push(function() {
             clearTimeout(timer);
             $li.attr('title',
                      $li.attr('title') + '; ' +
-                     'received value: ' + JSON.stringify(retVal) + '; ' +
-                     'arguments/types: ' + $.makeArray(args).map(function(x) {return $.type(x) == 'error' ? x.name + '[' + x.message + ']' : $.type(x);}).join(', ') + '; ' +
-                     'arguments/JSON: ' + JSON.stringify(args) +
+                     'callback arguments: ' + $.makeArray(args).map(function(x) {
+                         return $.type(x) == 'error' ? x.name + '[' + x.message + ']' : JSON.stringify(x) || $.type(x);
+                     }).join(', ') + '; ' +
                      ''
                     );
             markItem($li, retVal);
@@ -92,9 +99,10 @@ dna.push(function() {
             'load': distPath + 'test/generator.php?1'
         },{
             'proto': 'Test2',
-            'load': distPath + 'test/generator.php?2'
+            'load': distPath + 'test/generator.php?2',
+            'eval': 'window'
         }, 'Test1', 'Test2', test(true, ['function', 'function']))
-            .fail(test('promise fail'));
+            .fail(test(false));
     }
 
     // ------------------------------------------------------------------------

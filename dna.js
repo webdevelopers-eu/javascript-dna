@@ -23,13 +23,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var args = arguments;
         var dfd = $.Deferred()
                 .done(function() {
-                    $(window).trigger('dna:done', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                    $(window).trigger('dna:done', [{'dnaArguments': args, 'arguments': arguments}]);
                 })
                 .fail(function() {
-                    $(window).trigger('dna:fail', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                    $(window).trigger('dna:fail', [{'dnaArguments': args, 'arguments': arguments}]);
                 })
                 .always(function() {
-                    $(window).trigger('dna:always', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                    $(window).trigger('dna:always', [{'dnaArguments': args, 'arguments': arguments}]);
                 });
         var opts = dna.core.getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
