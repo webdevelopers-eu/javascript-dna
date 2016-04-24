@@ -11,7 +11,7 @@
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
-    var settings = {
+    var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna.core.set(SETTINGS))
         'factory': { // Methods to evaluate scripts based on config.eval value
             'window': function(jString, protoName) {
                 return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + (protoName ? 'window["' + protoName + '"]' : 'undefined'));
@@ -517,32 +517,36 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         $.when.apply(this, promises).done(function(scripts) {
             var val;
-            var proto = evaluateScripts(scripts);
+            evaluateScripts(scripts)
+                .done(function(proto) {
+                    // Install objects
+                    if (config.proto[0]) {
+                        if (proto) {
+                            $.each(config.proto.slice(config.proto.length > 1 ? 1 : 0), function(k, v) {
+                                dna[v] = proto;
+                            });
+                        } else {
+                            dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config), 602, {'config': config}));
+                        }
+                    }
+                    if (proto && config.service) {
+                        dna[config.service] = new proto;
+                    }
+                    if (config.id == name) {
+                        val = config;
+                    } else if (dna[name]) {
+                        val = dna[name];
+                    }
 
-            // Install objects
-            if (config.proto[0]) {
-                if (proto) {
-                    $.each(config.proto.slice(config.proto.length > 1 ? 1 : 0), function(k, v) {
-                        dna[v] = proto;
-                    });
-                } else {
-                    dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config), 602, {'config': config}));
-                }
-            }
-            if (proto && config.service) {
-                dna[config.service] = new proto;
-            }
-            if (config.id == name) {
-                val = config;
-            } else if (dna[name]) {
-                val = dna[name];
-            }
-
-            if (val) {
-                dfd.resolve(val);
-            } else {
-                dfd.reject(new DNAError('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config), 603, {'config': config}));
-            }
+                    if (val) {
+                        dfd.resolve(val);
+                    } else {
+                        dfd.reject(new DNAError('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config), 603, {'config': config}));
+                    }
+                })
+                .fail(function() {
+                    dfd.reject.apply(this, arguments);
+                });
         }).fail(function() {
             dfd.reject.apply(this, arguments);
         });
@@ -576,15 +580,19 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     };
 
     function evaluateScripts(scripts) {
-        var proto, factory;
-        for (var i = 0; i < scripts.length; i++) {
-            factory = settings.factory[scripts[i].config.eval || 'dna'];
+        var proto, dfd = $.Deferred();
+
+        // @todo let have deferred executions - we must call factory with new DFD one by one when first resolves, call another and so on.
+        while (scripts.length) {
+            var script = scripts.shift();
+            var factory = settings.factory[script.config.eval || 'dna'];
             if (typeof factory != 'function') {
-                throw new DNAError('Unknown evaluation type "' + scripts[i].config.eval + '"', 604, scripts[i]);
+                throw new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script);
             }
-            proto = factory(scripts[i].jString, scripts[i].config.proto[0]) || proto;
+            proto = factory(script.jString, script.config.proto[0]) || proto;
         }
-        return proto;
+        dfd.resolve(proto);
+        return dfd;
     }
 
     function loadGetResource(url) {
