@@ -11,6 +11,17 @@
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
+    var settings = {
+        'factory': { // Methods to evaluate scripts based on config.eval value
+            'window': function(jString, protoName) {
+                return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + (protoName ? 'window["' + protoName + '"]' : 'undefined'));
+            },
+            'dna': function(jString, protoName) {
+                return eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + (protoName || 'undefined'));
+            }
+        }
+    };
+
     /**
      * @param {...(string|function|object|array)} arguments
      *          string: proto name to initialize or URL of JSON file with DNA configurations
@@ -31,17 +42,19 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 .always(function() {
                     $(window).trigger('dna:always', [{'dnaArguments': args, 'arguments': arguments}]);
                 });
+        var reject = function() {dfd.reject.apply(this, arguments);};
         var opts = dna.core.getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
             ['jsonURLs', /[.\/]/],
             ['required', 'string'],
+            ['settings', function(arg) {return $.isPlainObject(arg) && !arg.proto && !arg.id;}],
             ['configs', 'plainObject'],
             ['callbacks', 'function']
         ]);
+        opts.settings.forEach(dna.core.set);
         if (opts.jsonURLs.length + opts.required.length + opts.configs.length == 0) { // empty args
             return dfd.resolve().done(opts.callbacks).promise();
         }
-
         try {
             opts.configs.forEach(dna.core.configure.bind(dna.core));
             $.when.apply(this, opts.jsonURLs.map(download)) // Resolve 'jsonURLs': download JSON configs
@@ -67,21 +80,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                                         .done(opts.callbacks, function() {
                                             dfd.resolve.apply(this, arguments);
                                         })
-                                        .fail(function() {
-                                            dfd.reject.apply(this, arguments);
-                                        });
+                                        .fail(reject);
                                 })
-                                .fail(function() {
-                                    dfd.reject.apply(this, arguments);
-                                });
+                                .fail(reject);
                         })
-                        .fail(function() {
-                            dfd.reject.apply(this, arguments);
-                        });
+                        .fail(reject);
                 })
-                .fail(function () {
-                    dfd.reject.apply(this, arguments);
-                });
+                .fail(reject);
         } catch (e) {
             dfd.reject(new DNAError(e));
         }
@@ -153,6 +158,26 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             url = link.href;
         }
         return url;
+    };
+
+    /**
+     * Set various settings. Example:
+     *  dna.core.set({'factory': {'myAMD': myEval}});
+     *
+     * @param {object} obj Plain object with DNA settings.
+     * @return {undefined}
+     */
+    DNACore.prototype.set = function(obj) {
+        $.each(obj, function(k, v) {
+            switch (k) {
+            case 'factory':
+                settings[k] = $.extend(settings[k], v);
+                break;
+            default:
+                settings[k] = v;
+            }
+        });
+        console.log('DNA: Settings altered.', settings);
     };
 
 
@@ -539,7 +564,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .done(function() {
                 var scripts = [];
                 for (var i = 0; i < arguments.length; i++) {
-                    scripts.push({'jsString': arguments[i], 'config': config});
+                    scripts.push({'jString': arguments[i], 'config': config});
                 }
                 dfd.resolve(scripts);
             })
@@ -551,33 +576,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     };
 
     function evaluateScripts(scripts) {
-        var proto;
+        var proto, factory;
         for (var i = 0; i < scripts.length; i++) {
-            proto = evaluate(scripts[i].jsString, scripts[i].config.eval, scripts[i].config.proto[0]) || proto;
+            factory = settings.factory[scripts[i].config.eval || 'dna'];
+            if (typeof factory != 'function') {
+                throw new DNAError('Unknown evaluation type "' + scripts[i].config.eval + '"', 604, scripts[i]);
+            }
+            proto = factory(scripts[i].jString, scripts[i].config.proto[0]) || proto;
         }
         return proto;
-    }
-
-    function evaluate(jsString, type, protoName) {
-        var evaluator, retStatement;
-
-        switch (type || 'dna') {
-        case 'window':
-            evaluator = function(jsString) {
-                return window.eval(jsString);
-            };
-            retStatement = (protoName ? 'window["' + protoName + '"]' : 'undefined');
-            break;
-        case 'dna':
-            evaluator = function(jsString) {
-                return eval(jsString);
-            };
-            retStatement = (protoName || 'undefined');
-            break;
-        default:
-            throw new DNAError('Unknown evaluation type "' + type + '"', 604, {'jsString': jsString, 'type': type, 'proto': protoName});
-        }
-        return evaluator(jsString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
     }
 
     function loadGetResource(url) {
@@ -594,10 +601,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             var doc = document.implementation.createHTMLDocument( 'html', '', '');
             doc.childNodes[1].innerHTML = string;
             var $script = $('#' + parts[1], doc);
-            var jsString = $.trim($script.text());
+            var jString = $.trim($script.text());
 
-            if (jsString.length) {
-                dfd.resolve(jsString + ' //# sourceURL=' + url);
+            if (jString.length) {
+                dfd.resolve(jString + ' //# sourceURL=' + url);
             } else if ($script.attr('src')) {
                 var linkURL = $script.get(0).src || $script.attr('src') ||
                         $script.get(0).href || $script.attr('href');
