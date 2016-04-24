@@ -8,6 +8,7 @@
     - [Syntax](#syntax)
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
+    - [Prototype Aliases](#prototype-aliases)
     - [Custom Factories](#custom-factories)
     - [Load Optimizations](#load-optimizations)
     - [Examples](#examples)
