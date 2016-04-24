@@ -46,8 +46,10 @@ class Point extends Geometry {
 > that can be intuitively required in the code by
 ```javascript
 dna(
-    'Point',
-    function() { console.log('My `Point` class is available:', new dna.Point(10, 20)); }
+       'Point', // Requirement(s)
+       function() { // Run after requirements are met
+           new dna.Point(10, 20);
+       }
    );
 ```
 
