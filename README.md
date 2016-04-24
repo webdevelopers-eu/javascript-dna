@@ -146,7 +146,10 @@ Where
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
-* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window`. Script evaluation type `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property. The value `window` evaluates the script using `window.eval()` method. Note: we can add `commonJS` and `requireJS` keywords later that will evaluate scripts to allow executing scripts from respective frameworks.
+* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window` or custom name.
+ * `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property.
+ * `window` evaluates the script using `window.eval()` method.
+ * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Factories](#custom-factories) section.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
@@ -162,6 +165,40 @@ dna(
     {'proto': 'Test', 'load': '/file.js'},
     [ '/other.json', '/otherother.json' ]
 );
+```
+
+## Custom Factories
+
+You can specify your own function to execute downloaded scripts. That way you can bridge RequireJS or CommonJS or any other module format.
+
+To specify you handler user this syntax
+```javascript
+  dna({
+    'factory': {
+      EVAL: function(jString, protoName, dfd)
+    }
+  });
+```
+
+Example:
+```javascript
+  dna({
+    'factory': {
+      'my-common-js: function(jString, protoName, dfd) {
+        var exports = {};
+        (function(exports) {
+           eval(jString);
+        }(exports));
+        dfd.resolve(exports[protoName]); // Return the exported object
+      },
+      'my-other-method': mySuperEvaluator
+    }
+  });
+  dna({
+    'proto': 'MyModule',
+    'load': '/lib/my.js',
+    'eval': 'my-common-js'
+  });
 ```
 
 ## Load Optimizations
