@@ -47,7 +47,7 @@ class Point extends Geometry {
 ```javascript
 dna(
        'Point', // Requirement(s)
-       function() { // Run after requirements are met
+       function() { // Run after all requirements are satisfied
            new dna.Point(10, 20);
        }
    );
