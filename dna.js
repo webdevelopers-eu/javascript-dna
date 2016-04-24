@@ -16,12 +16,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             'window': function(jString, protoName, dfd) {
                 protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
-                dfd.resolve(window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement));
+                dfd.resolve((function() {
+                    return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
+                }()));
             },
             'dna': function(jString, protoName, dfd) {
                 protoName = protoName ? protoName : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
-                dfd.resolve(eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement));
+                dfd.resolve((function() {
+                    return eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
+                }()));
             }
         }
     };
