@@ -76,20 +76,20 @@ Define locations of your Javascript prototypes and their dependencies
 dna({
      'proto': 'MyFunc1',
      'require': 'MyFunc2',
-     'load': '/my/func1.js'
+     'load': '/somewhere/func1.js'
   }, {
      'proto': 'MyFunc2',
-     'load': '/my/func2.js'
+     'load': '/somewhere/func2.js'
   });
 ```
 
 Create files with your javascript classes:
 
-File `/my/func1.js`
+File `/somewhere/func1.js`
 ```javascript
 function MyFunc1() { new dna.MyFunc2; }
 ```
-File `/my/func2.js`
+File `/somewhere/func2.js`
 ```javascript
 function MyFunc2() { alert('Hello world!'); }
 ```
