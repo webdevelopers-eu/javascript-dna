@@ -654,10 +654,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     function DNAError(info, code, detail) {
         if (info instanceof Error) {
-            this.name = i.name || 'DNAError';
-            this.message = i.message || 'Unknown Error.';
-            this.code = i.code || 700;
-            this.detail = i.detail || i;
+            this.name = info.name || 'DNAError';
+            this.message = info.message || 'Unknown Error.';
+            this.code = info.code || 700;
+            this.detail = info.detail || info;
         } else {
             this.name = 'DNAError';
             this.message = info || 'Ups!';
