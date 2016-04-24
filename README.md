@@ -143,7 +143,7 @@ Configuration Objects are used to define dependencies and requirements.
 ```
 Where
 * `ID`:`String` Optional. Unique super-identifier (unique across all `id`, `proto`, `service` identifiers in all configurations).
-* `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution.
+* `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution. See [Prototype Aliases](#prototype-aliases) to see how to load multiple versions of the same script.
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
@@ -167,6 +167,32 @@ dna(
     [ '/other.json', '/otherother.json' ]
 );
 ```
+
+## Prototype Aliases
+
+Sometimes you will need to load Javascript class that has the name that conflicts with other class. Usually it is the case of supporting the same class with different versions.
+
+In that case you can use prototype alias to export the prototype in different property. Example:
+
+```javascript
+dna({
+    'proto': 'MyStuff',
+    'load': '/lib/my-stuff-v1.js'
+}, {
+    'proto': 'MyStuff=MyStuff:v2',
+    'load': '/lib/my-stuff-v2.js'
+});
+```
+In this case the class `MyStuff` from the file `my-stuff-v1.js` will be exported as `dna.MyStuff` while the same class from file `my-stuff-v2.js` will be exported as `dna["MyStuff:v2"]`.
+
+You can use also multiple aliases:
+```javascript
+dna({
+    'proto': 'MyStuff=MyStuff:v2=MyStuffLatest',
+    'load': '/lib/my-stuff-v2.js'
+});
+```
+in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff:v2"]` and `dna.MyStuffLatest` but not as `dna.MyStuff`.
 
 ## Custom Factories
 
@@ -367,5 +393,3 @@ Watch the Javascript Console.
 
 ## ToDo
 - [ ] Document $(window) events 'dna:fail', 'dna:done', 'dna:always'
-- [ ] Document aliasing: `config = {'proto': 'Proto1=Proto1:v2', ...}` to allow inclusion different scripts with the same prototype names. Will install `Proto1` as `dna["Proto1:v2"]` and optionally multiple aliases `Proto1=Proto1:v2=Proto1:latest=Proto1`
-- [ ] Document custom factory functions: `dna({'factory': {'my-amd': function(jString, protoName, dfd)}});` then `dna({'proto': 'My', 'load': 'file.js', 'eval': 'my-amd'});`
