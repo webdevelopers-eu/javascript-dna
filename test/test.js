@@ -236,7 +236,7 @@ dna.push(function() {
             'eval': 'dna'
         }, 'Test17')
             .done(function() {
-                dna.Test17 && !window.Test17 ? cb17[1]() : cb17[0]();
+                dna.Test17 && !window.Test17 ? cb17[1].apply(this, arguments) : cb17[0].apply(this, arguments);
             })
             .fail(test(false));
     }
@@ -251,7 +251,7 @@ dna.push(function() {
             'eval': 'window'
         }, 'Test18')
             .done(function() {
-                dna.Test18 && window.Test18 ? cb18[1]() : cb18[0]();
+                dna.Test18 && window.Test18 ? cb18[1].apply(this, arguments) : cb18[0].apply(this, arguments);
             })
             .fail(test(false));
     }
@@ -282,11 +282,7 @@ dna.push(function() {
             'load': distPath + 'test/generator.php?22'
         }, 'Alias22:v2')
             .done(function() {
-                if (!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1']) {
-                    test(true)();
-                } else {
-                    test(false)();
-                }
+                test(!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1']).apply(this, arguments);
             })
             .fail(test(false));
     }

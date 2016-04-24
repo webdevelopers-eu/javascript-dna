@@ -221,7 +221,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         stack = stack || [];
         for (var i in requirements) {
             if ($.inArray(requirements[i], stack) !== -1) {
-                throw new DNAError('DNA: Recursive requirement loop' + stack.join(' > ') + ' > ' + requirements[i], 601, {'requirements': requirements, 'stack': stack});
+                throw new DNAError('DNA: Recursive requirement loop: ' + stack.join(' > ') + ' > ' + requirements[i], 601, {'requirements': requirements, 'stack': stack});
             }
             var config = this.getConfig(requirements[i]);
 
