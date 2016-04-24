@@ -171,7 +171,7 @@ dna(
 
 ## Prototype Aliases
 
-Sometimes you will need to load Javascript class that has the name that conflicts with other class. Usually it is the case of supporting the same class with different versions.
+Sometimes you will need to load Javascript class that has the name that conflicts with other class. Usually it is the case of supporting different versions of the same class.
 
 In that case you can use prototype alias to export the prototype in different property. Example:
 
