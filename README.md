@@ -185,7 +185,7 @@ Example:
 ```javascript
   dna({
     'factory': {
-      'my-common-js: function(jString, protoName, dfd) {
+      'my-common-js': function(jString, protoName, dfd) {
         var exports = {};
         (function(exports) {
            eval(jString);
