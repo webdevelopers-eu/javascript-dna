@@ -172,7 +172,7 @@ dna(
 
 You can specify your own function to execute downloaded scripts. That way you can bridge RequireJS or CommonJS or any other module format.
 
-To specify you handler user this syntax
+To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
