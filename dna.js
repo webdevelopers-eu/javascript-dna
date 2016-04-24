@@ -598,15 +598,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     return dfd.resolve(proto); // most / last script - resolve main dfd
                 }
             }
+            var factory = settings.factory[script.config.eval || 'dna'];
             var dfdEval = $.Deferred()
                     .done(function(captured) {
                         proto = captured || proto;
                         evaluate(scripts.shift());
                     })
                     .fail(function() {
-                        dfd.reject.apply(this, arguments);
+                        dfd.reject(new DNAError('Evaluation of the script failed.', 608,  {'arguments': arguments, 'about': script}));
                     });
-            var factory = settings.factory[script.config.eval || 'dna'];
             if (typeof factory != 'function') {
                 return dfdEval.reject(new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script));
             }
