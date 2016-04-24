@@ -183,6 +183,8 @@ dna({
     'proto': 'MyStuff=MyStuff:v2',
     'load': '/lib/my-stuff-v2.js'
 });
+
+dna('MyStuff:v2', newerCodeCallback);
 ```
 In this case the class `MyStuff` from the file `my-stuff-v1.js` will be exported as `dna.MyStuff` while the same class from file `my-stuff-v2.js` will be exported as `dna["MyStuff:v2"]`.
 
