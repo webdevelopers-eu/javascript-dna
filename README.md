@@ -1,10 +1,3 @@
-# Javascript DNA / jDNA
-
-Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver that will
-- dramatically __optimize__ the loading speed of many scripts
-- bring __order__ into big web apps
-- allow you to define __clean__ Javascript classes (prototypes) the way you always wanted to - without `define()` or `module.exports` auxiliary trash
-
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
@@ -15,11 +8,12 @@ Minimalist, jQuery based, simple to use, asynchronous script loader and dependen
     - [Syntax](#syntax)
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
+    - [Custom Factories](#custom-factories)
     - [Load Optimizations](#load-optimizations)
     - [Examples](#examples)
         - [Complete Example #1](#complete-example-1)
     - [Tricks](#tricks)
-        - [Call DNA Before It Is Loaded](#call-dna-before-it-is-loaded)
+        - [Call DNA Before It Loads](#call-dna-before-it-loads)
         - [External Configurations](#external-configurations)
         - [Load Anything](#load-anything)
         - [Load In Any Order](#load-in-any-order)
@@ -27,6 +21,13 @@ Minimalist, jQuery based, simple to use, asynchronous script loader and dependen
     - [ToDo](#todo)
 
 <!-- markdown-toc end -->
+# Javascript DNA / jDNA
+
+Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver that will
+- dramatically __optimize__ the loading speed of many scripts
+- bring __order__ into big web apps
+- allow you to define __clean__ Javascript classes (prototypes) the way you always wanted to - without `define()` or `module.exports` auxiliary trash
+
 
 ## Motivation
 
