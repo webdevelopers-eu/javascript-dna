@@ -54,7 +54,9 @@ dna(
        }
    );
 ```
-> There was nothing like that. Most solutions failed to meet this simple exepctation of every programmer by making impractical design choices or implementing unnecessary complex solutions to achieve simple goal.
+> There was nothing like that. Most solutions failed to meet this simple expectation of every programmer by making impractical design choices or implementing unnecessary complex solutions to achieve simple goal.
+>
+> If you want to try something simple, intuitive and powerfull then Javascript DNA is here for you!
 
 ## Features
 
