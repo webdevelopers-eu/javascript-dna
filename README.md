@@ -350,6 +350,7 @@ dna({
 
 dna('jquery:iPop', callback);
 ```
+Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-factories) that you can tailor to fit any framework and/or your special needs.
 
 ### Load In Any Order
 
