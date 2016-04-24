@@ -176,7 +176,7 @@ To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
-      EVAL: function(jString, protoName, dfd)
+      EVAL_TYPE: function(jString, protoName, dfd)
     }
   });
 ```
