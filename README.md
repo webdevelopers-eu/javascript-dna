@@ -36,20 +36,19 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > Simply system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or file names... Something like
 ```javascript
 // My file.js
-class Point extends Geometry {
-    constructor(x, y) {
-        this.coord = [x, y];
-    }
-    toString() {
-        return '[' + this.coord.join(' x ') + ']';
-    }
+function Point(x, y) {
+    this.coord = [x, y];
 }
+
+Point.prototype.toString = function() {
+        return '[' + this.coord.join(' x ') + ']';
+};
 ```
 > that can be intuitively required in the code by
 ```javascript
 dna(
-       'Point', // I need the Point class
-       function() { // Run this after you load the Point class
+       'Point', // I need the Point prototype
+       function() { // Run this after you load the Point prototype
            new dna.Point(10, 20);
        }
    );
