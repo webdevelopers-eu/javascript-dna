@@ -66,7 +66,7 @@ dna.push(function() {
             $li.attr('title',
                      $li.attr('title') + '; ' +
                      'callback arguments: ' + $.makeArray(args).map(function(x) {
-                         return $.type(x) == 'error' ? x.name + '[' + x.message + ']' : JSON.stringify(x) || $.type(x);
+                         return x instanceof Error ? x.name + '[' + x.message + ']' : JSON.stringify(x) || $.type(x);
                      }).join(', ') + '; ' +
                      ''
                     );
