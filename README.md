@@ -39,7 +39,6 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 function Point(x, y) {
     this.coord = [x, y];
 }
-
 Point.prototype.toString = function() {
         return '[' + this.coord.join(' x ') + ']';
 };
