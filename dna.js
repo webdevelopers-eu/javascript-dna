@@ -22,10 +22,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     var dna = function() {
         var args = arguments;
         var dfd = $.Deferred()
-                .done(function() {$(window).trigger('dna:done', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
-                .fail(function() {$(window).trigger('dna:fail', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
-                .always(function() {$(window).trigger('dna:always', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);})
-        ;
+                .done(function() {
+                    $(window).trigger('dna:done', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                })
+                .fail(function() {
+                    $(window).trigger('dna:fail', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                })
+                .always(function() {
+                    $(window).trigger('dna:always', [{'dnaCallArguments': args, 'callbackCallArguments': arguments}]);
+                });
         var opts = dna.core.getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
             ['jsonURLs', /[.\/]/],
@@ -60,10 +65,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                                         return dna.core.require(name);
                                     }))
                                         .done(opts.callbacks, function() {
-                                            dfd.resolve.apply(this, $.makeArray(arguments));
+                                            dfd.resolve.apply(this, arguments);
                                         })
                                         .fail(function() {
-                                            dfd.reject.apply(this, $.makeArray(arguments));
+                                            dfd.reject.apply(this, arguments);
                                         });
                                 })
                                 .fail(function() {
@@ -71,11 +76,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                                 });
                         })
                         .fail(function() {
-                            dfd.reject.apply(this, $.makeArray(arguments));
+                            dfd.reject.apply(this, arguments);
                         });
+                })
+                .fail(function () {
+                    dfd.reject.apply(this, arguments);
                 });
         } catch (e) {
-            dfd.reject(e);
+            dfd.reject(new DNAError(e));
         }
 
         return dfd.promise();
@@ -97,6 +105,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         dna.apply(this, arguments);
         return dna.core.waiting.length;
     };
+
 
     /**
      *  The dna.core service.
@@ -212,7 +221,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         stack = stack || [];
         for (var i in requirements) {
             if ($.inArray(requirements[i], stack) !== -1) {
-                throw new DNAError('DNA: Recursive requirement loop: ' + stack.join(' > ') + ' > ' + requirements[i] );
+                throw new DNAError('DNA: Recursive requirement loop' + stack.join(' > ') + ' > ' + requirements[i], 601, {'requirements': requirements, 'stack': stack});
             }
             var config = this.getConfig(requirements[i]);
 
@@ -254,7 +263,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 var can = this.canSatisfy(opts.requirements);
             } catch (e) {
                 this.waiting.splice(i, 1);
-                opts._dfd.reject(e);
+                opts._dfd.reject(new DNAError(e));
                 break;
             }
 
@@ -457,7 +466,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     promises.push(requireSingle.call(this, name, stack));
                 }).bind(this));
         } catch (e) {
-            return $.Deferred().reject(e).promise();
+            return $.Deferred().reject(new DNAError(e)).promise();
         }
 
         return $.when.apply(this, promises);
@@ -492,7 +501,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         dna[v] = proto;
                     });
                 } else {
-                    dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config)));
+                    dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config), 602, {'config': config}));
                 }
             }
             if (proto && config.service) {
@@ -507,10 +516,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             if (val) {
                 dfd.resolve(val);
             } else {
-                dfd.reject(new DNAError('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config)));
+                dfd.reject(new DNAError('DNA: Cannot find the requested object dna["' + name + '"]: ' + JSON.stringify(config), 603, {'config': config}));
             }
         }).fail(function() {
-            dfd.reject.apply(this, $.makeArray(arguments));
+            dfd.reject.apply(this, arguments);
         });
 
         return config._dfd;
@@ -535,7 +544,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 dfd.resolve(scripts);
             })
             .fail(function() {
-                console.log('DNA: Load failed', urls, arguments);
                 dfd.reject.apply(this, arguments);
             });
 
@@ -567,7 +575,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             retStatement = (protoName || 'undefined');
             break;
         default:
-            throw new DNAError('Unknown evaluation type "' + type + '"');
+            throw new DNAError('Unknown evaluation type "' + type + '"', 604, {'jsString': jsString, 'type': type, 'proto': protoName});
         }
         return evaluator(jsString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
     }
@@ -594,15 +602,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 var linkURL = $script.get(0).src || $script.attr('src') ||
                         $script.get(0).href || $script.attr('href');
                 if (!linkURL) {
-                    dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.'));
+                    dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': string, 'url': url}));
+                } else {
+                    loadGetResource(dna.core.resolveURL(linkURL, url))
+                        .done(function() {
+                            dfd.resolve.apply(this, arguments);
+                        })
+                        .fail(function() {
+                            dfd.reject.apply(this, arguments);
+                        });
                 }
-                loadGetResource(dna.core.resolveURL(linkURL, url))
-                    .done(function() {
-                        dfd.resolve.apply(this, $.makeArray(arguments));
-                    })
-                    .fail(function() {
-                        dfd.reject.apply(this, $.makeArray(arguments));
-                    });
             } else {
                 dfd.reject(404, 'Cannot load script "' + url + '"');
             }
@@ -610,7 +619,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         download(parts[0], 'text')
             .done(callback)
-            .fail(function() {dfd.reject.apply(this, $.makeArray(arguments));});
+            .fail(function() {
+                dfd.reject.apply(this, arguments);
+            });
 
         return dfd;
     }
@@ -634,19 +645,28 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .done(function(doc) {
                 dfd.resolve(doc);
             })
-            .fail(function() {
-                console.log('DNA: Cannot download "' + url + '"', arguments);
-                dfd.reject.apply(this, $.makeArray(arguments));
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
             });
 
         return dna.core.resources[url];
     };
 
-    function DNAError(message) {
-        this.name = 'DNAError';
-        this.message = message || 'Ups!';
+    function DNAError(info, code, detail) {
+        if (info instanceof Error) {
+            this.name = i.name || 'DNAError';
+            this.message = i.message || 'Unknown Error.';
+            this.code = i.code || 700;
+            this.detail = i.detail || i;
+        } else {
+            this.name = 'DNAError';
+            this.message = info || 'Ups!';
+            this.code = code || 700;
+            this.detail = detail;
+        }
+
         this.stack = (new Error()).stack;
-        console.log('DNAError: ' + message, this.stack);
+        console.log('DNAError: ' + this.code + ' ' + info, detail, this.stack);
     }
     DNAError.prototype = Object.create(Error.prototype);
     DNAError.prototype.constructor = DNAError;
