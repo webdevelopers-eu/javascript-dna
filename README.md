@@ -74,11 +74,11 @@ Define locations of your Javascript prototypes and their dependencies
 
 ```javascript
 dna({
-     'proto': 'MyFunc1',
-     'require': 'MyFunc2',
+     'proto': 'MyPrototype1',
+     'require': 'MyPrototype2',
      'load': '/somewhere/func1.js'
   }, {
-     'proto': 'MyFunc2',
+     'proto': 'MyPrototype2',
      'load': '/somewhere/func2.js'
   });
 ```
@@ -87,15 +87,15 @@ Create files with your javascript classes:
 
 File `/somewhere/func1.js`
 ```javascript
-function MyFunc1() { new dna.MyFunc2; }
+function MyPrototype1() { new dna.MyPrototype2; }
 ```
 File `/somewhere/func2.js`
 ```javascript
-function MyFunc2() { alert('Hello world!'); }
+function MyPrototype2() { alert('Hello world!'); }
 ```
-Execute your function after DNA exports explicitly required `MyFunc1` and its dependency `MyFunc2` as `dna` properties:
+Execute your function after DNA exports explicitly required `MyPrototype1` and its dependency `MyPrototype2` as `dna` properties:
 ```javascript
-dna('MyFunc1', function() { new dna.MyFunc1; });
+dna('MyPrototype1', function() { new dna.MyPrototype1; });
 ```
 
 ## Syntax
