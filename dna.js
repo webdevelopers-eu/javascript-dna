@@ -602,6 +602,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     .done(function(captured) {
                         proto = captured || proto;
                         evaluate(scripts.shift());
+                    })
+                    .fail(function() {
+                        dfd.reject.apply(this, arguments);
                     });
             var factory = settings.factory[script.config.eval || 'dna'];
             if (typeof factory != 'function') {
