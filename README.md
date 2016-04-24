@@ -54,7 +54,7 @@ dna(
        }
    );
 ```
-> There was nothing like that. Most solutions failed to meet this simple exepctation of every programmer by making impractical design choices or more complex solutions then it was required.
+> There was nothing like that. Most solutions failed to meet this simple exepctation of every programmer by making impractical design choices or implementing unnecessary complex solutions to achieve simple goal.
 
 ## Features
 
