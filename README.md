@@ -99,7 +99,7 @@ Create files with your javascript classes:
 File `/somewhere/func1.js`
 ```javascript
 function MyPrototype1() {
-    new dna.MyPrototype2; // we expect DNA to resolve also MyPrototype2 requirement before calling this.
+    new dna.MyPrototype2; // we expect DNA to resolve also MyPrototype2 requirement
 }
 ```
 File `/somewhere/func2.js`
