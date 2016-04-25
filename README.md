@@ -14,6 +14,7 @@
     - [Load Optimizations](#load-optimizations)
     - [Examples](#examples)
         - [Complete Example #1](#complete-example-1)
+    - [Portable Modules](#portable-modules)
     - [Tricks](#tricks)
         - [Call DNA Before It Loads](#call-dna-before-it-loads)
         - [External Configurations](#external-configurations)
