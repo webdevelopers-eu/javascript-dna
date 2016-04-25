@@ -35,7 +35,9 @@ Minimalist, jQuery based, simple to use, asynchronous script loader and dependen
 Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > A: There was a need for __clean__ and __intuitive__ loader. What every programer needs is a system that you can tell it that "I need classes `Class1` and `Class2` for my code to work." System will somehow make that happen and then execute your dependent code. This is what everybody wants. And this is what most f(r)ameworks don't get.
 >
-> And all force programmers to alter their precious code just to allow loading framework to work. That I consider as evil in most cases. Do you need to include `define()` at the end of your PHP class definition file? No! Why should you in Javascript? 
+> All require programmers to alter their precious code just to allow loading framework to work. That I consider as evil in most cases. Do you need to include `define()` at the end of your PHP class definition file? No! Why should you in Javascript?
+>
+> Everybody can write complex code. But only few can write [_simple_](https://simple.wikipedia.org/wiki/Occam%27s_razor) code.
 >
 > The desire was to build the system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or file names... Something like
 ```javascript
