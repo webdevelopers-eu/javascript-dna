@@ -61,6 +61,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         ]);
         opts.settings.forEach(dna.core.set);
         if (opts.jsonURLs.length + opts.required.length + opts.configs.length == 0) { // empty args
+            dna.core.checkQueue();
             return dfd.resolve().done(opts.callbacks).promise();
         }
         try {
@@ -80,7 +81,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     // insert JSON configs
                     dna(args)
                         .done(function() {
-                            dna.core.whenSatisfied(opts.required)
+                            dna.core.whenSatisfied(opts.required) // whenSatisfied checks whole queue
                                 .done(function() {
                                     $.when.apply(this, opts.required.map(function(name) { // Resolve 'require'
                                         return dna.core.require(name);
@@ -112,11 +113,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * only success-callbacks passed as parameters (see dna() arguments).
      *
      * @param {mixed...} argument
-     * @return {integer} number of waiting/unresolved requests;
+     * @return {integer} number of queue/unresolved requests;
      */
     dna.push = function() {
         dna.apply(this, arguments);
-        return dna.core.waiting.length;
+        return dna.core.queue.length;
     };
 
 
@@ -124,7 +125,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *  The dna.core service.
      */
     function DNACore() {
-        this.waiting = [];
+        this.queue = [];
         this.configs = [];
         this.resources = {};
     };
@@ -133,7 +134,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNACore.prototype.version = '1.0';
 
     /** @type {array} */
-    DNACore.prototype.waiting = null; // assigning [] would cause to share this accross instances - not sure if we want it
+    DNACore.prototype.queue = null; // assigning [] would cause to share this accross instances - not sure if we want it
 
     /** @type {array} */
     DNACore.prototype.configs = null; // assigning [] would cause to share this accross instances - not sure if we want it
@@ -208,8 +209,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         // IDs must not contain [./] because we recognize dna()'s URLs by those characters
         if (config.id) idOK = validateString(config.id, /^[a-z0-9:_-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
-        if (config.service) idOK = validateString(config.service, /^[a-z][a-zA-Z0-9_]+$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
-        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_:=]+$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
+        if (config.service) idOK = validateString(config.service, /^[a-z][a-zA-Z0-9_]*$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
+        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_:=]*$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
 
         if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
         if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
@@ -264,6 +265,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             if (!config) {
                 return false;
             }
+            if (config.eval && !settings.factory[config.eval]) {
+                return false;
+            }
+
             var nextStack = stack.slice();
             nextStack.push(requirements[i]);
             if (!this.canSatisfy(config.require, nextStack)) {
@@ -291,30 +296,32 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             'recursive'
         ]);
         newOpts._dfd = dfd;
-        this.waiting.push(newOpts);
+        this.queue.push(newOpts);
+        this.checkQueue();
+        return dfd;
+    };
 
-        for (var i = this.waiting.length - 1; 0 <= i; i--) {
-            var opts = this.waiting[i];
+    DNACore.prototype.checkQueue = function() {
+        for (var i = this.queue.length - 1; 0 <= i; i--) {
+            var opts = this.queue[i];
             try {
                 var can = this.canSatisfy(opts.requirements);
             } catch (e) {
-                this.waiting.splice(i, 1);
+                this.queue.splice(i, 1);
                 opts._dfd.reject(new DNAError(e));
                 break;
             }
 
             if (can) {
-                this.waiting.splice(i, 1);
+                this.queue.splice(i, 1);
                 $(opts.callbacks).each(function(k, callback) {
                     callback();
                 });
                 opts._dfd.resolve(opts);
             } else {
-                console.log('DNA: Queued action #' + (i + 1) + '/' + this.waiting.length + ': Waiting for yet undefined requirements: ' + opts.requirements.join(', '));
+                console.log('DNA: Queued action #' + (i + 1) + '/' + this.queue.length + ': Waiting for yet undefined requirements: ' + opts.requirements.join(', '));
             }
         }
-
-        return dfd;
     };
 
     DNACore.prototype.getConfig = function (name) {
@@ -723,12 +730,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     console.log('DNA: Ready.');
 
-    var queue = window.dna || [];  // replace optional queue of calls with reall object
+    var initQueue = window.dna || [];  // replace optional queue of calls with reall object
     window.dna = dna;
 
     // Resolve calls to dna() made before dna loaded
     // using `dna = dna || []; dna.push(args);`
-    for (var i = 0; i < queue.length; i++) {
-        window.dna.apply(this, [queue[i]]);
+    for (var i = 0; i < initQueue.length; i++) {
+        window.dna.apply(this, [initQueue[i]]);
     }
 })(jQuery, window);
