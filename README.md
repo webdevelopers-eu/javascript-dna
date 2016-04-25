@@ -39,7 +39,7 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 >
 > Everybody can write complex code. But only few can write [_simple_](https://simple.wikipedia.org/wiki/Occam%27s_razor) code.
 >
-> The desire was to build the system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or file names... Something like
+> The desire was to build the system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or file paths... Something like
 ```javascript
 // Contents of file /just/anywhere/file.js
 function Point(x, y) {
