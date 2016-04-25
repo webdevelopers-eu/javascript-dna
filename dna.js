@@ -4,8 +4,8 @@
  * Minimalistic asynchronous script loader, dependency resolver and
  * framework base. No bullshits.
  *
- * The MIT License (MIT), https://github.com/webdevelopers-eu/javascript-dna
- * Copyright (c) 2016 Daniel Ševčík, www.webdevelopers.eu
+ * @license The MIT License (MIT), https://github.com/webdevelopers-eu/javascript-dna
+ * @preserve Copyright (c) 2016 Daniel Ševčík, www.webdevelopers.eu
  */
 'use strict';
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
