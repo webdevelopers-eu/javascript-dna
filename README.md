@@ -405,7 +405,8 @@ var dna = dna || [];
 // Treat dna.push([ARGS]) as it were dna(ARGS)
 dna.push(['MyService', doSomething]);
 
-// Note - DNA is not loaded and just line before you specified dependency on MyService that was not defined either
+// Note - DNA is not loaded yet and just line before
+// you specified dependency on MyService that was not defined either
 dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
 ```
 And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
