@@ -237,7 +237,10 @@ Note: Thanks to Ozone API if you try to require a class that has unknown `eval` 
 
 You can bundle multiple scripts into one XML or HTML file for optimized download.
 
-Just create a document (e.g. `my-bundle.html`) and put standard `script` tags with `id` attributes in it. E.g. `<script id="myScript">function MyObject() {alert('Hello World!');}<script>`
+Just create a document (e.g. `my-bundle.html`) and put standard `script` tags with `id` attributes in it.
+```html
+<script id="myScript">function MyObject() {alert('Hello World!');}<script>
+```
 
 When specifying `load` property of the DNA Configuration object use the URL pointing to HTML file with hash part specifying the element ID.
 ```javascript
