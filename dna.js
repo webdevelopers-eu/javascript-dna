@@ -208,9 +208,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         config = $.extend({}, config); // clone it so later modification to the object does not do mass
 
         // IDs must not contain [./] because we recognize dna()'s URLs by those characters
-        if (config.id) idOK = validateString(config.id, /^[a-z0-9:_-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
-        if (config.service) idOK = validateString(config.service, /^[a-z][a-zA-Z0-9_]*$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
-        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_:=]*$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
+        if (config.id) idOK = validateString(config.id, /^[a-zA-Z0-9_:@#$*-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
+        if (config.service) idOK = validateString(config.service, /^[a-zA-Z0-9_:@#$*-]*$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
+        if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_]*(=[a-zA-Z0-9_:@#$*-]+)*$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
 
         if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
         if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));

@@ -364,6 +364,31 @@ MyApplication.prototype.start = function() {
 }
 ```
 
+## Portable Modules
+
+If you are writting piece of code then make sure that you create configuration with globally unique ids so programmers using your code can integrate it without changes.
+
+Good idea is to prefix your super-identifiers with your domain name with dots replaced by dashes.
+
+Example of your `config.json` file:
+```javascript
+[
+    {
+        'proto': 'Example=example-com:Example',
+        'require': ['example-com:Main', 'example-com:service'],
+        'load': './example.js'
+    }, {
+        'proto: 'Main=example-com:Main',
+        'load': './main.js'
+    }, {
+        'service': 'example-com:service',
+        'proto: 'ServiceProto=example-com:ServiceProto',
+        'require': 'example-com:Main',
+        'load': './service.js'
+    }
+]
+```
+
 ## Tricks
 
 There are many ways how to leverage the strength of DNA in your project.
