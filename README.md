@@ -259,7 +259,7 @@ It is good idea to make sure your web server allows browser-side caching of XML/
 For developement you can have empty `script` tags linking to external javascripts: `<script id="myScript" src="/libs/myscript.js"></script>`.
 DNA will figure out that the content of `script` tag is missing and will use linked resource instead.
 
-For live site you can populate the HTML with embeded scripts or use the web server [PageSpeed Module](https://developers.google.com/speed/pagespeed/module/) or other tools to do it automatically for you.
+For production site you can populate the HTML with embeded scripts or use the web server [PageSpeed Module](https://developers.google.com/speed/pagespeed/module/) or other tools to do it automatically for you.
 
 ## Examples
 
