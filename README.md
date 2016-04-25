@@ -118,7 +118,7 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ):N
 
 * `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
 * `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration-object) section.
-* `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file.
+* `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`")
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY`.
 
@@ -369,27 +369,27 @@ MyApplication.prototype.start = function() {
 
 If you write piece of code for global distribution then make sure you create configuration with globally (worldwide) unique ids so programmers using your code can integrate it without changes to your configs.
 
-Good idea is to prefix your super-identifiers with your domain name with dots replaced by dashes.
+Good idea is to prefix your super-identifiers with your domain name.
 
 Example of your `config.json` file:
 ```javascript
 [
     {
-        'proto': 'Example=example-com:Example',
-        'require': ['example-com:Main', 'example-com:service'],
+        'proto': 'Example=example.com:Example',
+        'require': ['example.com:Main', 'example.com:service'],
         'load': './example.js'
     }, {
-        'service': 'example-com:service',
-        'proto': 'ServiceProto=example-com:ServiceProto',
-        'require': 'example-com:Main',
+        'service': 'example.com:service',
+        'proto': 'ServiceProto=example.com:ServiceProto',
+        'require': 'example.com:Main',
         'load': './service.js'
     }, {
-        'proto': 'Main=example-com:Main',
+        'proto': 'Main=example.com:Main',
         'load': './main.js'
     }
 ]
 ```
-Code in the example will result in exports into `dna["example-com:..."]` properties.
+Code in the example will result in exports into `dna["example.com:..."]` properties.
 
 
 ## Tricks
