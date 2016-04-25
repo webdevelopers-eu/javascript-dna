@@ -85,9 +85,9 @@ Define locations of your Javascript prototypes and their dependencies
 
 ```javascript
 dna({
-     'proto': 'MyPrototype1',
-     'require': 'MyPrototype2',
-     'load': '/somewhere/func1.js'
+     'proto': 'MyPrototype1', // Prototype name stored in func1.js
+     'require': 'MyPrototype2', // It requires also another prototype defined elsewhere
+     'load': '/somewhere/func1.js' // There is MyPrototype1 expected to be defined.
   }, {
      'proto': 'MyPrototype2',
      'load': '/somewhere/func2.js'
