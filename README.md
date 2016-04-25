@@ -36,7 +36,7 @@ Unobtrusive, simple to use, asynchronous script loader and dependency resolver t
 Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 > A: There was a need for modern, __clean__ and __intuitive__ loader. What every programer needs is a system that you can say to "I need classes `Class1` and `Class2` for my code to work." System will somehow make that happen and then execute your dependent code. This is what everybody wants. And this is what most f(r)ameworks don't get.
 >
-> All require programmers to alter their precious code just to allow loading framework to work. That I consider in most cases as pure evil. Do you need to include `define()` at the end of your PHP class definition file? No! Why should you in Javascript?
+> Programmers are required to alter their precious code to enable loading frameworks. That I consider in most cases as pure evil. Framework should help you and you should not be required to help framework. Do you need to include `define()` at the end of your PHP class definition file? No! Why should you in Javascript?
 >
 > Everybody can write complex code. But only few can write [_simple_](https://simple.wikipedia.org/wiki/Occam%27s_razor) code.
 >
