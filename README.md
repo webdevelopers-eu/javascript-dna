@@ -202,7 +202,7 @@ in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["My
 
 ## Ozone API
 
-Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order to match your needs for worryless coding.
+Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order (O³ API) to match your needs for worryless coding.
 
 You can define callbacks before you load configurations. DNA will delay your callback's resolution until it gets enough information to resolve all dependencies.
 ```javascript
