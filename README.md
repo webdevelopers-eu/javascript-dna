@@ -379,11 +379,11 @@ Example of your `config.json` file:
         'require': ['example-com:Main', 'example-com:service'],
         'load': './example.js'
     }, {
-        'proto: 'Main=example-com:Main',
+        'proto': 'Main=example-com:Main',
         'load': './main.js'
     }, {
         'service': 'example-com:service',
-        'proto: 'ServiceProto=example-com:ServiceProto',
+        'proto': 'ServiceProto=example-com:ServiceProto',
         'require': 'example-com:Main',
         'load': './service.js'
     }
