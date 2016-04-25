@@ -64,7 +64,7 @@ dna(
 - [x] __Bundles__ - optional script archives capable of accommodating dozens of scripts that are fast to download and don't carry unnecessary burden on browser's internal script parser.
 - [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Custom factories__ - downloaded scripts can optionally be passed to your own function to execute them and return expected object. Make your lovely require.js or common.js work with Javascript DNA!
-- [x] __Out-of-order calls__ - you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
+- [x] __Out-of-order API__ - with unique O3 API you can call DNA methods in any order, define your needs before configuring the DNA, and even call DNA before it is loaded
 - [x] __Optimized__ - small and fast with minified size just about 11kB.
 - [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 - [x] __jQuery__ based
