@@ -694,7 +694,25 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var dfd = $.Deferred();
         dna.core.resources[url] = dfd.promise();
 
-        $.ajax({url: url, dataType: type || 'text', cache: true, type: 'GET', async: true})
+        $.ajax({
+            'url': url,
+            'dataType': type || 'text',
+            'cache': true,
+            'type': 'GET',
+            'async': true,
+            // 'xhrFields': {
+            //     onprogress: function (e) {
+            //         console.log('progress', e);
+            //         if (e.lengthComputable) {
+            //             // dfd.notify(parseInt(e.loaded / e.total * 100), 10);  // notify as a factor of the event object
+            //             console.log('progress', parseInt(e.loaded / e.total * 100), e);  // notify as a factor of the event object
+            //         }
+            //     }
+            // },
+            'headers': {
+                'X-Requested-With': 'DNA'
+            }
+        })
             .done(function(doc) {
                 dfd.resolve(doc);
             })
