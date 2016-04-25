@@ -284,7 +284,7 @@ dna({'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']}
 ```
 
 Making DNA calls before `dna.js` gets loaded using asynchronous `script` tag.
-```
+```html
 <script>
   var dna = dna || [];
   dna.push(function() { alert('DNA just loaded!'); });
@@ -298,7 +298,7 @@ Making DNA calls before `dna.js` gets loaded using asynchronous `script` tag.
 
 Contents of `index.html`:
 
-```
+```html
 <script>
     var dna = dna || [];
     dna.push(function() { // on DNA load
@@ -352,10 +352,12 @@ You can make DNA calls even before DNA was loaded.
 
 Create simple ```[]``` array if DNA is not loaded yet and call the ```dna.push([arguments])``` method on it as it was ```dna(arguments)``` method.
 
-```
+```html
+<script>
 var dna = dna || [];
 dna.push([ 'service1', function(svc1) {...} ]);
 dna.push(callbackOnDNAStart);
+</script>
 ...
 <script src=".../dna.js" async="async"></script>
 ```
