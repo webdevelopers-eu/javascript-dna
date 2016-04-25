@@ -231,7 +231,7 @@ Example:
   });
 ```
 
-Note: If you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. That makes possible to define custom factories anytime without worrying if any code requires given custom factory before it has been defined.
+Note: Thanks to Ozone API if you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. O³ API allows you to define custom factories anytime without worrying if any code requiring custom factory was called before it has been even defined.
 
 ## Load Optimizations
 
@@ -264,7 +264,7 @@ dna('Svc1', 'svc2', '/configs/svcs.json', {'service': 'svc2', 'proto': 'Svc2', '
     .fail(ups);
 ```
 
-Out-of-order calls: first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
+Out-of-order calls (O³ API): first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
 ```javascript
 dna(['Svc1', 'svc2'], run);
 
