@@ -11,7 +11,7 @@
     - [Prototype Aliases](#prototype-aliases)
     - [Ozone API](#ozone-api)
     - [Custom Factories](#custom-factories)
-    - [Load Optimizations](#load-optimizations)
+    - [Bundled Assets](#bundled-assets)
     - [Examples](#examples)
         - [Complete Example #1](#complete-example-1)
     - [Portable Modules](#portable-modules)
@@ -159,7 +159,7 @@ Where
 * `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution. See [Prototype Aliases](#prototype-aliases) to see how to load multiple versions of the same script.
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
-* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Load Optimizations](#load-optimizations)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
+* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window` or custom name.
  * `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property.
  * `window` evaluates the script using `window.eval()` method.
@@ -263,7 +263,7 @@ Example:
 
 Note: Thanks to Ozone API if you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. O³ API allows you to define custom factories anytime without worrying if any code requiring custom factory was called before it has been even defined.
 
-## Load Optimizations
+## Bundled Assets
 
 You can bundle multiple scripts into one XML or HTML file for optimized download.
 
