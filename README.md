@@ -395,14 +395,20 @@ dna('jquery:iPop', callback);
 ```
 Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-factories) that you can tailor to fit any framework and/or your special needs.
 
-### Load In Any Order
+### Ozone API
 
 You can define callbacks before you load configurations. DNA will delay your callback's resolution until it gets enough information to resolve all dependencies.
 ```javascript
-dna('MyService').done(doSomething);
+// DNA is not loaded yet? Create surrogate object.
+var dna = dna || [];
 
-dna({'proto': 'MyService', 'load': ['my1.js', 'my2.js']}); // This will doSomething()
+// Treat dna.push([ARGS]) as it were dna(ARGS)
+dna.push(['MyService', doSomething]);
+
+// Note - DNA is not loaded and just line before you specified dependency on MyService that was not defined either
+dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
 ```
+And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
 
 ## Troubleshooting
 
