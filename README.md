@@ -65,7 +65,7 @@ dna(
 - [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Custom factories__ - downloaded scripts can optionally be passed to your own function to execute them and return expected object. Make your lovely require.js or common.js work with Javascript DNA!
 - [x] __Out-of-order API__ - with unique O³ API (Ozone API) you can call DNA methods in any order, define your hooks with their requirements before feeding DNA with dependency information, call DNA before it is loaded and more.
-- [x] __Optimized__ - small and fast with minified size just about 11kB.
+- [x] __Optimized__ - small and fast with minified size of just about 11kB.
 - [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 - [x] __jQuery__ based
 
