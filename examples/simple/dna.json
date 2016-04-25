@@ -1,0 +1,12 @@
+[{
+    "proto": "Class1",
+    "require": "Class2",
+    "load": "./class1.js"
+}, {
+    "proto": "Class2",
+    "require": "Class3",
+    "load": "./class2.js"
+}, {
+    "proto": "Class3",
+    "load": "./class3.js"
+}]
