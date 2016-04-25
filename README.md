@@ -9,6 +9,7 @@
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
     - [Prototype Aliases](#prototype-aliases)
+    - [Ozone API](#ozone-api)
     - [Custom Factories](#custom-factories)
     - [Load Optimizations](#load-optimizations)
     - [Examples](#examples)
@@ -17,7 +18,6 @@
         - [Call DNA Before It Loads](#call-dna-before-it-loads)
         - [External Configurations](#external-configurations)
         - [Load Anything](#load-anything)
-        - [Load In Any Order](#load-in-any-order)
     - [Troubleshooting](#troubleshooting)
     - [ToDo](#todo)
 
@@ -199,6 +199,24 @@ dna({
 });
 ```
 in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff:v2"]` and `dna.MyStuffLatest` but not as `dna.MyStuff`.
+
+## Ozone API
+
+Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order to match your needs for worryless coding.
+
+You can define callbacks before you load configurations. DNA will delay your callback's resolution until it gets enough information to resolve all dependencies.
+```javascript
+// DNA is not loaded yet? Create surrogate object.
+var dna = dna || [];
+
+// Treat dna.push([ARGS]) as it were dna(ARGS)
+dna.push(['MyService', doSomething]);
+
+// Note - DNA is not loaded yet and just line before
+// you specified dependency on MyService that was not defined either
+dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
+```
+And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
 
 ## Custom Factories
 
@@ -394,22 +412,6 @@ dna({
 dna('jquery:iPop', callback);
 ```
 Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-factories) that you can tailor to fit any framework and/or your special needs.
-
-### Ozone API
-
-You can define callbacks before you load configurations. DNA will delay your callback's resolution until it gets enough information to resolve all dependencies.
-```javascript
-// DNA is not loaded yet? Create surrogate object.
-var dna = dna || [];
-
-// Treat dna.push([ARGS]) as it were dna(ARGS)
-dna.push(['MyService', doSomething]);
-
-// Note - DNA is not loaded yet and just line before
-// you specified dependency on MyService that was not defined either
-dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
-```
-And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
 
 ## Troubleshooting
 
