@@ -188,22 +188,22 @@ dna({
     'proto': 'MyStuff',
     'load': '/lib/my-stuff-v1.js'
 }, {
-    'proto': 'MyStuff=MyStuff:v2',
+    'proto': 'MyStuff=MyStuff@2',
     'load': '/lib/my-stuff-v2.js'
 });
 
-dna('MyStuff:v2', newerCodeCallback);
+dna('MyStuff@2', newerCodeCallback);
 ```
-In this case the class `MyStuff` from the file `my-stuff-v1.js` will be exported as `dna.MyStuff` while the same class from file `my-stuff-v2.js` will be exported as `dna["MyStuff:v2"]`.
+In this case the class `MyStuff` from the file `my-stuff-v1.js` will be exported as `dna.MyStuff` while the same class from file `my-stuff-v2.js` will be exported as `dna["MyStuff@2"]`.
 
 You can use also multiple aliases:
 ```javascript
 dna({
-    'proto': 'MyStuff=MyStuff:v2=MyStuffLatest',
+    'proto': 'MyStuff=MyStuff@2=webdevelopers.eu:MyStuff@2',
     'load': '/lib/my-stuff-v2.js'
 });
 ```
-in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff:v2"]` and `dna.MyStuffLatest` but not as `dna.MyStuff`.
+in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff@2"]` and `dna["webdevelopers.eu:MyStuff@2"]` but not as `dna.MyStuff`.
 
 ## Ozone API
 
@@ -391,6 +391,7 @@ Example of your `config.json` file:
 ```
 Code in the example will result in exports into `dna["example.com:..."]` properties.
 
+See more in [Prototype Aliases](#prototype-Aliases) section.
 
 ## Tricks
 
