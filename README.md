@@ -265,9 +265,13 @@ For production site you can populate the HTML with embeded scripts or use the we
 
 Mixed confugration using JSON file and inline Configuration Objects + requiring service `dna.svc2` and prototype `dna.Svc1`:
 ```javascript
-dna('Svc1', 'svc2', '/configs/svcs.json', {'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']})
-    .done(run)
-    .fail(ups);
+dna(
+      'Svc1', 'svc2',
+      '/configs/svcs.json',
+      {'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']}
+    )
+        .done(run)
+        .fail(ups);
 ```
 
 Out-of-order calls (O³ API): first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
