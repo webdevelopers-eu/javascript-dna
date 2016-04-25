@@ -231,7 +231,7 @@ Example:
   });
 ```
 
-Note: If you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. That allowes you to define you custom factories before or after the code that requires it.
+Note: If you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. That makes possible to define you custom factories anytime without worrying if any code requires custom factory before it is defined.
 
 ## Load Optimizations
 
