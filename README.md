@@ -98,11 +98,15 @@ Create files with your javascript classes:
 
 File `/somewhere/func1.js`
 ```javascript
-function MyPrototype1() { new dna.MyPrototype2; }
+function MyPrototype1() {
+    new dna.MyPrototype2; // we expect DNA to resolve also MyPrototype2 requirement before calling this.
+}
 ```
 File `/somewhere/func2.js`
 ```javascript
-function MyPrototype2() { alert('Hello world!'); }
+function MyPrototype2() {
+    alert('Hello world!');
+}
 ```
 Execute your function after DNA exports explicitly required `MyPrototype1` and its dependency `MyPrototype2` as `dna` properties:
 ```javascript
