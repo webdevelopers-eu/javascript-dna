@@ -367,7 +367,7 @@ MyApplication.prototype.start = function() {
 
 ## Portable Modules
 
-If you write piece of code for global distribution then make sure you create configuration with globally (worldwide) unique ids so programmers using your code can integrate it without changes.
+If you write piece of code for global distribution then make sure you create configuration with globally (worldwide) unique ids so programmers using your code can integrate it without changes to your configs.
 
 Good idea is to prefix your super-identifiers with your domain name with dots replaced by dashes.
 
