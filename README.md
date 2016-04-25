@@ -69,7 +69,7 @@ dna(
 - [x] __Bundles__ - optional script archives capable of accommodating dozens of scripts that are fast to download and don't carry unnecessary burden on browser's internal script parser.
 - [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Custom factories__ - downloaded scripts can optionally be passed to your own function to execute them and return expected object. Make your lovely require.js or common.js work with Javascript DNA!
-- [x] __Out-of-order API__ - with our unique O³ API (Ozone API) you can call DNA methods in any order, define your hooks with their requirements before feeding DNA with dependency information, call DNA even before it is loaded and more. No need to worry _if_, _when_ or in _what order_ you can use any of DNA features.
+- [x] __Out-of-order API__ - with our unique O₃ API (Ozone API) you can call DNA methods in any order, define your hooks with their requirements before feeding DNA with dependency information, call DNA even before it is loaded and more. No need to worry _if_, _when_ or in _what order_ you can use any of DNA features.
 - [x] __Optimized__ - small and fast with minified size of just about 11kB.
 - [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
 - [x] __jQuery__ based
@@ -211,7 +211,7 @@ in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["My
 
 ## Ozone API
 
-Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order (O³ API) to match your needs for worryless coding.
+Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order (O₃ API) to match your needs for worryless coding.
 
 You can define callbacks before you load configurations. DNA will delay your callback's resolution until it gets enough information to resolve all dependencies.
 ```javascript
@@ -261,7 +261,7 @@ Example:
   });
 ```
 
-Note: Thanks to Ozone API if you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. O³ API allows you to define custom factories anytime without worrying if any code requiring custom factory was called before it has been even defined.
+Note: Thanks to Ozone API if you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. O₃ API allows you to define custom factories anytime without worrying if any code requiring custom factory was called before it has been even defined.
 
 ## Bundled Assets
 
@@ -301,7 +301,7 @@ dna(
         .fail(ups);
 ```
 
-Out-of-order calls (O³ API): first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
+Out-of-order calls (O₃ API): first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
 ```javascript
 dna(['Svc1', 'svc2'], run);
 
