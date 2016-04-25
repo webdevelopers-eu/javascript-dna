@@ -25,7 +25,7 @@
 <!-- markdown-toc end -->
 # Javascript DNA / jDNA
 
-Minimalist, jQuery based, simple to use, asynchronous script loader and dependency resolver that will
+Unobtrusive, simple to use, asynchronous script loader and dependency resolver that will
 - dramatically __optimize__ the loading speed of many scripts
 - bring __order__ into big web apps
 - allow you to define __clean__ Javascript classes (prototypes) the way you always wanted to - without `define()` or `module.exports` auxiliary trash
