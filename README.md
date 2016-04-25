@@ -391,7 +391,7 @@ Example of your `config.json` file:
 ```
 Code in the example will result in exports into `dna["example.com:..."]` properties.
 
-See more in [Prototype Aliases](#prototype-Aliases) section.
+See more in [Prototype Aliases](#prototype-aliases) section.
 
 ## Tricks
 
