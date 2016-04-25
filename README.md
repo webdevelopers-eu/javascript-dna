@@ -71,7 +71,10 @@ dna(
 
 ## Quick Tutorial
 
-Include DNA script on your page `<script src=".../dna.js"></script>`
+Include DNA script on your page
+```html
+<script src=".../dna.js"></script>
+```
 
 Define locations of your Javascript prototypes and their dependencies
 
