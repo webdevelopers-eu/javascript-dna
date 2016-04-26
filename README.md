@@ -239,6 +239,14 @@ The main difference between asynchronous loaders is how loader
 
 Javascript DNA has core plugin system that allows you to define your own behavior for all of main components.
 
+To register your plugins pass the plugin configuration object to dna:
+```javscript({
+    'rewrite': rewritePlugin,
+    'fetcher': fetcherPlugins,
+    'factory': factoryPlugins
+});
+```
+
 ### Custom URL Rewriting
 
 To register your own URL rewritting function use this syntax
