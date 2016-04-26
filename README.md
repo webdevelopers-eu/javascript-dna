@@ -184,7 +184,7 @@ dna(
 );
 ```
 
-## Prototype Aliases
+#### Prototype Aliases
 
 Sometimes you will need to load Javascript class that has the name that conflicts with other class. Usually it is the case of supporting different versions of the same class.
 
