@@ -791,7 +791,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNAError.prototype.constructor = DNAError;
 
 
-    dna.DNACore = DNACore;
+    // dna['dna:Core'] = DNACore;
     dna['dna:core'] = new DNACore;
 
     console.log('DNA: Ready.');
