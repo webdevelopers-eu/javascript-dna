@@ -8,7 +8,7 @@
     - [Syntax](#syntax)
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
-    - [Prototype Aliases](#prototype-aliases)
+            - [Prototype Aliases](#prototype-aliases)
     - [Ozone API](#ozone-api)
     - [Core Plugin System](#core-plugin-system)
         - [Custom URL Rewriting](#custom-url-rewriting)
