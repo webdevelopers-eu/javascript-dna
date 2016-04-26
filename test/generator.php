@@ -19,7 +19,7 @@ function Test$num() {
     console.log('TEST: Service of class Test$num initialized.');
 }
 
-console.log('TEST: Proto Test$num loaded.');
+//console.log('TEST: Proto Test$num loaded.');
 
 // Check duplicate execution
 window.loadRegistry = window.loadRegistry || {};

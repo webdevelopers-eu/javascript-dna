@@ -12,6 +12,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
     var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna.core.set(SETTINGS))
+        'rewrite': [
+        ],
+        'fetcher': {
+        },
         'factory': { // Methods to evaluate scripts based on config.eval value
             'window': function(jString, protoName, dfd) {
                 protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
@@ -66,7 +70,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
         try {
             opts.configs.forEach(dna.core.configure.bind(dna.core));
-            $.when.apply(this, opts.jsonURLs.map(download)) // Resolve 'jsonURLs': download JSON configs
+            $.when.apply(this, opts.jsonURLs.map(rewriteURL).map(download)) // Resolve 'jsonURLs': download JSON configs
                 .done(function() {
                     // Format downloaded Configs with added config.baseURL
                     var args = $.makeArray(arguments).map(function(v, k) {
@@ -160,18 +164,24 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var doc = document.implementation.createHTMLDocument( 'html', '', '');
         var base = doc.head.appendChild(doc.createElement('base'));
         var link = doc.body.appendChild(doc.createElement('a'));
-        var url = location ? location.href : 'https://example.com/';
+        var url = location ? location.href : 'https://no-location-href.example.com/';
         for (var i = arguments.length - 1; 0 <= i; i--) {
-            base.setAttribute('href', url);
-            link.setAttribute('href', arguments[i]);
-            url = link.href;
+            if (typeof arguments[i] == 'string' && arguments[i].length) {
+                base.setAttribute('href', url);
+                link.setAttribute('href', arguments[i]);
+                url = link.href;
+            }
         }
         return url;
     };
 
     /**
      * Set various settings. Example:
-     *  dna.core.set({'factory': {'myAMD': myEval}});
+     *  dna.core.set({
+     *          'factory': {EVAL_TYPE: callback(jScript, config, dfd), ...},
+     *          'rewrite': [callback(currentURI, originalURI), ...],
+     *          'fetcher': {SCHEME: callback(uri, dfd), ...}
+     * });
      *
      * @param {object} obj Plain object with DNA settings.
      * @return {undefined}
@@ -183,7 +193,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 // we don't want people to mess with standard evals - they should define their own
                 delete v.dna;
                 delete v.window;
+                // nobreak;
+            case 'fetcher':
                 settings[k] = $.extend(settings[k], v);
+                break;
+            case 'rewrite':
+                settings[k] = settings[k].concat(v);
                 break;
             default:
                 settings[k] = v;
@@ -328,18 +343,20 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         for (var i = 0; i < this.configs.length; i++) {
             var c = this.configs[i];
             if (c.id == name || c.service == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
-                if (c.baseURL) { // we will resolve it on get rather then on load because on load it may never be used so it could waste CPU resources
+                if (!c._clean) { // was it alredy formatted?
                     c.load = dna.core
                         .getOpts(c.load, [['urls', 'string'], 'recursive'])
                         .urls
-                        .map(function(url) {return dna.core.resolveURL(url, c.baseURL);});
-                    delete c.baseURL;
-                }
-                if ($.type(c.require) == 'string') {
-                    c.require = [c.require];
-                }
-                if ($.type(c.load) == 'string') {
-                    c.load = [c.load];
+                        .map(function(url) {
+                            return rewriteURL(url, c.baseURL);
+                        });
+                    if ($.type(c.require) == 'string') {
+                        c.require = [c.require];
+                    }
+                    if ($.type(c.load) == 'string') {
+                        c.load = [c.load];
+                    }
+                    c._clean = true;
                 }
                 return c;
             }
@@ -646,7 +663,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             // HTML
             var doc = document.implementation.createHTMLDocument( 'html', '', '');
             doc.childNodes[1].innerHTML = string;
-            var $script = $('#' + parts[1], doc);
+            try {
+                var $script = $('#' + parts[1], doc);
+                if (!$script.length) throw 'Bundled resource "#' + parts[1] + '" not found in "' + url + '"';
+            } catch (e) {
+                dfd.reject(new DNAError('Cannot extract resource "#' + parts[1] + '" from bundle "' + url + ': ' + (e.message || e), 609, e));
+                return;
+            }
             var jString = $.trim($script.text());
 
             if (jString.length) {
@@ -670,7 +693,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             }
         };
 
-        download(parts[0], 'text')
+        download(parts[0])
             .done(callback)
             .fail(function() {
                 dfd.reject.apply(this, arguments);
@@ -686,7 +709,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return true;
     }
 
-    function download(url, type) {
+    function download(url) {
         if (dna.core.resources[url]) {
             return dna.core.resources[url];
         }
@@ -694,9 +717,17 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var dfd = $.Deferred();
         dna.core.resources[url] = dfd.promise();
 
+        // RFC 2396, Appendix A: scheme = alpha *( alpha | digit | "+" | "-" | "." )
+        var scheme = url.match(/^([a-z][a-z0-9+.-]*):/i)[1];
+        (settings.fetcher[scheme] || defaultFetcher)(url, dfd);
+
+        return dna.core.resources[url];
+    };
+
+    function defaultFetcher(url, dfd) {
         $.ajax({
             'url': url,
-            'dataType': type || 'text',
+            'dataType': 'text',
             'cache': true,
             'type': 'GET',
             'async': true,
@@ -719,9 +750,19 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .fail(function(jqXHR, textStatus, errorThrown) {
                 dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
             });
+    }
 
-        return dna.core.resources[url];
-    };
+    // There are two rewrite entry points:
+    // - JSON-config URL
+    // - config's load property
+    function rewriteURL(url, baseURL) {
+        var urlIn = url;
+        settings.rewrite.forEach(function(cb) {
+            url = cb(url, urlIn) || url;
+        });
+        url = dna.core.resolveURL(url, baseURL);
+        return url;
+    }
 
     function DNAError(info, code, detail) {
         if (info instanceof Error) {

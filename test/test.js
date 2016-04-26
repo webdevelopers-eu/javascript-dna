@@ -1,11 +1,14 @@
 var distPath = '../'; // document.querySelector('script[src*="test.js"]').src.replace(/test.js(\?.*)?$/, '');
+var classURL = function(query) {return distPath + 'test/generator.php?' + query;};
 var dna = dna || [];
+
+var calledOnce = {};
 
 // Test call before DNA is loaded
 if (isTestActive('Calls before DNA load')) {
     dna.push({
         'id': 'Test16',
-        'load': distPath + 'test/generator.php?16'
+        'load': classURL('16')
     });
 }
 
@@ -19,13 +22,19 @@ function isTestActive(name) {
 // Start standard tests
 dna.push(function() {
     var $table = $('<div class="list-group"></div>').appendTo('body');
-    var $main = $('<a href="?' + (new Date) + '#" class="list-group-item"><span class="label label-info" style="font-size: 2em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
+    var $main = $('<a href="?' + (new Date) + '#" class="list-group-item all"><span class="label label-info" style="font-size: 2em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
     window.testError = function(text) {
-        $('<div class="alert alert-danger"></div>').text(text).insertAfter($table);
+        $('<div class="alert alert-danger"></div>').text(text).insertBefore($table);
     };
 
     function markItem($item, success) {
+        if ($item.is('.marked:not(.all)')) {
+            success = false;
+            $item.attr('title', $item.attr('title') + ' ERROR: Item was already resolved/rejected!');
+            window.testError('Item "' + $item.text() + '" already resolved/rejected!');
+        }
         $item
+            .addClass('marked')
             .removeClass('list-group-item-danger list-group-item-success list-group-item-info')
             .addClass(success ? 'list-group-item-success' : 'list-group-item-danger')
             .find('.label')
@@ -42,10 +51,10 @@ dna.push(function() {
         }
     }
 
-    function addTest(name, seconds) {
+    function addTest(name) {
         if (!isTestActive(name)) return false;
 
-        seconds = seconds || 2;
+        var seconds = 10;
         var $result = $('<span class="label label-info" style="font-size: 1.2em;">⌛</span>');
         var $name = $('<span></span>').text(name);
         var details = 'timeout: ' + seconds + 's';
@@ -57,6 +66,9 @@ dna.push(function() {
                 .append($result)
         ;
         var timer = setTimeout(function() {
+            if ($li.is('.marked')) return;
+            $li.attr('title', $li.attr('title') + ' ERROR: TIMED OUT!');
+            window.testError('Item "' + $li.text() + '" timed out!');
             markItem($li, false);
         }, seconds * 1000);
 
@@ -78,7 +90,7 @@ dna.push(function() {
             return function() {
                 for (var i in argTypes) {
                     if ($.type(arguments[i]) != argTypes[i]) {
-                        cb('error: unexpected arguments - expected: ' + argTypes.join(', ') + '', arguments);
+                        cb(false, 'error: unexpected arguments - expected: ' + argTypes.join(', ') + '', arguments);
                         return;
                     }
                 }
@@ -94,10 +106,10 @@ dna.push(function() {
             window.dna({
                 'proto': 'Test1',
                 'require': 'Test2',
-                'load': distPath + 'test/generator.php?1'
+                'load': classURL('1')
             },{
                 'proto': 'Test2',
-                'load': distPath + 'test/generator.php?2',
+                'load': classURL('2'),
                 'eval': 'window'
             }, 'Test1', 'Test2', test(true, ['function', 'function']))
                 .fail(test(false));
@@ -118,12 +130,12 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Non-existing dependency failure', 5);
+        var test = addTest('Non-existing dependency failure');
         if (test) {
             window.dna({
                 'proto': 'Test4',
                 'require': 'Test5',
-                'load': distPath + 'test/generator.php?4'
+                'load': classURL('4')
             }, 'Test4', test(true))
                 .fail(test(false));
             setTimeout(function() {
@@ -168,11 +180,11 @@ dna.push(function() {
             window.dna({
                 'proto': 'Test9',
                 'require': 'Test10',
-                'load': distPath + 'test/generator.php?9'
+                'load': classURL('9')
             },{
                 'proto': 'Test10',
                 'require': 'Test9',
-                'load': distPath + 'test/generator.php?10'
+                'load': classURL('10')
             }, 'Test9')
                 .done(test(false))
                 .fail(test(true));
@@ -214,7 +226,7 @@ dna.push(function() {
 
             window.dna({
                 'proto': 'Test13',
-                'load': distPath + 'test/generator.php?13'
+                'load': classURL('13')
             });
         }
 
@@ -227,10 +239,10 @@ dna.push(function() {
             window.dna({
                 'id': 'Test14',
                 'require': 'Test15',
-                'load': distPath + 'test/generator.php?14'
+                'load': classURL('14')
             }, {
                 'id': 'Test15',
-                'load': distPath + 'test/generator.php?15'
+                'load': classURL('15')
             }, 'Test14')
                 .done(test(true))
                 .fail(test(false));
@@ -254,7 +266,7 @@ dna.push(function() {
             var cb17 = [ test(false), test(true) ];
             window.dna({
                 'proto': 'Test17',
-                'load': distPath + 'test/generator.php?17',
+                'load': classURL('17'),
                 'eval': 'dna'
             }, 'Test17')
                 .done(function() {
@@ -271,7 +283,7 @@ dna.push(function() {
             var cb18 = [ test(false), test(true) ];
             window.dna({
                 'proto': 'Test18',
-                'load': distPath + 'test/generator.php?18',
+                'load': classURL('18'),
                 'eval': 'window'
             }, 'Test18')
                 .done(function() {
@@ -283,15 +295,15 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Order of evaluations.', 5);
+        var test = addTest('Order of evaluations.');
         if (test) {
             var cb19 = [ test(false), test(true) ];
             window.dna({
                 'id': 'Test19',
                 'load': [
-                    distPath + 'test/generator.php?19&order[var]=orderTest19&order[id]=1&delay=4.0',
-                    distPath + 'test/generator.php?20&order[var]=orderTest19&order[id]=2&delay=0.0',
-                    distPath + 'test/generator.php?21&order[var]=orderTest19&order[id]=3&delay=3.0'
+                    classURL('19&order[var]=orderTest19&order[id]=1&delay=4.0'),
+                    classURL('20&order[var]=orderTest19&order[id]=2&delay=0.0'),
+                    classURL('21&order[var]=orderTest19&order[id]=3&delay=3.0')
                 ]
             }, 'Test19')
                 .done(function() {
@@ -303,11 +315,11 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Proto aliases.', 5);
+        var test = addTest('Proto aliases.');
         if (test) {
             window.dna({
                 'proto': 'Test22=Alias22=Alias22:v2=Alias22:v1',
-                'load': distPath + 'test/generator.php?22'
+                'load': classURL('22')
             }, 'Alias22:v2')
                 .done(function() {
                     test(!dna.Test22 && dna.Alias22 && dna['Alias22:v2'] && dna['Alias22:v1'], ['function']).apply(this, arguments);
@@ -317,7 +329,7 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Dependency depth 32.', 10);
+        var test = addTest('Dependency depth 32.');
         if (test) {
             var testId = 23, depDepth = 32, depWidth = 1;
             for (var depth = 0; depth < depDepth; depth++) {
@@ -327,14 +339,83 @@ dna.push(function() {
                     'load': []
                 };
                 for (var width = 0; width < depWidth; width++) {
-                    conf.load.push(distPath + 'test/generator.php?' + (testId + depth * depWidth + width));
+                    conf.load.push(classURL(testId + depth * depWidth + width));
                 }
                 window.dna(conf);
-                console.log(JSON.stringify(conf));
             }
             window.dna('Test' + testId, test(true, ['function'])).fail(test(false));
         }
     }());
 
+
+    // ------------------------------------------------------------------------
+    (function() {
+        var test = addTest('Rewrite test.');
+        if (test) {
+            dna({
+                'rewrite': function(url) {
+                    console.log('Rewritting', url);
+                    return url.replace(/^rewrite-test:1$/, classURL('55'));
+                }
+            }, {
+                'rewrite': [function(url) {
+                    console.log('Rewritting', url);
+                    return url.replace(/^rewrite-test:2$/, classURL('56'));
+                }]
+            }, {
+                'proto': 'Test55',
+                'load': ['rewrite-test:2', 'rewrite-test:1']
+            },
+                'Test55'
+               )
+                .done(test(true, ['function']))
+                .fail(test(false));
+        }
+    }());
+
+    // ------------------------------------------------------------------------
+    (function() {
+        var test = addTest('Factory test.');
+        if (test) {
+            dna({
+                'factory': {
+                    'eval57': function(jString, protoName, dfd) {
+                        dfd.resolve(123456);
+                    }
+                }
+            }, {
+                'proto': 'Test57',
+                'load': classURL('57'),
+                'eval': 'eval57'
+            },
+                'Test57'
+               )
+                .done(test(true, ['number']))
+                .fail(test(false));
+        }
+    }());
+
+    // ------------------------------------------------------------------------
+    (function() {
+        var test = addTest('Fetcher test.');
+        if (test) {
+            dna({
+                'fetcher': {
+                    'variable': function(uri, dfd) {
+                        var jScript = 'function Test58() { console.log("Fetcher-generated function 58 for uri ' + uri + '!"); }';
+                        console.log('Fetcher: generated: ' + jScript);
+                        dfd.resolve(jScript);
+                    }
+                }
+            }, {
+                'proto': 'Test58',
+                'load': 'variable:58'
+            },
+                'Test58'
+               )
+                .done(test(true, ['function']))
+                .fail(test(false));
+        }
+    }());
 
 });
