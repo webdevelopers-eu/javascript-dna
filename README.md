@@ -297,7 +297,7 @@ dna({
             var contents = myCachedContents[uri.replace('variable:', '')];
 
             if (contents) dfd.resolve(contents);
-            else dfd.reject('Cannot fetch URI "' + uri + '"!');
+            else dfd.reject(new Error('Cannot fetch URI "' + uri + '"!'));
         }
     }
 });
