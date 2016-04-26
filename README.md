@@ -127,7 +127,7 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | S
 * `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration-object) section.
 * `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`")
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
-* `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY`.
+* `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY` | `SETTINGS` .
 * `SETTINGS`:`Object` see more in [Core Plugin System](#core-plugin-system) section.
 
 Returned values
