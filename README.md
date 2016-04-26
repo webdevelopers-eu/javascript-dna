@@ -41,8 +41,6 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 >
 > Programmers are required to alter their precious code to enable loading frameworks. That I consider in most cases as pure evil. Framework should help you and you should not be required to help framework. Do you need to include `define()` at the end of your PHP class definition file? No! Why should you in Javascript?
 >
-> Everybody can write complex code. But only few can write [_simple_](https://simple.wikipedia.org/wiki/Occam%27s_razor) code.
->
 > The desire was to build the system that will understand simple files containing clean (future ECMA6) class declarations or current Javascript prototype definitions without any `define()` and `module.export` trash code. Something you are used to from other languages. Something where one can express dependencies using __class names__ rather then cryptic ids or file paths... Something like
 ```javascript
 // Contents of file /just/anywhere/file.js
