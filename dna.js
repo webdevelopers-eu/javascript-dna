@@ -719,6 +719,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         // RFC 2396, Appendix A: scheme = alpha *( alpha | digit | "+" | "-" | "." )
         var scheme = url.match(/^([a-z][a-z0-9+.-]*):/i)[1];
+
+        dfd.fail(function(e) {new DNAError(e);}); // write to console
+
         if ((settings.fetcher[scheme] || defaultFetcher)(url, dfd) === false) {
             defaultFetcher(url, dfd);
         }
