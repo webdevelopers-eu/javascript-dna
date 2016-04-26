@@ -73,7 +73,7 @@ dna(
 - [x] __Out-of-order API__ - with our unique O₃ API (Ozone API) you can call DNA methods in any order, define your hooks with their requirements before feeding DNA with dependency information, call DNA even before it is loaded and more. No need to worry _if_, _when_ or in _what order_ you can use any of DNA features.
 - [x] __Optimized__ - small and fast with minified size of just about 11kB.
 - [x] __Easy debugging__ - shows correct source/lines in debuggers. Reporting problems in console. Global error handlers.
-- [x] __Open plugin system__ - support for URL-rewritting, download and script evaluation plugins. One can theoretically implement also ECMAScript 6's `import` functionality using Javscript DNA.
+- [x] __Open plugin system__ - support for URL-rewritting, download and script evaluation plugins.
 - [x] __jQuery__ based
 
 ## Quick Tutorial
