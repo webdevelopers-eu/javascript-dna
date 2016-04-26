@@ -250,7 +250,7 @@ dna({
 
 ### Custom URL Rewriting
 
-To register your own URL rewritting function use this syntax
+To register your own URL rewritting callback use this syntax
 ```javascript
   dna({
       'rewrite': function(currentUri, originalURI) | [ function(currentUri, originalURI), ... ]
@@ -268,7 +268,9 @@ if (server.development) {
 }
 ```
 
-You can register multiple rewrite functions. They will be called in order of registration.
+You can register multiple rewrite callbacks. They will be called in order of registration.
+
+The resulting URI will be resolved to absolute URL if it is relative after all rewrite callbacks were applied.
 
 ### Custom Downloader
 
