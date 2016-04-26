@@ -2,6 +2,14 @@ var distPath = '../'; // document.querySelector('script[src*="test.js"]').src.re
 var classURL = function(query) {return distPath + 'test/generator.php?' + query;};
 var dna = dna || [];
 
+var minified = false;
+if (location.hash.match(/^#minified/)) {
+    document.write('<script type="text/javascript" defer src="../dna.min.js"></script>');
+    minified = true;
+} else {
+    document.write('<script type="text/javascript" defer src="../dna.js"></script>');
+}
+
 var calledOnce = {};
 
 // Test call before DNA is loaded
@@ -21,6 +29,11 @@ function isTestActive(name) {
 
 // Start standard tests
 dna.push(function() {
+    $('.minified')
+        .hide()
+        .filter('#minified-' + (minified ? 'on' : 'off'))
+        .show();
+
     var $table = $('<div class="list-group"></div>').appendTo('body');
     var $main = $('<a href="?' + (new Date) + '#" class="list-group-item all"><span class="label label-info" style="font-size: 2em;">⌛</span><h1>All DNA Tests</h1></a>').appendTo($table);
     window.testError = function(text) {
