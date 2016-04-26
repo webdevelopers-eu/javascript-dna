@@ -348,6 +348,15 @@ Example:
 
 Note: Thanks to Ozone API if you try to require a class that has unknown `eval` type then the request will be queued until apropriate `eval` type is defined. O₃ API allows you to define custom factories anytime without worrying if any code requiring custom factory was called before it has been even defined.
 
+In fact this should allow also ECMA6 bridge.
+```javascript
+// app.js
+import * as calculator from 'calculator';
+
+console.log(calculator.sum(1, 2)); // => 3
+```
+where factory can search for `import` statement, do sub-call to DNA to resolve the found dependency and remove the `import` statement for compatibility with non-ECMA6 browsers... :-)
+
 ## Bundled Assets
 
 You can bundle multiple scripts into one XML or HTML file for optimized download.
