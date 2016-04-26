@@ -163,7 +163,7 @@ Where
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window` or custom name.
  * `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property.
  * `window` evaluates the script using `window.eval()` method.
- * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Factories](#custom-factories) section.
+ * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Script Evaluation](#custom-script-evaluation) section.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
@@ -227,7 +227,76 @@ dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
 ```
 And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
 
-## Custom Factories
+## Core Plugin System
+
+The main difference between asynchronous loaders is how loader
+- interprets URLs
+- fetches files
+- evaluates scripts
+
+Javascript DNA has core plugin system that allows you to define your own behavior for all of main components.
+
+### Custom URL Rewriting
+
+To register your own URL rewritting function use this syntax
+```javascript
+  dna({
+      'rewrite: function(currentUri, originalURI) | [ function(currentUri, originalURI), ... ]
+    });
+```
+
+Example:
+```javascript
+if (server.development) {
+    dna({
+        'rewrite: function(currentURI, originalURI) {
+            return currentURI.replace(/\.min\.js$/, '.js');
+        }
+    });
+}
+```
+
+You can register multiple rewrite functions. They will be called in order of registration.
+
+### Custom Downloader
+
+You can also register your own URI fetcher. That way you can fetch files not only from server but also from local storage, variables, ...
+
+You can register only one fetcher for each HTTP scheme with optional default fallback to `$.AJAX`.
+
+To register your own URL rewritting function use this syntax
+```javascript
+  dna({
+      'fetcher': {
+          SCHEME: function(uri, dfd),
+          ...
+      }
+    });
+```
+Your fetcher is expected to call `dfd.reject(ERROR)` or `dfd.resolve(DATA_STRING)` after the fetch.
+
+Example:
+```javascript
+dna({
+    'fetcher': {
+        'variable': function(uri, dfd) {
+            var contents = myCachedContents[uri.replace('variable:', '')];
+
+            if (contents) dfd.resolve(contents);
+            else dfd.reject('Cannot fetch URI "' + uri + '"!');
+        }
+    }
+});
+
+dna({
+    'proto': 'Test',
+    'load': 'variable:myTest'
+}, 'Test', callback);
+```
+
+Note: When your fetcher returns `false` then default `$.AJAX` fetcher will be called instead. If you return `false` from your fetcher then you are supposed not to resolve `dfd` Deferred object.
+
+### Custom Script Evaluation
 
 You can specify your own function to execute downloaded scripts. That way you can bridge RequireJS or CommonJS or any other module format.
 
@@ -235,10 +304,12 @@ To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
-      EVAL_TYPE: function(jString, protoName, dfd)
+      EVAL_TYPE: function(jString, protoName, dfd),
+      ...
     }
   });
 ```
+Your factory is expected to call `dfd.reject(ERROR)` or `dfd.resolve(FUNCTION)` after resolution.
 
 Example:
 ```javascript
@@ -448,7 +519,7 @@ dna({
 
 dna('jquery:iPop', callback);
 ```
-Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-factories) that you can tailor to fit any framework and/or your special needs.
+Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-script-evaluation) that you can tailor to fit any framework and/or your special needs.
 
 ## Troubleshooting
 
@@ -456,5 +527,3 @@ Watch the Javascript Console.
 
 ## ToDo
 - [ ] Document $(window) events 'dna:fail', 'dna:done', 'dna:always'
- 
- 

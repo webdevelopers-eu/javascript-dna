@@ -719,7 +719,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         // RFC 2396, Appendix A: scheme = alpha *( alpha | digit | "+" | "-" | "." )
         var scheme = url.match(/^([a-z][a-z0-9+.-]*):/i)[1];
-        (settings.fetcher[scheme] || defaultFetcher)(url, dfd);
+        if ((settings.fetcher[scheme] || defaultFetcher)(url, dfd) === false) {
+            defaultFetcher(url, dfd);
+        }
 
         return dna.core.resources[url];
     };
@@ -750,6 +752,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .fail(function(jqXHR, textStatus, errorThrown) {
                 dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
             });
+
+        return true;
     }
 
     // There are two rewrite entry points:
