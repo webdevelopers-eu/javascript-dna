@@ -119,8 +119,8 @@ dna('MyPrototype1', function() { new dna.MyPrototype1; });
 ## Syntax
 
 ```
-dna( [ REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ], ...):Promise
-dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ):Number
+dna( [ REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | SETTINGS ], ...):Promise
+dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | SETTINGS ):Number
 ```
 
 * `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
@@ -128,6 +128,7 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY ):N
 * `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`")
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY`.
+* `SETTINGS`:`Object` see more in [Core Plugin System](#core-plugin-system) section.
 
 Returned values
 * `Promise` -  the call to `dna(...)` always returns jQuery [Promise](https://api.jquery.com/category/deferred-object/) object that you can use to hook your callbacks onto immediately or anytime later.
