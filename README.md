@@ -242,7 +242,7 @@ Javascript DNA has core plugin system that allows you to define your own behavio
 To register your plugins pass the plugin configuration object to dna:
 ```javascript
 dna({
-    'rewrite': rewritePlugin,
+    'rewrite': rewritePlugins,
     'fetcher': fetcherPlugins,
     'factory': factoryPlugins
 });
