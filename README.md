@@ -278,7 +278,7 @@ You can also register your own URI fetcher. That way you can fetch files not onl
 
 You can register only one fetcher for each URI scheme.
 
-To register your own URL rewritting function use this syntax
+To register your own fetcher use this syntax
 ```javascript
   dna({
       'fetcher': {
