@@ -392,7 +392,7 @@ dna.push(function() {
         if (test) {
             dna({
                 'factory': {
-                    'eval57': function(jString, protoName, dfd) {
+                    'eval57': function(dfd, jString, protoName) {
                         dfd.resolve(123456);
                     }
                 }
@@ -414,7 +414,7 @@ dna.push(function() {
         if (test) {
             dna({
                 'fetcher': {
-                    'variable': function(uri, dfd) {
+                    'variable': function(dfd, uri) {
                         var jScript = 'function Test58() { console.log("Fetcher-generated function 58 for uri ' + uri + '!"); }';
                         console.log('Fetcher: generated: ' + jScript);
                         dfd.resolve(jScript);

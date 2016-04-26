@@ -282,7 +282,7 @@ To register your own fetcher use this syntax
 ```javascript
   dna({
       'fetcher': {
-          SCHEME: function(uri, dfd),
+          SCHEME: function(dfd, uri),
           ...
       }
     });
@@ -293,7 +293,7 @@ Example:
 ```javascript
 dna({
     'fetcher': {
-        'variable': function(uri, dfd) {
+        'variable': function(dfd, uri) {
             var contents = myCachedContents[uri.replace('variable:', '')];
 
             if (contents) dfd.resolve(contents);
@@ -318,7 +318,7 @@ To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
-      EVAL_TYPE: function(jString, protoName, dfd),
+      EVAL_TYPE: function(dfd, jString, protoName),
       ...
     }
   });
@@ -329,7 +329,7 @@ Example:
 ```javascript
   dna({
     'factory': {
-      'my-common-js': function(jString, protoName, dfd) {
+      'my-common-js': function(dfd, jString, protoName) {
         var exports = {};
         (function(exports) {
            eval(jString);

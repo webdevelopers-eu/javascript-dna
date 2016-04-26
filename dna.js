@@ -17,14 +17,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'fetcher': {
         },
         'factory': { // Methods to evaluate scripts based on config.eval value
-            'window': function(jString, protoName, dfd) {
+            'window': function(dfd, jString, protoName) {
                 protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 dfd.resolve((function() {
                     return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
                 }()));
             },
-            'dna': function(jString, protoName, dfd) {
+            'dna': function(dfd, jString, protoName) {
                 protoName = protoName ? protoName : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 dfd.resolve((function() {
@@ -178,9 +178,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     /**
      * Set various settings. Example:
      *  dna.core.set({
-     *          'factory': {EVAL_TYPE: callback(jScript, config, dfd), ...},
+     *          'factory': {EVAL_TYPE: callback(dfd, jScript, config), ...},
      *          'rewrite': [callback(currentURI, originalURI), ...],
-     *          'fetcher': {SCHEME: callback(uri, dfd), ...}
+     *          'fetcher': {SCHEME: callback(dfd, uri), ...}
      * });
      *
      * @param {object} obj Plain object with DNA settings.
@@ -639,7 +639,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 return dfdEval.reject(new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script));
             }
             try {
-                factory(script.jString, script.config.proto[0], dfdEval);
+                factory(dfdEval, script.jString, script.config.proto[0]);
             } catch (e) {
                 return dfdEval.reject(new DNAError(e));
             }
@@ -722,14 +722,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         dfd.fail(function(e) {new DNAError(e);}); // write to console
 
-        if ((settings.fetcher[scheme] || defaultFetcher)(url, dfd) === false) {
-            defaultFetcher(url, dfd);
+        if ((settings.fetcher[scheme] || defaultFetcher)(dfd, url) === false) {
+            defaultFetcher(dfd, url);
         }
 
         return dna.core.resources[url];
     };
 
-    function defaultFetcher(url, dfd) {
+    function defaultFetcher(dfd, url) {
         $.ajax({
             'url': url,
             'dataType': 'text',
