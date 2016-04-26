@@ -263,9 +263,9 @@ You can register multiple rewrite functions. They will be called in order of reg
 
 ### Custom Downloader
 
-You can also register your own URI fetcher. That way you can fetch files not only from server but also from local storage, variables, ...
+You can also register your own URI fetcher. That way you can fetch files not only from server but also from local storage, variables or other resources.
 
-You can register only one fetcher for each HTTP scheme with optional default fallback to `$.AJAX`.
+You can register only one fetcher for each URI scheme.
 
 To register your own URL rewritting function use this syntax
 ```javascript
