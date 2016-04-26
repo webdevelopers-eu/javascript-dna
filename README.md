@@ -244,7 +244,7 @@ Javascript DNA has core plugin system that allows you to define your own behavio
 To register your own URL rewritting function use this syntax
 ```javascript
   dna({
-      'rewrite: function(currentUri, originalURI) | [ function(currentUri, originalURI), ... ]
+      'rewrite': function(currentUri, originalURI) | [ function(currentUri, originalURI), ... ]
     });
 ```
 
@@ -252,7 +252,7 @@ Example:
 ```javascript
 if (server.development) {
     dna({
-        'rewrite: function(currentURI, originalURI) {
+        'rewrite': function(currentURI, originalURI) {
             return currentURI.replace(/\.min\.js$/, '.js');
         }
     });
