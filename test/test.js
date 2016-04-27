@@ -123,7 +123,8 @@ dna.push(function() {
             },{
                 'proto': 'Test2',
                 'load': classURL('2'),
-                'eval': 'window'
+                'eval': 'dna',
+                'namespace': 'window'
             }, 'Test1', 'Test2', test(true, ['function', 'function']))
                 .fail(test(false));
         }
@@ -274,7 +275,7 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Evaluation test - dna');
+        var test = addTest('Evaluation test - dna factory');
         if (test) {
             var cb17 = [ test(false), test(true) ];
             window.dna({
@@ -291,13 +292,13 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Evaluation test - window');
+        var test = addTest('Evaluation test - window namespace');
         if (test) {
             var cb18 = [ test(false), test(true) ];
             window.dna({
                 'proto': 'Test18',
                 'load': classURL('18'),
-                'eval': 'window'
+                'namespace': 'window'
             }, 'Test18')
                 .done(function() {
                     dna.Test18 && window.Test18 ? cb18[1].apply(this, arguments) : cb18[0].apply(this, arguments);
@@ -430,5 +431,35 @@ dna.push(function() {
                 .fail(test(false));
         }
     }());
+
+    // // ------------------------------------------------------------------------
+    // (function() {
+    //     var test = addTest('Namespace test.');
+    //     if (test) {
+    //         dna({
+    //             'proto': 'Test59',
+    //             'load': classURL('59'),
+    //             'namespace': 'ns:59'
+    //         }, {
+    //             'proto': 'Test60',
+    //             'load': classURL('60'),
+    //             'namespace': 'ns:59'
+    //         }, {
+    //             'proto': 'Test61',
+    //             'load': classURL('61'),
+    //             'namespace': 'ns:61'
+    //         },
+    //             'Test59', 'Test60', 'Test61'
+    //            )
+    //             .done(function(proto1, proto2, proto3) {
+    //                 if (proto1() === proto2() && proto2() !== proto3()) {
+    //                     test(true, ['function', 'function', 'function'])(arguments);
+    //                 } else {
+    //                     test(false)();
+    //                 }
+    //             })
+    //             .fail(test(false));
+    //     }
+    // }());
 
 });

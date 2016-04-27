@@ -154,7 +154,8 @@ Configuration Objects are used to define dependencies and requirements.
     'service': SERVICE,
     'require': REQUIRE,
     'load': LOAD,
-    'eval': EVAL
+    'eval': EVAL,
+    'namespace': NAMESPACE
 }
 ```
 Where
@@ -163,10 +164,12 @@ Where
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first.
-* `EVAL`:`String` Optional. Accepted values: `dna` (default) or `window` or custom name.
- * `dna` evaluates the script in closure variable scope and expects the script to define variable of name specified in configuration's `proto` property.
- * `window` evaluates the script using `window.eval()` method.
+* `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name.
+ * `dna` evaluates the script in closure scope and expects the script to define variable of name specified in configuration's `proto` property.
  * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Script Evaluation](#custom-script-evaluation) section.
+* `NAMESPACE`:`String` Optional. Default: `false`. Name of the namespace to evaluate the script. Currently supported values: "`window`" or `false`.
+ * `false` (default) boolean causes the script evaluation in its own context.
+ * "`window`" string causes evaluation in `window` object context
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 

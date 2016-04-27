@@ -15,8 +15,12 @@ if (is_numeric(@$_GET['delay'])) {
 }
 
 echo "
+var localVar = localVar || [];
+localVar.push($num);
+
 function Test$num() {
     console.log('TEST: Service of class Test$num initialized.');
+    return localVar;
 }
 
 //console.log('TEST: Proto Test$num loaded.');
