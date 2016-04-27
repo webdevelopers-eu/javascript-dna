@@ -170,6 +170,7 @@ Where
 * `NAMESPACE`:`String` Optional. Default: `false`. Name of the namespace to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
  * "`window`" string causes evaluation in `window` object context
+ * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same namespace name will have `this` set to the same private Object.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
