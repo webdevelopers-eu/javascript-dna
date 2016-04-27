@@ -1,6 +1,3 @@
-// @todo format config.load to []
-// @todo format config.proto=[] to config.proto={}
-
 /**
  * Javascript DNA 1.0
  *
@@ -49,21 +46,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             }
         },
         'factory': { // Methods to evaluate scripts based on config.eval value
-            'window': function(dfd, jString, protoName, config) {
-                protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
-                var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
-                try {
-                    dfd.resolve((function() {return window.eval(evalStr);}()));
-                } catch (e) {
-                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
-                    throw e;
-                }
-            },
             'dna': function(dfd, jString, protoName, config) {
                 protoName = protoName ? protoName : 'undefined';
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
-                    dfd.resolve((function() {return eval(evalStr);}()));
+                    dfd.resolve(config._namespace(evalStr));
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
                     throw e;
@@ -230,7 +217,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             case 'factory':
                 // we don't want people to mess with standard evals - they should define their own
                 delete v.dna;
-                delete v.window;
                 settings[k] = $.extend(settings[k], v);
                 break;
             case 'fetcher':
@@ -272,7 +258,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         // Only minimal fast cleaning of IDs so we can find the config.
         // Thorough cleanup is done when fetching
-        configCleanUpIds(config);
+        cleanConfigFast(config);
 
         [config.id, config.service]
             .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
@@ -379,7 +365,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         for (var i = 0; i < this.configs.length; i++) {
             var c = this.configs[i];
             if (c.id == name || c.service == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
-                return configCleanUpThorough(c);
+                return readyConfig(c);
             }
         }
         return null;
@@ -763,14 +749,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return url;
     }
 
-    function configCleanUpIds(config) {
+    function cleanConfigFast(config) {
         delete config._clean;
         config.proto = config.proto ? config.proto.split('=') : []; // support aliasing Proto=Alias=Alias2...
         return config;
     }
 
-    function configCleanUpThorough(config) {
-        if (config._clean) return config;
+    function readyConfig(config) {
+        if (config._ready) return config;
 
         delete config._dfd;
 
@@ -789,7 +775,19 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             config.load = config.load ? [config.load] : [];
         }
 
-        config._clean = true;
+        // Namespace
+        config.namespace = config.namespace + '' || false;
+        if (config.namespace == 'window') {
+            dna['dna:namespaces'][config.namespace] = dna['dna:namespaces'][config.namespace] || (function(jString) {return window.eval(jString);});
+            config._namespace = dna['dna:namespaces'][config.namespace];
+        } else if (config.namespace) {
+            dna['dna:namespaces'][config.namespace] = dna['dna:namespaces'][config.namespace] || (function(jString) {return eval(jString);});
+            config._namespace = dna['dna:namespaces'][config.namespace];
+        } else {
+            config._namespace = (function(jString) {return eval(jString);});
+        }
+
+        config._ready = true;
 
         return config;
     }
@@ -816,6 +814,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     // dna['dna:Core'] = DNACore;
     dna['dna:core'] = new DNACore;
+    dna['dna:namespaces'] = {};
 
     console.log('DNA: Ready.');
 
