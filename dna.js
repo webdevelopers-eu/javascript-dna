@@ -18,6 +18,35 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'rewrite': [
         ],
         'fetcher': {
+            '*': function (dfd, url, config) {
+                $.ajax({
+                    'url': url,
+                    'dataType': 'text',
+                    'cache': true,
+                    'type': 'GET',
+                    'async': true,
+                    // 'xhrFields': {
+                    //     onprogress: function (e) {
+                    //         console.log('progress', e);
+                    //         if (e.lengthComputable) {
+                    //             // dfd.notify(parseInt(e.loaded / e.total * 100), 10);  // notify as a factor of the event object
+                    //             console.log('progress', parseInt(e.loaded / e.total * 100), e);  // notify as a factor of the event object
+                    //         }
+                    //     }
+                    // },
+                    'headers': {
+                        'X-Requested-With': 'DNA'
+                    }
+                })
+                    .done(function(doc) {
+                        dfd.resolve(doc);
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
+                    });
+
+                return true;
+            }
         },
         'factory': { // Methods to evaluate scripts based on config.eval value
             'window': function(dfd, jString, protoName, config) {
@@ -196,8 +225,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 // we don't want people to mess with standard evals - they should define their own
                 delete v.dna;
                 delete v.window;
-                // nobreak;
+                settings[k] = $.extend(settings[k], v);
+                break;
             case 'fetcher':
+                delete v['*']; // protect default fetcher - let people define their own
                 settings[k] = $.extend(settings[k], v);
                 break;
             case 'rewrite':
@@ -707,42 +738,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         dfd.fail(function(e) {new DNAError(e);}); // write to console
 
-        if ((settings.fetcher[scheme] || defaultFetcher)(dfd, url, config) === false) {
-            defaultFetcher(dfd, url, config);
+        if (!settings.fetcher[scheme] || settings.fetcher[scheme](dfd, url, config) === false) {
+            settings.fetcher['*'](dfd, url, config);
         }
 
         return dna['dna:core'].resources[url];
     };
-
-    function defaultFetcher(dfd, url, config) {
-        $.ajax({
-            'url': url,
-            'dataType': 'text',
-            'cache': true,
-            'type': 'GET',
-            'async': true,
-            // 'xhrFields': {
-            //     onprogress: function (e) {
-            //         console.log('progress', e);
-            //         if (e.lengthComputable) {
-            //             // dfd.notify(parseInt(e.loaded / e.total * 100), 10);  // notify as a factor of the event object
-            //             console.log('progress', parseInt(e.loaded / e.total * 100), e);  // notify as a factor of the event object
-            //         }
-            //     }
-            // },
-            'headers': {
-                'X-Requested-With': 'DNA'
-            }
-        })
-            .done(function(doc) {
-                dfd.resolve(doc);
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-                dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
-            });
-
-        return true;
-    }
 
     // There are two rewrite entry points:
     // - JSON-config URL
