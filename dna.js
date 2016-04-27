@@ -1,3 +1,6 @@
+// @todo format config.load to []
+// @todo format config.proto=[] to config.proto={}
+
 /**
  * Javascript DNA 1.0
  *
@@ -17,14 +20,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'fetcher': {
         },
         'factory': { // Methods to evaluate scripts based on config.eval value
-            'window': function(dfd, jString, protoName) {
+            'window': function(dfd, jString, protoName, config) {
                 protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 dfd.resolve((function() {
                     return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
                 }()));
             },
-            'dna': function(dfd, jString, protoName) {
+            'dna': function(dfd, jString, protoName, config) {
                 protoName = protoName ? protoName : 'undefined';
                 var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 dfd.resolve((function() {
@@ -230,13 +233,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
         if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
 
-        // Cleanup - we reserve some properties for ourselves - not
-        // sure if .configure should have more cleanup I moved cleanup
-        // in .getConfig() because we may have hundreds of configs but
-        // only few may be really used on the page so only basic clean
-        // up here and more thorough in .getConfig()
-        delete config._dfd;
-        config.proto = config.proto ? config.proto.split('=') : []; // support aliasing Proto=Alias=Alias2...
+        // Only minimal fast cleaning of IDs so we can find the config.
+        // Thorough cleanup is done when fetching
+        configCleanUpIds(config);
 
         [config.id, config.service]
             .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
@@ -343,22 +342,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         for (var i = 0; i < this.configs.length; i++) {
             var c = this.configs[i];
             if (c.id == name || c.service == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
-                if (!c._clean) { // was it alredy formatted?
-                    c.load = dna['dna:core']
-                        .getOpts(c.load, [['urls', 'string'], 'recursive'])
-                        .urls
-                        .map(function(url) {
-                            return rewriteURL(url, c.baseURL);
-                        });
-                    if ($.type(c.require) == 'string') {
-                        c.require = [c.require];
-                    }
-                    if ($.type(c.load) == 'string') {
-                        c.load = [c.load];
-                    }
-                    c._clean = true;
-                }
-                return c;
+                return configCleanUpThorough(c);
             }
         }
         return null;
@@ -547,12 +531,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
         config._dfd = dfd.promise();
 
-        promises.push(this.load(config, config.load || [])); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
+        promises.push(fetchResources(config)); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
         promises.push(requireMulti.call(this, [config.require], stack));
 
         $.when.apply(this, promises).done(function(scripts) {
             var val;
-            evaluateScripts(scripts)
+            evaluateScripts(scripts, config)
                 .done(function(proto) {
                     // Install objects
                     if (config.proto[0]) {
@@ -590,12 +574,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     };
 
 
-    DNACore.prototype.load = function(config, urls) {
-        urls = this.getOpts(urls, [['urls', 'string'], 'recursive']).urls;
+    function fetchResources(config) {
+        var urls = this.getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
 
         var promises = [];
         urls.forEach(function(url) {
-            promises.push(loadGetResource(url));
+            promises.push(loadGetResource(url), config);
         });
 
         var dfd = $.Deferred();
@@ -603,7 +587,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .done(function() {
                 var scripts = [];
                 for (var i = 0; i < arguments.length; i++) {
-                    scripts.push({'jString': arguments[i], 'config': config});
+                    scripts.push(arguments[i]);
                 }
                 dfd.resolve(scripts);
             })
@@ -614,7 +598,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return dfd;
     };
 
-    function evaluateScripts(scripts) {
+    // Evaluates fetched scripts from the same config
+    function evaluateScripts(scripts, config) {
         var proto, dfd = $.Deferred();
 
         // Note - there is a risk of running too deep recursively - tested in Chromium with dep chain of 100 items with 32 loaded files for each item
@@ -636,10 +621,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         dfd.reject(new DNAError('Evaluation of the script failed.', 608,  {'arguments': arguments, 'about': script}));
                     });
             if (typeof factory != 'function') {
-                return dfdEval.reject(new DNAError('Unknown evaluation type "' + script.config.eval + '"', 604, script));
+                return dfdEval.reject(new DNAError('Unknown evaluation type "' + config.eval + '"', 604, config));
             }
             try {
-                factory(dfdEval, script.jString, script.config.proto[0]);
+                factory(dfdEval, script, config.proto[0], config);
             } catch (e) {
                 return dfdEval.reject(new DNAError(e));
             }
@@ -650,7 +635,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return dfd;
     }
 
-    function loadGetResource(url) {
+    function loadGetResource(url, config) {
         var dfd = $.Deferred();
         var parts = url.split('#');
         var callback;
@@ -680,7 +665,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 if (!linkURL) {
                     dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': string, 'url': url}));
                 } else {
-                    loadGetResource(dna['dna:core'].resolveURL(linkURL, url))
+                    loadGetResource(dna['dna:core'].resolveURL(linkURL, url), config)
                         .done(function() {
                             dfd.resolve.apply(this, arguments);
                         })
@@ -693,7 +678,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             }
         };
 
-        download(parts[0])
+        download(parts[0], config)
             .done(callback)
             .fail(function() {
                 dfd.reject.apply(this, arguments);
@@ -709,7 +694,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return true;
     }
 
-    function download(url) {
+    function download(url, config) {
         if (dna['dna:core'].resources[url]) {
             return dna['dna:core'].resources[url];
         }
@@ -722,14 +707,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         dfd.fail(function(e) {new DNAError(e);}); // write to console
 
-        if ((settings.fetcher[scheme] || defaultFetcher)(dfd, url) === false) {
-            defaultFetcher(dfd, url);
+        if ((settings.fetcher[scheme] || defaultFetcher)(dfd, url, config) === false) {
+            defaultFetcher(dfd, url, config);
         }
 
         return dna['dna:core'].resources[url];
     };
 
-    function defaultFetcher(dfd, url) {
+    function defaultFetcher(dfd, url, config) {
         $.ajax({
             'url': url,
             'dataType': 'text',
@@ -769,6 +754,37 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         });
         url = dna['dna:core'].resolveURL(url, baseURL);
         return url;
+    }
+
+    function configCleanUpIds(config) {
+        delete config._clean;
+        config.proto = config.proto ? config.proto.split('=') : []; // support aliasing Proto=Alias=Alias2...
+        return config;
+    }
+
+    function configCleanUpThorough(config) {
+        if (config._clean) return config;
+
+        delete config._dfd;
+
+        config.load = dna['dna:core']
+            .getOpts(config.load, [['urls', 'string'], 'recursive'])
+            .urls
+            .map(function(url) {
+                return rewriteURL(url, config.baseURL);
+            });
+
+        if ($.type(config.require) !== 'array') {
+            config.require = config.require ? [config.require] : [];
+        }
+
+        if ($.type(config.load) !== 'array') {
+            config.load = config.load ? [config.load] : [];
+        }
+
+        config._clean = true;
+
+        return config;
     }
 
     function DNAError(info, code, detail) {
