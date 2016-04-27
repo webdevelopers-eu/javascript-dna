@@ -50,7 +50,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 protoName = protoName ? protoName : 'undefined';
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
-                    dfd.resolve(config._namespace(evalStr));
+                    dfd.resolve(
+                                config.namespace === 'window' ?
+                                (function(evalStr) {return window.eval(evalStr);}(evalStr)) :
+                                (function(evalStr) {return eval(evalStr);}(evalStr))
+                               );
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
                     throw e;
@@ -775,17 +779,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             config.load = config.load ? [config.load] : [];
         }
 
-        // Namespace
+        // Namespace - could we use yield for that?
         config.namespace = config.namespace + '' || false;
-        if (config.namespace == 'window') {
-            dna['dna:namespaces'][config.namespace] = dna['dna:namespaces'][config.namespace] || (function(jString) {return window.eval(jString);});
-            config._namespace = dna['dna:namespaces'][config.namespace];
-        } else if (config.namespace) {
-            dna['dna:namespaces'][config.namespace] = dna['dna:namespaces'][config.namespace] || (function(jString) {return eval(jString);});
-            config._namespace = dna['dna:namespaces'][config.namespace];
-        } else {
-            config._namespace = (function(jString) {return eval(jString);});
-        }
+        // if (config.namespace === 'window') {
+        //     config._namespace = window;
+        // } else {
+        //     config._namespace = dna['dna:namespaces'][config.namespace] || {};
+        // }
+        // if (config.namespace) {
+        //     dna['dna:namespaces'][config.namespace] = config._namespace;
+        // }
 
         config._ready = true;
 
