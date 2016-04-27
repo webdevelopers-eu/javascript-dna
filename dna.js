@@ -42,7 +42,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         dfd.resolve(doc);
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
-                        dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
+                        dfd.reject.call(this, new DNAError('Download "' + url + '" failed: ' + jqXHR.status + ' ' + textStatus + ' ' + errorThrown, 606, {'config': config, 'xhr': jqXHR, 'textStatus': textStatus,  'error': errorThrown}));
                     });
 
                 return true;
@@ -51,17 +51,23 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'factory': { // Methods to evaluate scripts based on config.eval value
             'window': function(dfd, jString, protoName, config) {
                 protoName = protoName ? 'window["' + protoName + '"]' : 'undefined';
-                var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
-                dfd.resolve((function() {
-                    return window.eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
-                }()));
+                var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
+                try {
+                    dfd.resolve((function() {return window.eval(evalStr);}()));
+                } catch (e) {
+                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'arguments': arguments, 'exception': e}));
+                    throw e;
+                }
             },
             'dna': function(dfd, jString, protoName, config) {
                 protoName = protoName ? protoName : 'undefined';
-                var retStatement = 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
-                dfd.resolve((function() {
-                    return eval(jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + retStatement);
-                }()));
+                var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
+                try {
+                    dfd.resolve((function() {return eval(evalStr);}()));
+                } catch (e) {
+                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e}));
+                    throw e;
+                }
             }
         }
     };
