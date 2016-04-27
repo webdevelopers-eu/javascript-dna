@@ -304,7 +304,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      */
     DNACore.prototype.whenSatisfied = function() {
         var dfd = $.Deferred();
-        var newOpts  = this.getOpts(arguments, [
+        var newOpts  = dna['dna:core'].getOpts(arguments, [
             ['requirements', 'string'],
             ['callbacks', 'function'],
             'recursive'
@@ -505,7 +505,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     function requireMulti(args, stack) {
         var promises = [];
         try {
-            this.getOpts(args, [['names', 'string'], 'recursive']).names
+            dna['dna:core'].getOpts(args, [['names', 'string'], 'recursive']).names
                 .forEach((function(name) {
                     promises.push(requireSingle.call(this, name, stack));
                 }).bind(this));
@@ -575,11 +575,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 
     function fetchResources(config) {
-        var urls = this.getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
+        var urls = dna['dna:core'].getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
 
         var promises = [];
         urls.forEach(function(url) {
-            promises.push(loadGetResource(url), config);
+            promises.push(loadGetResource(url, config));
         });
 
         var dfd = $.Deferred();
@@ -611,7 +611,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     return dfd.resolve(proto); // most / last script - resolve main dfd
                 }
             }
-            var factory = settings.factory[script.config.eval || 'dna'];
+            var factory = settings.factory[config.eval || 'dna'];
             var dfdEval = $.Deferred()
                     .done(function(captured) {
                         proto = captured || proto;
