@@ -50,7 +50,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 protoName = protoName ? protoName : 'undefined';
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
-                    dfd.resolve(function(evalStr) {return config._namespace.eval ? config._namespace.eval(evalStr) : eval(evalStr);}(evalStr));
+                    dfd.resolve(function(evalStr) {
+                        return config.namespace == 'window' ? window.eval(evalStr) : eval(evalStr);
+                    }(evalStr));
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
                     throw e;
@@ -780,7 +782,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config.namespace === 'window') {
             config._namespace = window;
         } else {
-            config._namespace = dna['dna:namespaces'][config.namespace] || {};
+            config._namespace = dna['dna:namespaces'][config.namespace] || ({});
         }
         if (config.namespace) {
             dna['dna:namespaces'][config.namespace] = config._namespace;
