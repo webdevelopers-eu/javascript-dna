@@ -55,7 +55,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 try {
                     dfd.resolve((function() {return window.eval(evalStr);}()));
                 } catch (e) {
-                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'arguments': arguments, 'exception': e}));
+                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
                     throw e;
                 }
             },
@@ -65,7 +65,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 try {
                     dfd.resolve((function() {return eval(evalStr);}()));
                 } catch (e) {
-                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e}));
+                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
                     throw e;
                 }
             }
