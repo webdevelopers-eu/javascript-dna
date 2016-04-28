@@ -11,6 +11,7 @@
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
+    var contexts = {};
     var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna['dna:core'].set(SETTINGS))
         'rewrite': [
         ],
@@ -51,7 +52,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
                     dfd.resolve(function(evalStr) {
-                        return config._namespace.eval(evalStr);
+                        return config._context.eval(evalStr);
                     }(evalStr));
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
@@ -777,15 +778,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             config.load = config.load ? [config.load] : [];
         }
 
-        // Namespace - could we use yield for that?
-        config.namespace = config.namespace + '' || false;
-        if (config.namespace === 'window') {
-            config._namespace = window;
+        // Context - could we use yield for that?
+        config.context = config.context + '' || false;
+        if (config.context === 'window') {
+            config._context = window;
         } else {
-            config._namespace = dna['dna:namespaces'][config.namespace] || ({'eval': function(jString) {return eval(jString);}});
+            config._context = contexts[config.context] || {'eval': function(jString) {return eval(jString);}};
         }
-        if (config.namespace) {
-            dna['dna:namespaces'][config.namespace] = config._namespace;
+        if (config.context) {
+            contexts[config.context] = config._context;
         }
 
         config._ready = true;
@@ -815,8 +816,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     // dna['dna:Core'] = DNACore;
     dna['dna:core'] = new DNACore;
-    dna['dna:namespaces'] = {};
-
     console.log('DNA: Ready.');
 
     var initQueue = window.dna || [];  // replace optional queue of calls with reall object

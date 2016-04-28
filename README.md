@@ -155,7 +155,7 @@ Configuration Objects are used to define dependencies and requirements.
     'require': REQUIRE,
     'load': LOAD,
     'eval': EVAL,
-    'namespace': NAMESPACE
+    'context': CONTEXT
 }
 ```
 Where
@@ -167,10 +167,10 @@ Where
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name.
  * `dna` evaluates the script in closure scope and expects the script to define variable of name specified in configuration's `proto` property.
  * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Script Evaluation](#custom-script-evaluation) section.
-* `NAMESPACE`:`String` Optional. Default: `false`. Name of the namespace to evaluate the script. Currently supported values: "`window`" or `false`.
+* `CONTEXT`:`String` Optional. Default: `false`. Name of the context to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
  * "`window`" string causes evaluation in `window` object context
- * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same namespace name will have `this` set to the same private Object.
+ * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` set to the same private Object.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
