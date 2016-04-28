@@ -569,7 +569,6 @@ dna({
         'context': 'my-private'
     });
 ```
-
 ```javscript
 // /libs/script1.js
 
