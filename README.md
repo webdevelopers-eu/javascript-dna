@@ -563,18 +563,16 @@ Most of older scripts can be specified using `id` attribute and executed using `
 
 Sometimes selected scripts need to share the variables. Polluting global `window` scope with variables is not the best solution.
 
-With DNA you can use the experimental named contexts. Scripts sharing the same name of the context will have `this` and variable `module` set to their own shared Object.
-
-Variable `module` has property `exports` (`module.exports`) for compatibility with apps expecting that.
+With DNA you can use the experimental named contexts. Scripts sharing the same name of the context will have `this` and variable `context` set to their own shared Object.
 
 ```javascript
 dna({
         'id': 'test:1',
-        'load': 'javascript: module.exports.myVar1 = "var 1"; console.log("Script 1", module.exports.myVar1, module.exports.myVar2);',
+        'load': 'javascript: context.myVar1 = "var 1"; console.log("Script 1", context.myVar1, context.myVar2);',
         'context': 'my-private'
     }, {
         'id': 'test:2',
-        'load': 'javascript: module.exports.myVar2 = "var 2"; console.log("Script 2", module.exports.myVar1, module.exports.myVar2);',
+        'load': 'javascript: context.myVar2 = "var 2"; console.log("Script 2", context.myVar1, context.myVar2);',
         'context': 'my-private'
     },
     'test:1', 'test:2');

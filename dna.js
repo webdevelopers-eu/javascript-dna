@@ -54,8 +54,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 protoName = protoName ? protoName : 'undefined';
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
-                    dfd.resolve(function(evalStr, module) {
-                        return config._context.eval(evalStr);
+                    dfd.resolve(function(evalStr, context) {
+                        return context.eval(evalStr);
                     }(evalStr, config._context));
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
@@ -787,7 +787,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config.context === 'window') {
             config._context = window;
         } else {
-            config._context = contexts[config.context] || {'eval': function(jString) {return eval(jString);}, 'exports': {}};
+            config._context = contexts[config.context] || {'eval': function(jString) {return eval(jString);}};
         }
         if (config.context) {
             contexts[config.context] = config._context;
