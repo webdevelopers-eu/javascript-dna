@@ -411,13 +411,13 @@ dna.push(function() {
 
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Fetcher test.');
+        var test = addTest('Downloader test.');
         if (test) {
             dna({
-                'fetcher': {
+                'downloader': {
                     'variable': function(dfd, uri) {
-                        var jScript = 'function Test58() { console.log("Fetcher-generated function 58 for uri ' + uri + '!"); }';
-                        console.log('Fetcher: generated: ' + jScript);
+                        var jScript = 'function Test58() { console.log("Downloader-generated function 58 for uri ' + uri + '!"); }';
+                        console.log('Downloader: generated: ' + jScript);
                         dfd.resolve(jScript);
                     }
                 }

@@ -15,7 +15,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna['dna:core'].set(SETTINGS))
         'rewrite': [
         ],
-        'fetcher': {
+        'downloader': {
             '*': function (dfd, url, config) {
                 $.ajax({
                     'url': url,
@@ -208,7 +208,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *  dna['dna:core'].set({
      *          'factory': {EVAL_TYPE: callback(dfd, jScript, config), ...},
      *          'rewrite': [callback(currentURI, originalURI), ...],
-     *          'fetcher': {SCHEME: callback(dfd, uri), ...}
+     *          'downloader': {SCHEME: callback(dfd, uri), ...}
      * });
      *
      * @param {object} obj Plain object with DNA settings.
@@ -222,8 +222,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 delete v.dna;
                 settings[k] = $.extend(settings[k], v);
                 break;
-            case 'fetcher':
-                delete v['*']; // protect default fetcher - let people define their own
+            case 'downloader':
+                delete v['*']; // protect default downloader - let people define their own
                 settings[k] = $.extend(settings[k], v);
                 break;
             case 'rewrite':
@@ -260,7 +260,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
 
         // Only minimal fast cleaning of IDs so we can find the config.
-        // Thorough cleanup is done when fetching
+        // Thorough cleanup is done when downloading
         cleanConfigFast(config);
 
         [config.id, config.service]
@@ -557,7 +557,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
         config._dfd = dfd.promise();
 
-        promises.push(fetchResources(config)); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
+        promises.push(downloadResources(config)); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
         promises.push(requireMulti.call(this, [config.require], stack));
 
         $.when.apply(this, promises).done(function(scripts) {
@@ -600,7 +600,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     };
 
 
-    function fetchResources(config) {
+    function downloadResources(config) {
         var urls = dna['dna:core'].getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
 
         var promises = [];
@@ -624,7 +624,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return dfd;
     };
 
-    // Evaluates fetched scripts from the same config
+    // Evaluates downloaded scripts from the same config
     function evaluateScripts(scripts, config) {
         var proto, dfd = $.Deferred();
 
@@ -733,8 +733,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         dfd.fail(function(e) {new DNAError(e);}); // write to console
 
-        if (!settings.fetcher[scheme] || settings.fetcher[scheme](dfd, url, config) === false) {
-            settings.fetcher['*'](dfd, url, config);
+        if (!settings.downloader[scheme] || settings.downloader[scheme](dfd, url, config) === false) {
+            settings.downloader['*'](dfd, url, config);
         }
 
         return dna['dna:core'].resources[url];

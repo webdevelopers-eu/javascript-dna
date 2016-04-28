@@ -240,7 +240,7 @@ And when DNA is included everything falls in place automatically and `doSomethin
 
 The main difference between asynchronous loaders is how loader
 - interprets URLs
-- fetches files
+- downloads files
 - evaluates scripts
 
 Javascript DNA has core plugin system that allows you to define your own behavior for all of main components.
@@ -249,7 +249,7 @@ To register your plugins pass the plugin configuration object to dna:
 ```javascript
 dna({
     'rewrite': rewritePlugins,
-    'fetcher': fetcherPlugins,
+    'downloader': downloaderPlugins,
     'factory': factoryPlugins
 });
 ```
@@ -280,30 +280,30 @@ The resulting URI will be resolved to absolute URL if it is relative after all r
 
 ### Custom Downloader
 
-You can also register your own URI fetcher. That way you can fetch files not only from server but also from local storage, variables or other resources.
+You can also register your own URI downloader. That way you can download files not only from server but also from local storage, variables or other resources.
 
-You can register only one fetcher for each URI scheme.
+You can register only one downloader for each URI scheme.
 
-To register your own fetcher use this syntax
+To register your own downloader use this syntax
 ```javascript
   dna({
-      'fetcher': {
+      'downloader': {
           SCHEME: function(dfd, uri),
           ...
       }
     });
 ```
-Your fetcher is expected to call `dfd.reject(ERROR)` or `dfd.resolve(DATA_STRING)` after the fetch.
+Your downloader is expected to call `dfd.reject(ERROR)` or `dfd.resolve(DATA_STRING)` after the download.
 
 Example:
 ```javascript
 dna({
-    'fetcher': {
+    'downloader': {
         'variable': function(dfd, uri) {
             var contents = myCachedContents[uri.replace('variable:', '')];
 
             if (contents) dfd.resolve(contents);
-            else dfd.reject(new Error('Cannot fetch URI "' + uri + '"!'));
+            else dfd.reject(new Error('Cannot download URI "' + uri + '"!'));
         }
     }
 });
@@ -314,7 +314,7 @@ dna({
 }, 'Test', callback);
 ```
 
-Note: When your fetcher returns `false` then default `$.AJAX` fetcher will be called instead. If you return `false` from your fetcher then you are supposed not to resolve `dfd` Deferred object.
+Note: When your downloader returns `false` then default `$.AJAX` downloader will be called instead. If you return `false` from your downloader then you are supposed not to resolve `dfd` Deferred object.
 
 ### Custom Script Evaluation
 
@@ -567,7 +567,8 @@ dna({
         'id': 'test:1',
         'load': '/libs/script2.js',
         'context': 'my-private'
-    });
+    },
+    'test:1', 'test:2');
 ```
 ```javascript
 // /libs/script1.js
