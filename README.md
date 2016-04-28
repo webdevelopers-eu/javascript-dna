@@ -22,6 +22,8 @@
         - [Call DNA Before It Loads](#call-dna-before-it-loads)
         - [External Configurations](#external-configurations)
         - [Load Anything](#load-anything)
+    - [Experimental Features](#experimental-features)
+        - [Named Context](#named-context)
     - [Troubleshooting](#troubleshooting)
     - [ToDo](#todo)
 
