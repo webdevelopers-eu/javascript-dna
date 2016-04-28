@@ -124,7 +124,7 @@ dna.push(function() {
                 'proto': 'Test2',
                 'load': classURL('2'),
                 'eval': 'dna',
-                'namespace': 'window'
+                'context': 'window'
             }, 'Test1', 'Test2', test(true, ['function', 'function']))
                 .fail(test(false));
         }
@@ -292,13 +292,13 @@ dna.push(function() {
     }());
     // ------------------------------------------------------------------------
     (function() {
-        var test = addTest('Evaluation test - window namespace');
+        var test = addTest('Evaluation test - window context');
         if (test) {
             var cb18 = [ test(false), test(true) ];
             window.dna({
                 'proto': 'Test18',
                 'load': classURL('18'),
-                'namespace': 'window'
+                'context': 'window'
             }, 'Test18')
                 .done(function() {
                     dna.Test18 && window.Test18 ? cb18[1].apply(this, arguments) : cb18[0].apply(this, arguments);
@@ -434,20 +434,20 @@ dna.push(function() {
 
     // // ------------------------------------------------------------------------
     // (function() {
-    //     var test = addTest('Namespace test.');
+    //     var test = addTest('Context test.');
     //     if (test) {
     //         dna({
     //             'proto': 'Test59',
     //             'load': classURL('59'),
-    //             'namespace': 'ns:59'
+    //             'context': 'ns:59'
     //         }, {
     //             'proto': 'Test60',
     //             'load': classURL('60'),
-    //             'namespace': 'ns:59'
+    //             'context': 'ns:59'
     //         }, {
     //             'proto': 'Test61',
     //             'load': classURL('61'),
-    //             'namespace': 'ns:61'
+    //             'context': 'ns:61'
     //         },
     //             'Test59', 'Test60', 'Test61'
     //            )
