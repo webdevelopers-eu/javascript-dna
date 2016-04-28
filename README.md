@@ -569,14 +569,14 @@ dna({
         'context': 'my-private'
     });
 ```
-```javscript
+```javascript
 // /libs/script1.js
 
 this.myVar1 = 'script 1';
 console.log(this.myVar2);
 ```
 
-```javscript
+```javascript
 // /libs/script2.js
 
 this.myVar2 = 'script 2';
