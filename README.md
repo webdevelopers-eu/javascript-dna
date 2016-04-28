@@ -171,7 +171,7 @@ Where
 * `CONTEXT`:`String` Optional. Default: `false`. Name of the context to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
  * "`window`" string causes evaluation in `window` object context
- * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` set to the same private Object. See [Named Context](#named-context) section for more information.
+ * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` and `module` set to the same private Object. See [Named Context](#named-context) section for more information.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
@@ -563,16 +563,18 @@ Most of older scripts can be specified using `id` attribute and executed using `
 
 Sometimes selected scripts need to share the variables. Polluting global `window` scope with variables is not the best solution.
 
-With DNA you can use the experimental named contexts. Scripts sharing the same name of the context will have `this` set to their own shared Object.
+With DNA you can use the experimental named contexts. Scripts sharing the same name of the context will have `this` and variable `module` set to their own shared Object.
+
+Variable `module` has property `exports` (`module.exports`) for compatibility with apps expecting that.
 
 ```javascript
 dna({
         'id': 'test:1',
-        'load': 'javascript:this.myVar1 = "var 1"; console.log("Script 1", this.myVar1, this.myVar2);',
+        'load': 'javascript: module.exports.myVar1 = "var 1"; console.log("Script 1", module.exports.myVar1, module.exports.myVar2);',
         'context': 'my-private'
     }, {
         'id': 'test:2',
-        'load': 'javascript:this.myVar2 = "var 2"; console.log("Script 2", this.myVar1, this.myVar2);',
+        'load': 'javascript: module.exports.myVar2 = "var 2"; console.log("Script 2", module.exports.myVar1, module.exports.myVar2);',
         'context': 'my-private'
     },
     'test:1', 'test:2');
