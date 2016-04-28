@@ -332,7 +332,7 @@ To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
-      EVAL_TYPE: function(dfd, jString, protoName),
+      EVAL: function(dfd, jString, protoName),
       ...
     }
   });
@@ -460,7 +460,7 @@ Contents of `/app/config.json` (relative paths are resolved relatively to JSON's
     }, {
         'id': 'app:base',
         'load': ['./base/jquery.js', '/lib/bootstrap.js'],
-        'eval': 'window'
+        'context': 'window'
     }
 ]
 ```
@@ -546,17 +546,17 @@ You can use `dna()` to load any script that was not directly written for DNA.
 dna({
         'id': 'jquery',
         'load': '/libs/jquery.min.js',
-        'eval': 'window'
+        'context': 'window'
     }, {
         'id': 'jquery:iPop',
         'require': 'jquery',
         'load': '/libs/jquery.ipop.js',
-        'eval': 'window'
+        'context': 'window'
     });
 
 dna('jquery:iPop', callback);
 ```
-Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-script-evaluation) that you can tailor to fit any framework and/or your special needs.
+Most of older scripts can be specified using `id` attribute and executed using `context` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-script-evaluation) that you can tailor to fit any framework and/or your special needs.
 
 ## Experimental Features
 
