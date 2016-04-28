@@ -282,7 +282,13 @@ The resulting URI will be resolved to absolute URL if it is relative after all r
 
 You can also register your own URI downloader. That way you can download files not only from server but also from local storage, variables or other resources.
 
-DNA has native `javascript` scheme downloader and everything else is passed to default `$.AJAX` downloader.
+DNA has native `javascript` scheme downloader and everything else is passed to default `$.AJAX` downloader. For example the `javascript` scheme hook allows you to embed javascripts into URLs.
+```javascript
+dna({
+    'id': 'my-test',
+    'load': 'javascript: alert("Hello World!");'
+}, 'my-test'});
+```
 
 You can register only one downloader for each URI scheme.
 
