@@ -566,7 +566,7 @@ dna({
     }, {
         'id': 'test:1',
         'load': '/libs/script2.js',
-        'context: 'my-private'
+        'context': 'my-private'
     });
 ```
 
