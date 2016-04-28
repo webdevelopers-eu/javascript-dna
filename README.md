@@ -556,7 +556,7 @@ Most of older scripts can be specified using `id` attribute and executed using `
 
 Sometimes selected scripts need to share the variables. Polluting global `window` scope with variables is not the best solution.
 
-With DNA you can use the experimental named contexts. Scripts sharing the same name of context will have `this` set to their own shared Object.
+With DNA you can use the experimental named contexts. Scripts sharing the same name of the context will have `this` set to their own shared Object.
 
 ```javascript
 dna({
