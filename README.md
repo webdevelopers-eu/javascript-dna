@@ -171,7 +171,7 @@ Where
 * `CONTEXT`:`String` Optional. Default: `false`. Name of the context to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
  * "`window`" string causes evaluation in `window` object context
- * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` and `module` set to the same private Object. See [Named Context](#named-context) section for more information.
+ * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` and `context` set to the same private Object. See [Named Context](#named-context) section for more information.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
 
