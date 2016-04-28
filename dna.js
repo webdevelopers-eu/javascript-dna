@@ -16,6 +16,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'rewrite': [
         ],
         'downloader': {
+            'javascript': function (dfd, url, config) {
+                dfd.resolve(url.replace(/^javascript:/, ''));
+            },
             '*': function (dfd, url, config) {
                 $.ajax({
                     'url': url,
@@ -663,12 +666,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     function loadGetResource(url, config) {
         var dfd = $.Deferred();
-        var parts = url.split('#');
+        var isHTTP = url.match(/^https?:/);
+        var parts = isHTTP ? url.split('#') : [url]; // to support other schemes like 'javascript:'
         var callback;
 
         callback = function(string) {
             if (parts.length == 1) { // Javascript
-                dfd.resolve(string + ' //# sourceURL=' + url + '#dna');
+                dfd.resolve(string + (isHTTP ? ' //# sourceURL=' + url + '#dna' : ''));
                 return;
             }
             // HTML
