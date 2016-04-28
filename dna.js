@@ -812,13 +812,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
 
         this.stack = (new Error()).stack;
-        console.log('DNAError: ' + this.code + ' ' + info, detail, this.stack);
+        console.log('DNAError #' + this.code + ': ' + info, detail, this.stack);
     }
     DNAError.prototype = Object.create(Error.prototype);
+    DNAError.prototype.toString = function() {return 'DNAError';};
     DNAError.prototype.constructor = DNAError;
 
 
     // dna['dna:Core'] = DNACore;
+    dna['Error'] = DNAError;
     dna['dna:core'] = new DNACore;
     console.log('DNA: Ready.');
 
