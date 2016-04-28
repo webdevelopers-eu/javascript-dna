@@ -282,6 +282,8 @@ The resulting URI will be resolved to absolute URL if it is relative after all r
 
 You can also register your own URI downloader. That way you can download files not only from server but also from local storage, variables or other resources.
 
+DNA has native `javascript` scheme downloader and everything else is passed to default `$.AJAX` downloader.
+
 You can register only one downloader for each URI scheme.
 
 To register your own downloader use this syntax
@@ -560,30 +562,16 @@ With DNA you can use the experimental named contexts. Scripts sharing the same n
 
 ```javascript
 dna({
-        'id': 'test:2',
-        'load': '/libs/script1.js',
+        'id': 'test:1',
+        'load': 'javascript:this.myVar1 = "var 1"; console.log("Script 1", this.myVar1, this.myVar2);',
         'context': 'my-private'
     }, {
-        'id': 'test:1',
-        'load': '/libs/script2.js',
+        'id': 'test:2',
+        'load': 'javascript:this.myVar2 = "var 2"; console.log("Script 2", this.myVar1, this.myVar2);',
         'context': 'my-private'
     },
     'test:1', 'test:2');
 ```
-```javascript
-// /libs/script1.js
-
-this.myVar1 = 'script 1';
-console.log(this.myVar2);
-```
-
-```javascript
-// /libs/script2.js
-
-this.myVar2 = 'script 2';
-console.log(this.myVar1);
-```
-
 If named context is not specified then with `dna` eval mode each configuration has its own private Object set as context automatically.
 
 ## Troubleshooting
