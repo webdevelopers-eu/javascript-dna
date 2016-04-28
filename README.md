@@ -548,6 +548,42 @@ dna('jquery:iPop', callback);
 ```
 Most of older scripts can be specified using `id` attribute and executed using `eval` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-script-evaluation) that you can tailor to fit any framework and/or your special needs.
 
+## Experimental Features
+
+### Named Context
+
+Sometimes selected scripts need to share the variables. Polluting global `window` scope with variables is not the best solution.
+
+With DNA you can use the experimental named contexts. Scripts sharing the same name of context will have `this` set to their own shared Object.
+
+```javascript
+dna({
+        'id': 'test:2',
+        'load': '/libs/script1.js',
+        'context': 'my-private'
+    }, {
+        'id': 'test:1',
+        'load': '/libs/script2.js',
+        'context: 'my-private'
+    });
+```
+
+```javscript
+// /libs/script1.js
+
+this.myVar1 = 'script 1';
+console.log(this.myVar2);
+```
+
+```javscript
+// /libs/script2.js
+
+this.myVar2 = 'script 2';
+console.log(this.myVar1);
+```
+
+If named context is not specified then with `dna` eval mode each configuration has its own private Object set as context automatically.
+
 ## Troubleshooting
 
 Watch the Javascript Console.
