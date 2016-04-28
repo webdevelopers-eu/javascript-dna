@@ -295,7 +295,7 @@ To register your own downloader use this syntax
 ```javascript
   dna({
       'downloader': {
-          SCHEME: function(dfd, uri),
+          SCHEME: function(dfd, uri, config),
           ...
       }
     });
@@ -306,7 +306,7 @@ Example:
 ```javascript
 dna({
     'downloader': {
-        'variable': function(dfd, uri) {
+        'variable': function(dfd, uri, config) {
             var contents = myCachedContents[uri.replace('variable:', '')];
 
             if (contents) dfd.resolve(contents);
@@ -331,7 +331,7 @@ To specify execution handler use this syntax
 ```javascript
   dna({
     'factory': {
-      EVAL: function(dfd, jString, protoName),
+      EVAL: function(dfd, jString, protoName, config),
       ...
     }
   });
@@ -342,7 +342,7 @@ Example:
 ```javascript
   dna({
     'factory': {
-      'my-common-js': function(dfd, jString, protoName) {
+      'my-common-js': function(dfd, jString, protoName, config) {
         var exports = {};
         (function(exports) {
            eval(jString);
