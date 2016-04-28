@@ -364,7 +364,7 @@ Note: Thanks to Ozone API if you try to require a class that has unknown `eval` 
 In fact this should allow also ECMA6 bridge.
 ```javascript
 // app.js
-import * as calculator from 'calculator';
+import something as calculator from 'calculator';
 
 console.log(calculator.sum(1, 2)); // => 3
 ```
