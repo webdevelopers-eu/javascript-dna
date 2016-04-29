@@ -15,22 +15,18 @@
 
   <body>
 
-    <script type="text/javascript">
-      /*<![CDATA[*/
+<script class="reveal">
+    var dna = dna || []; // If dna is not loaded yet then create surrogate object instead (DNA will later deal with it)
+    dna.push(function() { // Run the code as soon as DNA loads
 
-        var dna = dna || []; // If dna is not loaded yet then create surrogate object instead (DNA will later deal with it)
-        dna.push(function() { // Run the code as soon as DNA loads
-
-            dna('Class1', function() { // Say that this function requires 'Class1' to be loaded first
-                message('Gotcha! All classes loaded.', '<i>We requested <code>dna.Class1</code> which required <code>dna.Class2</code> which required <code>dna.Class3</code></i>');
-            });
-
-
-            dna('./dna.json'); // Feed dependency configuration to DNA
+        dna('Class1', function() { // Say that this function requires 'Class1' to be loaded first
+            message('Gotcha! All classes loaded.', '<i>We requested <code>dna.Class1</code> which required <code>dna.Class2</code> which required <code>dna.Class3</code></i>');
         });
 
-     /*]]>*/
-    </script>
+
+        dna('./dna.json'); // Feed dependency configuration to DNA
+    });
+</script>
 
   </body>
 </html>

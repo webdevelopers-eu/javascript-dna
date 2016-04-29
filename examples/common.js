@@ -16,6 +16,19 @@ $(function() {
     }
 
     message(); // flush buffer
+
+    $('.reveal').each(function(k, v) {
+        var code = $('<div></div>').append($(v).clone().removeAttr('class')).html();
+        var escaped = $('<div></div>').text(code).html();
+
+        escaped = escaped.replace(/([a-z./]+\/[a-z./]+)/g, '<a target="_tab" href="$1">$1</a>'); // links
+        escaped = escaped.replace(/(\/\/.+)$/mg, '<span class="comment">$1</span>'); // comments
+
+        $('<pre></pre>')
+            .append(escaped)
+            .appendTo('.panel-default');
+    });
+
 });
 
 var message = (function() {

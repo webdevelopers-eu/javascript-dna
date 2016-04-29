@@ -30,3 +30,6 @@
 .message-detail, .message-main {
     display: block;
 }
+.comment {
+    opacity: 0.5;
+}
