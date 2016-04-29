@@ -4,7 +4,7 @@
  */
 function Module1() {
     // do stuff
-    message("Initialized dna.service1");
+    message('Initialized dna.service1', 'Requirement for <code>start</code> service.');
 }
 
 Module1.prototype = Object.create(null);

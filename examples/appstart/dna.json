@@ -2,11 +2,11 @@
     {
         "service": "start",
         "proto": "Start",
+        "require": "service1",
         "load": "modules/start.js"
     }, {
         "service": "service1",
         "proto": "Module1",
-        "require": "service3",
         "load": "modules/module1.js"
     }, {
         "service": "service2",
