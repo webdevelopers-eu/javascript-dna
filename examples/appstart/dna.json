@@ -1,0 +1,21 @@
+[
+    {
+        "service": "start",
+        "proto": "Start",
+        "load": "modules/start.js"
+    }, {
+        "service": "service1",
+        "proto": "Module1",
+        "require": "service3",
+        "load": "modules/module1.js"
+    }, {
+        "service": "service2",
+        "proto": "Module2",
+        "require": "service3",
+        "load": "modules/module2.js"
+    }, {
+        "service": "service3",
+        "proto": "Module3",
+        "load": "modules/module3.js"
+    }
+]

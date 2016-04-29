@@ -57,8 +57,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         return context.eval(evalStr);
                     }(evalStr, config._context));
                 } catch (e) {
-                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, {'jString': evalStr, 'arguments': arguments, 'exception': e, 'config': config}));
-                    throw e;
+                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, e));
                 }
             }
         }
@@ -654,8 +653,8 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         proto = captured || proto;
                         evaluate(scripts.shift());
                     })
-                    .fail(function() {
-                        dfd.reject(new DNAError('Evaluation of the script failed.', 608,  {'arguments': arguments, 'about': script}));
+                    .fail(function(e) {
+                        dfd.reject(new DNAError('Evaluation of the script failed.', 608,  e));
                     });
             if (typeof factory != 'function') {
                 return dfdEval.reject(new DNAError('Unknown evaluation type "' + config.eval + '"', 604, config));
@@ -824,8 +823,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             this.detail = detail;
         }
 
-        this.stack = (new Error()).stack;
-        console.error('DNAError #' + this.code + ': ' + info, detail, this.stack);
+        if (detail instanceof DNAError || $.type(detail) == 'error') {
+            this.stack = detail.stack;
+        } else {
+            this.stack = (new Error()).stack;
+        }
+
+        if (!(detail instanceof DNAError)) {
+            console.error('DNAError #' + this.code + ': ' + info, detail, this.stack);
+        }
     }
     DNAError.prototype = Object.create(Error.prototype);
     DNAError.prototype.toString = function() {return 'DNAError';};
