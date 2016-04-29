@@ -278,7 +278,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         var conflictConfig = dna['core'].getConfig(name);
                         var msgs =  ['DNA: Conflicting property `dna["' + name + '"]`.'];
                         if (dna[name] && $.inArray(name, installed) == -1) {
-                            msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! This property was not installed as standard DNA module.');
+                            msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! The existing `dna["' + name + '"]` property was not installed as standard DNA module.');
                         } else {
                             if (conflictConfig) {
                                 msgs.push('Conflicting config exists: ' + JSON.stringify(conflictConfig) + '.\nNote: All `id`, `proto` and `service` names must be unique accross the board.');
