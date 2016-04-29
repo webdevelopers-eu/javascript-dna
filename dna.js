@@ -11,8 +11,7 @@
 if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
-    var contexts = {};
-    var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna['dna:core'].set(SETTINGS))
+    var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna['core'].set(SETTINGS))
         'rewrite': [
         ],
         'downloader': {
@@ -64,6 +63,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             }
         }
     };
+    var console = window.console || {'log': (function() {})}; console.error = console.error || console.log;
+    var installed = [];
+    var contexts = {};
 
     /**
      * @param {...(string|function|object|array)} arguments
@@ -86,7 +88,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     $(window).trigger('dna:always', [{'dnaArguments': args, 'arguments': arguments}]);
                 });
         var reject = function() {dfd.reject.apply(this, arguments);};
-        var opts = dna['dna:core'].getOpts(arguments, [
+        var opts = dna['core'].getOpts(arguments, [
             {'recursive': true, 'match': 'array'},
             ['jsonURLs', /\//],
             ['required', 'string'],
@@ -94,18 +96,18 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             ['configs', 'plainObject'],
             ['callbacks', 'function']
         ]);
-        opts.settings.forEach(dna['dna:core'].set);
+        opts.settings.forEach(dna['core'].set);
         if (opts.jsonURLs.length + opts.required.length + opts.configs.length == 0) { // empty args
-            dna['dna:core'].checkQueue();
+            dna['core'].checkQueue();
             return dfd.resolve().done(opts.callbacks).promise();
         }
         try {
-            opts.configs.forEach(dna['dna:core'].configure.bind(dna['dna:core']));
+            opts.configs.forEach(dna['core'].configure.bind(dna['core']));
             $.when.apply(this, opts.jsonURLs.map(rewriteURL).map(download)) // Resolve 'jsonURLs': download JSON configs
                 .done(function() {
                     // Format downloaded Configs with added config.baseURL
                     var args = $.makeArray(arguments).map(function(v, k) {
-                        return dna['dna:core']
+                        return dna['core']
                             .getOpts($.parseJSON(v), [['configs', 'plainObject'], 'recursive'])
                             .configs
                             .map(function(config) {
@@ -116,10 +118,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     // insert JSON configs
                     dna(args)
                         .done(function() {
-                            dna['dna:core'].whenSatisfied(opts.required) // whenSatisfied checks whole queue
+                            dna['core'].whenSatisfied(opts.required) // whenSatisfied checks whole queue
                                 .done(function() {
                                     $.when.apply(this, opts.required.map(function(name) { // Resolve 'require'
-                                        return dna['dna:core'].require(name);
+                                        return dna['core'].require(name);
                                     }))
                                         .done(opts.callbacks, function() {
                                             dfd.resolve.apply(this, arguments);
@@ -150,14 +152,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * @param {mixed...} argument
      * @return {integer} number of queue/unresolved requests;
      */
-    dna.push = function() {
+    install('push', function() {
         dna.apply(this, arguments);
-        return dna['dna:core'].queue.length;
-    };
+        return dna['core'].queue.length;
+    });
 
 
     /**
-     *  The dna['dna:core'] service.
+     *  The dna['core'] service.
      */
     function DNACore() {
         this.queue = [];
@@ -182,10 +184,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *
      * Examples:
      *
-     * dna['dna:core'].resolveURL('file#hash')
+     * dna['core'].resolveURL('file#hash')
      * - result: "https://example.org/file#hash" resolved to current document
      *
-     * dna['dna:core'].resolveURL('file#hash', '/directory/', 'https://example.org')
+     * dna['core'].resolveURL('file#hash', '/directory/', 'https://example.org')
      * - result: "https://example.org/directory/file#hash
      *
      * @param {string...} url Any URL to resolve
@@ -208,7 +210,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     /**
      * Set various settings. Example:
-     *  dna['dna:core'].set({
+     *  dna['core'].set({
      *          'factory': {EVAL_TYPE: callback(dfd, jScript, config), ...},
      *          'rewrite': [callback(currentURI, originalURI), ...],
      *          'downloader': {SCHEME: callback(dfd, uri), ...}
@@ -273,12 +275,18 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     if (typeof dna[name] == 'undefined') {
                         dna[name] = null;
                     } else {
-                        $.error('DNA: ' +
-                                'Conflicting name `' + name + '` / ' +
-                                'redundand Config registration while registering config: ' + JSON.stringify(config) + '; ' +
-                                'conflicting config exists: ' + JSON.stringify(dna['dna:core'].getConfig(name)) + '. ' +
-                                'Note: All `id`, `proto` and `service` names must be unique accross the board.'
-                               );
+                        var conflictConfig = dna['core'].getConfig(name);
+                        var msgs =  ['DNA: Conflicting property `dna["' + name + '"]`.'];
+                        if (dna[name] && $.inArray(name, installed) == -1) {
+                            msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! This property was not installed as standard DNA module.');
+                        } else {
+                            if (conflictConfig) {
+                                msgs.push('Conflicting config exists: ' + JSON.stringify(conflictConfig) + '.\nNote: All `id`, `proto` and `service` names must be unique accross the board.');
+                            } else {
+                                msgs.push('Conflicting special DNA core property: dna["' + name + '"]. Name `' + name + '` is reserved.');
+                            }
+                        }
+                        $.error(msgs.join('\n'));
                     }
                 }
             });
@@ -290,7 +298,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * Check if we have all Configs loaded to satisfy given requirement.
      *
      * Example:
-     *   dna['dna:core'].canSatisfy(['Proto1', 'service2']);
+     *   dna['core'].canSatisfy(['Proto1', 'service2']);
      *
      * @param {array} requirements Array of names or ids
      * @return {boolean} false: missing configs, true: all required configs to satisfy the requirement available
@@ -326,14 +334,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * configuration information to resolve all requirements.
      *
      * Example:
-     *   dna['dna:core'].whenSatisfied('Proto1', ['Proto2', 'service3']).done(canDo);
+     *   dna['core'].whenSatisfied('Proto1', ['Proto2', 'service3']).done(canDo);
      *
      * @param {array|string|callback...} arguments
      * @return {Deferred}
      */
     DNACore.prototype.whenSatisfied = function() {
         var dfd = $.Deferred();
-        var newOpts  = dna['dna:core'].getOpts(arguments, [
+        var newOpts  = dna['core'].getOpts(arguments, [
             ['requirements', 'string'],
             ['callbacks', 'function'],
             'recursive'
@@ -384,19 +392,19 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * Examples:
      *
      * // Unsorted parameters
-     * dna['dna:core'].getOpts(['10px', 'right'], [
+     * dna['core'].getOpts(['10px', 'right'], [
      *     ['width', /px$/],
      *     ['position', /top|right/]
      * ]); // Result: {"width":["10px"],"position":["right"]}
      *
      * // Switched order of parameters
-     * dna['dna:core'].getOpts(['right', '10px'], [
+     * dna['core'].getOpts(['right', '10px'], [
      *     ['width', /px$/],
      *     ['position', /top|right/]
      * ]); // Result: {"width":["10px"],"position":["right"]}
      *
      * // More advanced
-     * dna['dna:core'].getOpts(['10px', {'position': 'bottom', 'newAttr': 'some value'}, ['top', 'right', '1234']], [
+     * dna['core'].getOpts(['10px', {'position': 'bottom', 'newAttr': 'some value'}, ['top', 'right', '1234']], [
      *     {'match': ['array', 'plainObject'], 'recursive': true},
      *     {'name': 'width', 'match': [/px$/, 'numeric']},
      *     ['obj', 'object'],
@@ -404,7 +412,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *     ['other', '*']
      * ]); // Result: {"width":["10px"],"obj":[],"position":["bottom","top","right"],"other":["1234"],"newAttr":["some value"]}
      *
-     * dna['dna:core'].getOpts(['10px', {'position': 'bottom', 'newAttr': 'some value'}, ['top', 'right', '1234']], [
+     * dna['core'].getOpts(['10px', {'position': 'bottom', 'newAttr': 'some value'}, ['top', 'right', '1234']], [
      *     ['strings', 'string'],
      *     'recursive'
      * ]); // Result: {"strings":["10px","bottom","some value","top","right","1234"]}
@@ -534,7 +542,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     function requireMulti(args, stack) {
         var promises = [];
         try {
-            dna['dna:core'].getOpts(args, [['names', 'string'], 'recursive']).names
+            dna['core'].getOpts(args, [['names', 'string'], 'recursive']).names
                 .forEach((function(name) {
                     promises.push(requireSingle.call(this, name, stack));
                 }).bind(this));
@@ -554,7 +562,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
         stack.push(name);
 
-        config = dna['dna:core'].getConfig(name);
+        config = dna['core'].getConfig(name);
         if (!config) $.error('DNA: Cannot satisfy the requirement "' + name + '"');
 
         if (config._dfd) return config._dfd; // Already pending resolution of this Config
@@ -571,14 +579,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                     if (config.proto[0]) {
                         if (proto) {
                             $.each(config.proto.slice(config.proto.length > 1 ? 1 : 0), function(k, v) {
-                                dna[v] = proto;
+                                install(v, proto);
                             });
                         } else {
                             dfd.reject(new DNAError('DNA: Cannot find the Proto object window["' + config.proto + '"]: ' + JSON.stringify(config), 602, {'config': config}));
                         }
                     }
                     if (proto && config.service) {
-                        dna[config.service] = new proto;
+                        install(config.service, new proto);
                     }
                     if (config.id == name) {
                         val = config;
@@ -604,7 +612,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 
     function downloadResources(config) {
-        var urls = dna['dna:core'].getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
+        var urls = dna['core'].getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
 
         var promises = [];
         urls.forEach(function(url) {
@@ -695,7 +703,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 if (!linkURL) {
                     dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': string, 'url': url}));
                 } else {
-                    loadGetResource(dna['dna:core'].resolveURL(linkURL, url), config)
+                    loadGetResource(dna['core'].resolveURL(linkURL, url), config)
                         .done(function() {
                             dfd.resolve.apply(this, arguments);
                         })
@@ -725,12 +733,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     }
 
     function download(url, config) {
-        if (dna['dna:core'].resources[url]) {
-            return dna['dna:core'].resources[url];
+        if (dna['core'].resources[url]) {
+            return dna['core'].resources[url];
         }
 
         var dfd = $.Deferred();
-        dna['dna:core'].resources[url] = dfd.promise();
+        dna['core'].resources[url] = dfd.promise();
 
         // RFC 2396, Appendix A: scheme = alpha *( alpha | digit | "+" | "-" | "." )
         var scheme = url.match(/^([a-z][a-z0-9+.-]*):/i)[1];
@@ -741,7 +749,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             settings.downloader['*'](dfd, url, config);
         }
 
-        return dna['dna:core'].resources[url];
+        return dna['core'].resources[url];
     };
 
     // There are two rewrite entry points:
@@ -752,7 +760,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         settings.rewrite.forEach(function(cb) {
             url = cb(url, urlIn) || url;
         });
-        url = dna['dna:core'].resolveURL(url, baseURL);
+        url = dna['core'].resolveURL(url, baseURL);
         return url;
     }
 
@@ -767,7 +775,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         delete config._dfd;
 
-        config.load = dna['dna:core']
+        config.load = dna['core']
             .getOpts(config.load, [['urls', 'string'], 'recursive'])
             .urls
             .map(function(url) {
@@ -798,6 +806,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return config;
     }
 
+    function install(property, obj) {
+        dna[property] = obj;
+        installed.push(property);
+    }
+
     function DNAError(info, code, detail) {
         if (info instanceof Error) {
             this.name = info.name || 'DNAError';
@@ -812,16 +825,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
 
         this.stack = (new Error()).stack;
-        console.log('DNAError #' + this.code + ': ' + info, detail, this.stack);
+        console.error('DNAError #' + this.code + ': ' + info, detail, this.stack);
     }
     DNAError.prototype = Object.create(Error.prototype);
     DNAError.prototype.toString = function() {return 'DNAError';};
     DNAError.prototype.constructor = DNAError;
 
-
-    // dna['dna:Core'] = DNACore;
-    dna['Error'] = DNAError;
-    dna['dna:core'] = new DNACore;
+    install('Error', DNAError);
+    install('console', console);
+    install('core', new DNACore);
     console.log('DNA: Ready.');
 
     var initQueue = window.dna || [];  // replace optional queue of calls with reall object
