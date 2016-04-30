@@ -9,11 +9,14 @@
         - [Configuration Object](#configuration-object)
             - [Register Configurations](#register-configurations)
             - [Prototype Aliases](#prototype-aliases)
+    - [Evaluation Engines](#evaluation-engines)
+        - [Engine `dna`](#engine-dna)
+        - [Engine `deferred`](#engine-deferred)
     - [Ozone API](#ozone-api)
     - [Core Plugin System](#core-plugin-system)
         - [Custom URL Rewriting](#custom-url-rewriting)
         - [Custom Downloader](#custom-downloader)
-        - [Custom Script Evaluation](#custom-script-evaluation)
+        - [Custom Evaluation Engines](#custom-evaluation-engines)
     - [Bundled Assets](#bundled-assets)
     - [Examples](#examples)
         - [Complete Example #1](#complete-example-1)
@@ -165,12 +168,13 @@ Where
 * `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
 * `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first. Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
-* `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name.
+* `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name. See more in [Evaluation Engines](#evaluation-engines) section.
  * `dna` evaluates the script in closure scope and expects the script to define variable of name specified in configuration's `proto` property.
- * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Script Evaluation](#custom-script-evaluation) section.
+ * `deferred` your script is not expected to define variable of name specified in `config.proto` property but you are expected to pass object representing `config.proto` to Promise object in `factory` variable.
+ * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Evaluation Engines](#custome-valuation-engines) section.
 * `CONTEXT`:`String` Optional. Default: `false`. Name of the context to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
- * "`window`" string causes evaluation in `window` object context
+ * "`window`" string causes evaluation in `window` object context.
  * `STRING` *Experimental* - any name identifying a shared context. Scripts having the same context name will have `this` and `context` set to the same private Object. See [Named Context](#named-context) section for more information.
 
 Note: At least one `id` or `proto` super-identifier must be specified in the single Configuration Object.
@@ -217,6 +221,52 @@ dna({
 ```
 in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff@2"]` and `dna["webdevelopers.eu:MyStuff@2"]` but not as `dna.MyStuff`.
 
+## Evaluation Engines
+
+You can execute your scripts in various ways. You can even register your own [Custom Evaluation Engines](#custome-valuation-engines).
+
+DNA comes with following evaluation engines.
+
+### Engine `dna`
+
+Your script is expected to define variable matching the name specified in config's `proto` property that holds the prototype object representing your module.
+
+Example:
+
+```javascript
+dna({
+    'proto': 'MyModue',
+    'load': '/mymodule.js'
+});
+```
+Contents of `/mymodule.js` is expected to define `MyModule` variable holding the Object. For example:
+```javascript
+function MyModule() {}
+```
+
+### Engine `deferred`
+
+Sometimes you need to asynchronously load other parts of the module and you cannot define the prototype right away during script evaluation.
+
+For that the `deferred` engine is the right one as it expects you to pass the prototype object to `Promise` when you are ready.
+
+Example:
+
+```javascript
+dna({
+    'proto': 'MyModue',
+    'load': '/mymodule.js'
+    'eval': 'deferred'
+});
+```
+Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your module is ready.
+```javascript
+// Do some asynchronous sub-initialization
+doSomeAsyncInit
+  .done(function(myProto) {
+        factory.resolve(myProto); // Signalize that myProto is the final prototype object to be registered in dna.MyModule property
+  });
+```
 ## Ozone API
 
 Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order (O₃ API) to match your needs for worryless coding.
@@ -323,7 +373,7 @@ dna({
 
 Note: When your downloader returns `false` then default `$.AJAX` downloader will be called instead. If you return `false` from your downloader then you are supposed not to resolve `dfd` Deferred object.
 
-### Custom Script Evaluation
+### Custom Evaluation Engines
 
 You can specify your own function to execute downloaded scripts. That way you can bridge RequireJS or CommonJS or any other module format.
 
@@ -555,7 +605,7 @@ dna({
 
 dna('jquery:iPop', callback);
 ```
-Most of older scripts can be specified using `id` attribute and executed using `context` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custom-script-evaluation) that you can tailor to fit any framework and/or your special needs.
+Most of older scripts can be specified using `id` attribute and executed using `context` type `window`. To support newer scripts (like AMD scripts) use [custom factories](#custome-valuation-engines) that you can tailor to fit any framework and/or your special needs.
 
 ## Experimental Features
 
