@@ -223,7 +223,7 @@ in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["My
 
 ## Evaluation Engines
 
-You can execute your scripts in various ways. You can even register your own [Custom Evaluation Engines](#custome-evaluation-engines).
+You can execute your scripts in various ways. You can even register your own [Custom Evaluation Engines](#custom-evaluation-engines).
 
 DNA comes with following evaluation engines.
 
