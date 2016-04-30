@@ -274,7 +274,7 @@ This Engine will allow you to include other extensive configurations on request.
 ```javascript
 dna({
     'id': 'extensive:module',
-    'load': '[javascript](#custom-downloader): dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });',
+    'load': 'javascript: dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });',
     'eval': 'deferred'
 });
 
@@ -284,6 +284,7 @@ dna('extensive:module', function() {
     // My extensive module is ready
 });
 ```
+Note: for the trick with `"load": "javascript:..."` see [Custom Downloader](#custom-downloader) section.
 
 ## Ozone API
 
