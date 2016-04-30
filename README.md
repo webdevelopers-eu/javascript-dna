@@ -274,7 +274,7 @@ This Engine will allow you to include other extensive configurations on request.
 ```javascript
 dna({
     'id': 'extensive:module',
-    'load': 'javascript: dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });'
+    'load': 'javascript: dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });',
     'eval': 'deferred'
 });
 
