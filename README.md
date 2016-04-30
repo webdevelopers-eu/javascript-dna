@@ -170,7 +170,7 @@ Where
 * `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first. Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name. See more in [Evaluation Engines](#evaluation-engines) section.
  * `dna` evaluates the script in closure scope and expects the script to define variable of name specified in configuration's `proto` property.
- * `deferred` your script is not expected to define variable of name specified in `config.proto` property but you are expected to pass object representing `config.proto` to Promise object in `factory` variable.
+ * `deferred` your script is not expected to define variable of name specified in `config.proto` property but you are expected to pass object representing `config.proto` to Deferred object stored in `factory` variable.
  * custom name expects you to specify your own factory to execute the code and return the result object. See more in [Custom Evaluation Engines](#custome-valuation-engines) section.
 * `CONTEXT`:`String` Optional. Default: `false`. Name of the context to evaluate the script. Currently supported values: "`window`" or `false`.
  * `false` (default) boolean causes the script evaluation in its own context.
@@ -261,7 +261,7 @@ dna({
 ```
 Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your module is ready.
 ```javascript
-// Do some asynchronous sub-initialization
+// variable myProto is already populated with Deferred object you are expected to resolve/reject.
 doSomeAsyncInit
   .done(function(myProto) {
         factory.resolve(myProto); // Signalize that myProto is the final prototype object to be registered in dna.MyModule property
