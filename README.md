@@ -264,7 +264,9 @@ Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your
 // variable myProto is already populated with Deferred object you are expected to resolve/reject.
 doSomeAsyncInit
   .done(function(myProto) {
-        factory.resolve(myProto); // Pass myProto prototype object to be registered in dna.MyModule property
+        // myProto prototype is the outcome of your module.
+        // It will be passed on to DNA to be registered in dna.MyModule property.
+        factory.resolve(myProto);
   });
 ```
 ## Ozone API
