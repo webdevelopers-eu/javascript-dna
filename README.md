@@ -269,6 +269,22 @@ doSomeAsyncInit
         factory.resolve(myProto);
   });
 ```
+
+This Engine will allow you to include other extensive configurations on request.
+```javascript
+dna({
+    'id': 'extensive:module',
+    'load': 'javascript: dna('/lot-of.json', 'extensive:loader', function() { factory.resolve(); });'
+    'eval': 'deferred'
+});
+
+// will load /lot-of.json with additional configuration
+// and initialize service dna['extensive:loader']
+dna('extensive:module', function() {
+    // My extensive module is ready
+});
+```
+
 ## Ozone API
 
 Nowadays Javascript loader should download scripts asynchronously and out-of-order. DNA pushed it even further by making whole API fully out-of-order (O₃ API) to match your needs for worryless coding.
