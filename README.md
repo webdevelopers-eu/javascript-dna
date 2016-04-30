@@ -270,7 +270,7 @@ doSomeAsyncInit
   });
 ```
 
-This Engine will allow you to include other extensive configurations on request.
+This Engine will allow you to include other extensive configurations on request. That way you can chain up .json configurations and modules that will be loaded on request or can be specified as dependencies for other modules.
 ```javascript
 dna({
     'id': 'extensive:module',
