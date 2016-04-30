@@ -838,7 +838,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNAError.prototype.constructor = DNAError;
 
     install('Error', DNAError);
-    install('console', console);
     install('core', new DNACore);
     console.log('DNA: Ready.');
 
