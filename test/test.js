@@ -99,11 +99,11 @@ dna.push(function() {
         };
 
         return function(retVal, argTypes) {
-            if (!argTypes) argTypes = [];
             return function() {
-                for (var i in argTypes) {
-                    if ($.type(arguments[i]) != argTypes[i]) {
-                        cb(false, 'error: unexpected arguments - expected: ' + argTypes.join(', ') + '', arguments);
+                if (argTypes) {
+                    var gotTypes = $.map(arguments, function(v) {return $.type(v);});
+                    if (argTypes.join(', ') != gotTypes.join(', ')) {
+                        cb(false, 'error: unexpected arguments - expected: ' + argTypes.join(', ') + '; got: ' + gotTypes.join(', '), arguments);
                         return;
                     }
                 }
@@ -432,34 +432,34 @@ dna.push(function() {
         }
     }());
 
-    // // ------------------------------------------------------------------------
-    // (function() {
-    //     var test = addTest('Context test.');
-    //     if (test) {
-    //         dna({
-    //             'proto': 'Test59',
-    //             'load': classURL('59'),
-    //             'context': 'ns:59'
-    //         }, {
-    //             'proto': 'Test60',
-    //             'load': classURL('60'),
-    //             'context': 'ns:59'
-    //         }, {
-    //             'proto': 'Test61',
-    //             'load': classURL('61'),
-    //             'context': 'ns:61'
-    //         },
-    //             'Test59', 'Test60', 'Test61'
-    //            )
-    //             .done(function(proto1, proto2, proto3) {
-    //                 if (proto1() === proto2() && proto2() !== proto3()) {
-    //                     test(true, ['function', 'function', 'function'])(arguments);
-    //                 } else {
-    //                     test(false)();
-    //                 }
-    //             })
-    //             .fail(test(false));
-    //     }
-    // }());
+    // ------------------------------------------------------------------------
+    (function() {
+        var test = addTest('Evaluation type - deferred');
+        if (test) {
+            dna({
+                'proto': 'Test59',
+                'load': 'javascript: factory.x = 59; setTimeout(function() {factory.x == 59 ? factory.resolve({"name": "Test59"}) : factory.reject("Error: `factory` is shared!");}, 1000);',
+                'eval': 'deferred'
+            }, {
+                'proto': 'Test60',
+                'load': 'javascript: factory.x = 60; setTimeout(function() {factory.x == 60 ? factory.resolve({"name": "Test60"}) : factory.reject("Error: `factory` is shared!");}, 1000);',
+                'eval': 'deferred'
+            }, {
+                'proto': 'Test61',
+                'load': 'javascript: factory.x = 61; setTimeout(function() {factory.x == 61 ? factory.resolve({"name": "Test61"}) : factory.reject("Error: `factory` is shared!");}, 1000);',
+                'eval': 'deferred',
+                'context': 'window'
+            }, {
+                'proto': 'Test62',
+                'load': 'javascript: factory.x = 62; setTimeout(function() {factory.x == 62 ? factory.resolve({"name": "Test62"}) : factory.reject("Error: `factory` is shared!");}, 1000);',
+                'eval': 'deferred',
+                'context': 'window'
+            }, 'Test59', 'Test60')
+                .done(test(true, ['object', 'object']))
+                .fail(test(false));
+            dna('Test61');
+            dna('Test62');
+        }
+    }());
 
 });

@@ -53,12 +53,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 protoName = protoName ? protoName : 'undefined';
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
-                    dfd.resolve(function(evalStr, context) {
-                        return context.eval(evalStr);
-                    }(evalStr, config._context));
+                    dfd.resolve(function(context) {
+                        return context == window ? window.eval(evalStr) :  (function () {return eval(evalStr);}).call(context);
+                    }(config._context));
                 } catch (e) {
                     dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, e));
                 }
+            },
+            'deferred': function(factory, jString, protoName, config) {
+                (function(factory) {config.context == window ? window.eval(jString) : eval(jString);}(factory));
             }
         }
     };
@@ -790,11 +793,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
 
         // Context - could we use yield for that?
-        config.context = config.context + '' || false;
+        config.context = config.context || false;
         if (config.context === 'window') {
             config._context = window;
         } else {
-            config._context = contexts[config.context] || {'eval': function(jString) {return eval(jString);}};
+            config._context = config.context && contexts[config.context] || {};
         }
         if (config.context) {
             contexts[config.context] = config._context;
