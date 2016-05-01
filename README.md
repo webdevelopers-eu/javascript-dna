@@ -236,7 +236,8 @@ Example:
 ```javascript
 dna({
     'proto': 'MyModue',
-    'load': '/mymodule.js'
+    'load': '/mymodule.js',
+    'eval': 'dna' // default
 });
 ```
 Contents of `/mymodule.js` is expected to define `MyModule` variable holding the Object. For example:
@@ -261,7 +262,7 @@ dna({
 ```
 Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your module is ready.
 ```javascript
-// variable myProto is already populated with Deferred object you are expected to resolve/reject.
+// variable `factory` is already populated with Deferred object you are expected to resolve/reject.
 doSomeAsyncInit
   .done(function(myProto) {
         // myProto prototype is the outcome of your module.
