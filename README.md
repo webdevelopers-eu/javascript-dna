@@ -128,7 +128,7 @@ dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | S
 
 * `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
 * `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration-object) section.
-* `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`") Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
+* `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`") Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system. JSON files can contain also string names of prototypes/services to be loaded right away.
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY` | `SETTINGS` .
 * `SETTINGS`:`Object` see more in [Core Plugin System](#core-plugin-system) section.
@@ -328,7 +328,7 @@ dna({
 To register your own URL rewritting callback use this syntax
 ```javascript
   dna({
-      'rewrite': function(currentUri, originalURI) | [ function(currentUri, originalURI), ... ]
+      'rewrite': function(currentURI, originalURI) | [ function(currentURI, originalURI), ... ]
     });
 ```
 
