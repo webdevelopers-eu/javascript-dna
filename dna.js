@@ -109,13 +109,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 .done(function() {
                     // Format downloaded Configs with added config.baseURL
                     var args = $.makeArray(arguments).map(function(v, k) {
-                        return dna['core']
-                            .getOpts($.parseJSON(v), [['configs', 'plainObject'], 'recursive'])
-                            .configs
-                            .map(function(config) {
-                                config.baseURL = opts.jsonURLs[k];
-                                return config;
-                            });
+                        var optsParsed = dna['core']
+                                .getOpts($.parseJSON(v), [['configs', 'plainObject'], 'recursive', ['other', '*']]);
+
+                        optsParsed.configs = optsParsed.configs.map(function(config) {
+                            config.baseURL = opts.jsonURLs[k];
+                            return config;
+                        });
+                        return [optsParsed.configs, optsParsed.other];
                     });
                     // insert JSON configs
                     dna(args)
@@ -426,7 +427,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *    [NAME,  MATCH],
      *    {'name': NAME, 'match': MATCH},
      *    {'match': MATCH, 'recursive': true},
-     *    'recursive', // alias for {'match': '*', 'recursive': true},
+     *    'recursive', // alias for {'match': ['array', 'object'], 'recursive': true},
      *    ...
      * ]
      * MATCH := MATCHER | [MATCHER, MATCHER, ...]
@@ -434,7 +435,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      * MATCHER := '*' | 'array' | 'boolean' | 'date' | 'error' |
      * 'function' | 'null' | 'number' | 'object' | 'regexp' | 'string'
      * | 'undefined' | 'xmlDocument' | 'plainObject' | 'emptyObject' |
-     * 'array' | 'numeric' | /REGEXP/ | CALLBACK
+     * 'numeric' | /REGEXP/ | CALLBACK
      *
      * Rule: First match wins (argument will be assigned only to first matching group)
      *
@@ -447,7 +448,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var groups = {};
         capture.forEach(function(v, k) {
             if (capture[k] == 'recursive') {
-                capture[k] = {'match': '*', 'recursive': true};
+                capture[k] = {'match': ['array', 'object'], 'recursive': true};
             }
             if ($.isArray(capture[k])) {
                 capture[k] = {'name': capture[k][0], 'match': capture[k][1]};
@@ -464,8 +465,12 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         });
 
         $.each($.makeArray(args), (function(k, arg) {
-            if (!getOptsCategorize(arg, capture, groups)) {
-                $.error('Unexpected opt (' + (typeof arg) + ') ' + arg);
+            try {
+                if (!getOptsCategorize(arg, capture, groups)) {
+                    throw Error('Cannot categorize arguments.');
+                }
+            } catch (e) {
+                $.error('Unexpected opt (' + (typeof arg) + ') `' + arg.toString() + '`: ' + e.message);
             }
         }).bind(this));
 
