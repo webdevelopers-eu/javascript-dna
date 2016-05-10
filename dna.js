@@ -567,7 +567,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         if ($.inArray(name, stack) != -1) {
             $.error('DNA: Recursive requirement: ' + stack.join(' > ') + ' > ' + name + ' (recursion)');
         }
-        stack.push(name);
 
         config = dna['core'].getConfig(name);
         if (!config) $.error('DNA: Cannot satisfy the requirement "' + name + '"');
@@ -576,7 +575,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         config._dfd = dfd.promise();
 
         promises.push(downloadResources(config)); // Must be first among promises because we capture the first returned parameter (proto object) in $.when(promises) bellow
-        promises.push(requireMulti.call(this, [config.require], stack));
+
+        var newStack = stack.slice();
+        newStack.push(name);
+        promises.push(requireMulti.call(this, [config.require], newStack));
 
         $.when.apply(this, promises).done(function(scripts) {
             var val;
