@@ -40,7 +40,7 @@ Unobtrusive, simple to use, asynchronous script loader and dependency resolver t
 - dramatically __optimize__ the loading speed of many scripts
 - bring __order__ into big web apps
 - allow you to define __clean__ Javascript classes (prototypes) the way you always wanted to - without `define()` or `module.exports` auxiliary trash
-
+- ability to resolve dependencies for all Javascript files CSS files and [more](#downloaders)
 
 ## Motivation
 
@@ -76,6 +76,7 @@ dna(
 
 - [x] __Simple API__ - all you need is just one method `dna(...)`. That's really it. There is not more to it.
 - [x] __Bundles__ - optional script archives capable of accommodating dozens of scripts that are fast to download and don't carry unnecessary burden on browser's internal script parser.
+- [x] __CSS resources__ - you can load javascripts as easy as CSS resources only when needed.
 - [x] __100% asynchronous__ - scripts are loaded out-of-order yet evaluation order is guaranteed.
 - [x] __Out-of-order API__ - with our unique O₃ API (Ozone API) you can call DNA methods in any order, define your hooks with their requirements before feeding DNA with dependency information, call DNA even before it is loaded and more. No need to worry _if_, _when_ or in _what order_ you can use any of DNA features.
 - [x] __Optimized__ - small and fast with minified size of just about 11kB.
