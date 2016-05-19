@@ -304,9 +304,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *   dna['core'].canSatisfy(['Proto1', 'service2']);
      *
      * @param {array} requirements Array of names or ids
+     * @param {array} log Optional log object to log debug messages to
      * @return {boolean} false: missing configs, true: all required configs to satisfy the requirement available
      */
-    DNACore.prototype.canSatisfy = function(requirements, stack) {
+    DNACore.prototype.canSatisfy = function(requirements, log, stack) {
+        log = log || [];
         if (typeof requirements == 'undefined' || requirements.length == 0) return true; // undefined
 
         stack = stack || [];
@@ -317,6 +319,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             var config = this.getConfig(requirements[i]);
 
             if (!config) {
+                log.push('Config with super-identifier `' + requirements[i] + '` not defined yet.');
                 return false;
             }
             if (config.eval && !settings.factory[config.eval]) {
@@ -325,7 +328,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
             var nextStack = stack.slice();
             nextStack.push(requirements[i]);
-            if (!this.canSatisfy(config.require, nextStack)) {
+            if (!this.canSatisfy(config.require, log, nextStack)) {
                 return false;
             }
         }
@@ -357,9 +360,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     DNACore.prototype.checkQueue = function() {
         for (var i = this.queue.length - 1; 0 <= i; i--) {
-            var opts = this.queue[i];
+            var opts = this.queue[i], log = [];
             try {
-                var can = this.canSatisfy(opts.requirements);
+                var can = this.canSatisfy(opts.requirements, log);
             } catch (e) {
                 this.queue.splice(i, 1);
                 opts._dfd.reject(new DNAError(e));
@@ -373,7 +376,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 });
                 opts._dfd.resolve(opts);
             } else {
-                console.log('DNA: Queued action #' + (i + 1) + '/' + this.queue.length + ': Waiting for yet undefined requirements: ' + opts.requirements.join(', '));
+                console.log('DNA: Queued action #' + (i + 1) + '/' + this.queue.length + ': Cannot satisfy requirement(s) `' + opts.requirements.join('`, `') + '` yet -> ' + log.join(' '));
             }
         }
     };
