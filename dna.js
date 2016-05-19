@@ -18,6 +18,11 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             'javascript': function (dfd, url, config) {
                 dfd.resolve(url.replace(/^javascript:/, ''));
             },
+            'css': function(dfd, url, config) {
+                var cssLink = url.replace(/^css:/, '').replace("'", "\\'") + '#dna';
+                cssLink = dna['core'].resolveURL(cssLink, config.baseURL);
+                dfd.resolve('/* DNA CSS Downloader Dummy */ $(\'<link rel="stylesheet" data-origin="dna" type="text/css" />\').attr(\'href\', \'' + cssLink + '\').appendTo(\'head\');');
+            },
             '*': function (dfd, url, config) {
                 $.ajax({
                     'url': url,
@@ -628,7 +633,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
         var promises = [];
         urls.forEach(function(url) {
-            promises.push(loadGetResource(url, config));
+            promises.push(downloadResourcesSingle(url, config));
         });
 
         var dfd = $.Deferred();
@@ -684,7 +689,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return dfd;
     }
 
-    function loadGetResource(url, config) {
+    function downloadResourcesSingle(url, config) {
         var dfd = $.Deferred();
         var isHTTP = url.match(/^https?:/);
         var parts = isHTTP ? url.split('#') : [url]; // to support other schemes like 'javascript:'
@@ -715,7 +720,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 if (!linkURL) {
                     dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': string, 'url': url}));
                 } else {
-                    loadGetResource(dna['core'].resolveURL(linkURL, url), config)
+                    downloadResourcesSingle(dna['core'].resolveURL(linkURL, url), config)
                         .done(function() {
                             dfd.resolve.apply(this, arguments);
                         })

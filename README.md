@@ -347,10 +347,11 @@ You can register multiple rewrite callbacks. They will be called in order of reg
 
 The resulting URI will be resolved to absolute URL if it is relative after all rewrite callbacks were applied.
 
-### Custom Downloader
+### Downloaders
 
 You can also register your own URI downloader. That way you can download files not only from server but also from local storage, variables or other resources.
 
+#### Inbuilt Javascript Scheme
 DNA has native `javascript` scheme downloader and everything else is passed to default `$.AJAX` downloader. For example the `javascript` scheme hook allows you to embed javascripts into URLs.
 ```javascript
 dna({
@@ -359,6 +360,17 @@ dna({
 }, 'my-test'});
 ```
 
+#### Inbuilt CSS Scheme
+Inbuilt `css` sheme downloader allows you to embed CSS.
+
+```javascript
+dna({
+    'id': 'my-test',
+    'load': 'css:./my.css'
+}, 'my-test'});
+```
+
+#### Custom
 You can register only one downloader for each URI scheme.
 
 To register your own downloader use this syntax
@@ -466,6 +478,21 @@ DNA will figure out that the content of `script` tag is missing and will use lin
 For production site you can populate the HTML with embeded scripts or use the web server [PageSpeed Module](https://developers.google.com/speed/pagespeed/module/) or other tools to do it automatically for you.
 
 ## Examples
+
+Load jQuery plugins
+```javascript
+    dna('/dna-configs/my.json', 'jquery:my');
+```
+
+Contents of `my.json` (note the [CSS scheme](#inbuilt-css-scheme) trick)
+```javascript
+[
+    {
+        "id": "jquery:my",
+        "load": ["css:js/jquery.my.css", "js/jquery.my.js"]
+    }
+]
+```
 
 Mixed confugration using JSON file and inline Configuration Objects + requiring service `dna.svc2` and prototype `dna.Svc1`:
 ```javascript
