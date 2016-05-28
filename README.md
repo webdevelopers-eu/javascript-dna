@@ -332,7 +332,7 @@ dna({
 To register your own URL rewritting callback use this syntax
 ```javascript
   dna({
-      'rewrite': function(currentURI, originalURI) | [ function(currentURI, originalURI), ... ]
+      'rewrite': function(currentURI, originalURI, baseURI) | [ function(currentURI, originalURI, baseURI), ... ]
     });
 ```
 
@@ -340,7 +340,7 @@ Example:
 ```javascript
 if (server.development) {
     dna({
-        'rewrite': function(currentURI, originalURI) {
+        'rewrite': function(currentURI, originalURI, baseURI) {
             return currentURI.replace(/\.min\.js$/, '.js');
         }
     });

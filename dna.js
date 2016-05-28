@@ -110,7 +110,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         }
         try {
             opts.configs.forEach(dna['core'].configure.bind(dna['core']));
-            $.when.apply(this, opts.jsonURLs.map(rewriteURL).map(download)) // Resolve 'jsonURLs': download JSON configs
+            $.when.apply(this, opts.jsonURLs.map(function(v) {return rewriteURL(v, null);}).map(download)) // Resolve 'jsonURLs': download JSON configs
                 .done(function() {
                     // Format downloaded Configs with added config.baseURL
                     var args = $.makeArray(arguments).map(function(v, k) {
@@ -778,9 +778,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     // - JSON-config URL
     // - config's load property
     function rewriteURL(url, baseURL) {
-        var urlIn = url;
+        var originalURL = url;
         settings.rewrite.forEach(function(cb) {
-            url = cb(url, urlIn) || url;
+            url = cb(url, originalURL, baseURL) || url;
         });
         url = dna['core'].resolveURL(url, baseURL);
         return url;
