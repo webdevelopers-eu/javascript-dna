@@ -208,9 +208,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         var url = location ? location.href : 'https://no-location-href.example.com/';
         for (var i = arguments.length - 1; 0 <= i; i--) {
             if (typeof arguments[i] == 'string' && arguments[i].length) {
-                base.setAttribute('href', url);
-                link.setAttribute('href', arguments[i]);
-                url = link.href;
+                //   scheme        = alpha *( alpha | digit | "+" | "-" | "." )
+                if (arguments[i].match(/^[a-z0-9+.-]+:/i)) { // already absolute
+                    url = arguments[i];
+                } else {
+                    base.setAttribute('href', url);
+                    link.setAttribute('href', arguments[i]);
+                    url = link.href;
+                }
             }
         }
         return url;
