@@ -386,7 +386,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 });
                 opts._dfd.resolve(opts);
             } else {
-                console.log('DNA: Queued action #' + (i + 1) + '/' + this.queue.length + ': Cannot satisfy requirement(s) `' + opts.requirements.join('`, `') + '` yet -> ' + log.join(' '));
+                // console.log('DNA: Queued action #' + (i + 1) + '/' + this.queue.length + ': Cannot satisfy requirement(s) `' + opts.requirements.join('`, `') + '` yet -> ' + log.join(' '));
             }
         }
     };
