@@ -56,13 +56,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'factory': { // Methods to evaluate scripts based on config.eval value
             'dna': function(dfd, jString, protoName, config) {
                 protoName = protoName ? protoName : 'undefined';
+
                 var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
                 try {
                     dfd.resolve(function(context) {
                         return context == window ? window.eval(evalStr) :  (function () {return eval(evalStr);}).call(context);
                     }(config._context));
                 } catch (e) {
-                    dfd.reject(new DNAError('Failed to evaluate the script: ' + (e.message || e), 610, e));
+                    var sourceURL = (jString.match(/\/\/#\s+sourceURL=(.+)$/) || [null, ''])[1]; // preserve sourceURL
+                    dfd.reject(new DNAError('Failed to evaluate the script ' + sourceURL + ' : ' + (e.message || e), 610, e));
                 }
             },
             'deferred': function(factory, jString, protoName, config) {
