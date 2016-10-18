@@ -15,6 +15,22 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         'rewrite': [
         ],
         'downloader': {
+            'remote': function httpWrapper(dfd, url, config) {
+                var script = document.createElement('script');
+                var before = document.getElementsByTagName('script')[0];
+
+                script.type = 'text/javascript';
+                script.async = true;
+                script.setAttribute('data-origin', 'Javascript DNA');
+                script.onload = function() {
+                    dfd.resolve('true /* Already executed */');
+                };
+                script.onerror = function() {
+                    dfd.reject(new Error('Failed to load: ' + url));
+                };
+                before.parentNode.insertBefore(script, before);
+                script.src = url.replace(/^remote:/, '');
+            },
             'javascript': function (dfd, url, config) {
                 dfd.resolve(url.replace(/^javascript:/, ''));
             },
@@ -72,6 +88,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             }
         }
     };
+
     var console = window.console || {'log': (function() {})}; console.error = console.error || console.log;
     var installed = [];
     var contexts = {};
