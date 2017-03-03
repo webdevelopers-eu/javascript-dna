@@ -142,12 +142,22 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         });
                         return [optsParsed.configs, optsParsed.other];
                     });
+
+                    // Issue warning if not resolved in 10 seconds
+                    var warnings = {};
+                    $.each(opts.required, function(k, name) {
+                        warnings[name] = setTimeout(function() {
+                                $.error("DNA: Failed to satisfy the requirement '" + name + "' in 15 seconds");
+                        }, 15000);
+                    });
+
                     // insert JSON configs
                     dna(args)
                         .done(function() {
                             dna['core'].whenSatisfied(opts.required) // whenSatisfied checks whole queue
                                 .done(function() {
                                     $.when.apply(this, opts.required.map(function(name) { // Resolve 'require'
+                                        clearTimeout(warnings[name]);
                                         return dna['core'].require(name);
                                     }))
                                         .done(opts.callbacks, function() {
