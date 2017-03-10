@@ -34,10 +34,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             'javascript': function (dfd, url, config) {
                 dfd.resolve(url.replace(/^javascript:/, ''));
             },
+            'config': function(dfd, url, config) {
+                var link = dna['core'].resolveURL(url.replace(/^config:/, '').replace("'", "\\'") + '#dna', config.baseURL);
+                dna(link); // feed the config - we can assume success as DNA will postpone all dependencies automatically
+                dfd.resolve('/* DNA Config Downloader Dummy */ true;');
+            },
             'css': function(dfd, url, config) {
-                var cssLink = url.replace(/^css:/, '').replace("'", "\\'") + '#dna';
-                cssLink = dna['core'].resolveURL(cssLink, config.baseURL);
-                dfd.resolve('/* DNA CSS Downloader Dummy */ $(\'<link rel="stylesheet" data-origin="dna" type="text/css" />\').attr(\'href\', \'' + cssLink + '\').appendTo(\'head\');');
+                var link = dna['core'].resolveURL(url.replace(/^css:/, '').replace("'", "\\'") + '#dna', config.baseURL);
+                dfd.resolve('/* DNA CSS Downloader Dummy */ $(\'<link rel="stylesheet" data-origin="dna" type="text/css" />\').attr(\'href\', \'' + link + '\').appendTo(\'head\');');
             },
             '*': function (dfd, url, config) {
                 $.ajax({

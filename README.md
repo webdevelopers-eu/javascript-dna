@@ -18,6 +18,8 @@
         - [Downloaders](#downloaders)
             - [Inbuilt Javascript Scheme](#inbuilt-javascript-scheme)
             - [Inbuilt CSS Scheme](#inbuilt-css-scheme)
+            - [Inbuilt Config Scheme](#inbuilt-config-scheme)
+            - [Inbuilt Remote Scheme](#inbuilt-remote-scheme)
             - [Custom](#custom)
         - [Custom Evaluation Engines](#custom-evaluation-engines)
     - [Bundled Assets](#bundled-assets)
@@ -355,15 +357,17 @@ The resulting URI will be resolved to absolute URL if it is relative after all r
 
 You can also register your own URI downloader. That way you can download files not only from server but also from local storage, variables or other resources.
 
-#### Inbuilt Javascript Scheme
 DNA has following native scheme downloaders
 
-- `javascript`: able to exectue javascript URLs. Eg. ```'load': 'javascript: alert("Hello World!");'```
-- `css`: able to load CSS URLs. Eg. ```'load': 'css:./modules/my.css'```
-- `remote`: able to load scripts from third-party domains. Eg. ```'load': 'remote:https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'```
+- [`javascript`](#inbilt-javascript-scheme): able to exectue javascript URLs. Eg. ```'load': 'javascript: alert("Hello World!");'```
+- [`css`](#inbuilt-css-scheme): able to load CSS URLs. Eg. ```'load': 'css:./modules/my.css'```
+- [`config`](#inbuilt-config-scheme): able to load additional DNA configurations. Eg. ```'load': 'config:./modules/my.json'```
+- [`remote`](#inbuilt-remote-scheme): able to load scripts from third-party domains. Eg. ```'load': 'remote:https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'```
 - `*`: default downloader that uses standard `$.AJAX` call.
 
-For example the `javascript` scheme hook allows you to embed javascripts into URLs.
+#### Inbuilt Javascript Scheme
+The inbuilt `javascript` scheme hook allows you to embed javascripts into URLs.
+
 ```javascript
 dna({
     'id': 'my-test',
@@ -378,6 +382,28 @@ Inbuilt `css` sheme downloader allows you to embed CSS.
 dna({
     'id': 'my-test',
     'load': 'css:./my.css'
+}, 'my-test'});
+```
+#### Inbuilt Config Scheme
+Inbuilt `config` sheme downloader allows you to load additional DNA configurations on demand.
+
+```javascript
+dna({
+    'id': 'my-test',
+    'load': [
+        'config:my/dna.json',
+        'my/script.js'
+}, 'my-test'});
+```
+#### Inbuilt Remote Scheme
+Inbuilt `remote` sheme downloader allows you to load scripts from third-party domains.
+
+```javascript
+dna({
+    'id': 'my-test',
+    'load': [
+        'load': 'remote:https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+        'my/script.js'
 }, 'my-test'});
 ```
 
