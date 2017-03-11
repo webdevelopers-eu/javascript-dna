@@ -13,6 +13,7 @@
         - [Engine `dna`](#engine-dna)
         - [Engine `deferred`](#engine-deferred)
     - [Ozone API](#ozone-api)
+    - [Settings](#settings)
     - [Core Plugin System](#core-plugin-system)
         - [Custom URL Rewriting](#custom-url-rewriting)
         - [Downloaders](#downloaders)
@@ -132,12 +133,12 @@ dna( [ REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | SETT
 dna.push( REQUIREMENT | CONFIGURATION | CONFIGURATION_URL | CALLBACK | ARRAY | SETTINGS ):Number
 ```
 
-* `REQUIREMENT`:`String` is a string with `id`, `proto` or `service` identifier that needs to be resolved before calling callbacks.
+* `REQUIREMENT`:`String` is a string with `id`, `proto`, `service` identifier that needs to be resolved before calling callbacks.
 * `CONFIGURATION`:`Object` is an object with list of requirements and scripts to load. See more in [Configuration](#configuration-object) section.
 * `CONFIGURATION_URL`:`String` you can store your configuration(s) as an array of objects in an external JSON file. This will load configurations from the file. JSON URL must contain at least one character "`/`" (e.g. "`./dna.json`") Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system. JSON files can contain also string names of prototypes/services to be loaded right away.
 * `CALLBACK`:`Function` any callback(s) to be executed when all requirements were resolved. Same as specifying callback using `$(...).done(CALLBACK);`
 * `ARRAY`:`Array` list of any combination of items of type `REQUIREMENT` | `CONFIGURATION` | `CONFIGURATION_URL` | `CALLBACK` | `ARRAY` | `SETTINGS` .
-* `SETTINGS`:`Object` see more in [Core Plugin System](#core-plugin-system) section.
+* `SETTINGS`:`Object` see more in [Settings](#settings) and [Core Plugin System](#core-plugin-system) section.
 
 Returned values
 * `Promise` -  the call to `dna(...)` always returns jQuery [Promise](https://api.jquery.com/category/deferred-object/) object that you can use to hook your callbacks onto immediately or anytime later.
@@ -169,11 +170,11 @@ Configuration Objects are used to define dependencies and requirements.
 }
 ```
 Where
-* `ID`:`String` Optional. Unique super-identifier (unique across all `id`, `proto`, `service` identifiers in all configurations).
-* `PROTO`:`String` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution. See [Prototype Aliases](#prototype-aliases) to see how to load multiple versions of the same script.
-* `SERVICE`:`String` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
-* `REQUIRE`:`String|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies. All dependencies referred by listed super-identifiers will be resolved prior to resolving this particular configuration.
-* `LOAD`:`String|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first. Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
+* `ID`:`Identifier` Optional. Unique super-identifier (unique across all `id`, `proto`, `service` identifiers in all configurations).
+* `PROTO`:`Identifier` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution. See [Prototype Aliases](#prototype-aliases) to see how to load multiple versions of the same script.
+* `SERVICE`:`Identifier` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
+* `REQUIRE`:`URI|Identifier|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies or relative or absolute `CONFIGURATION_URL` of with additional list of JSON-serialized `CONFIGURATION` objects to be loaded. All dependencies referred by listed super-identifiers will be resolved prior to resolving `load` section of this particular configuration
+* `LOAD`:`URI|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first. Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name. See more in [Evaluation Engines](#evaluation-engines) section.
  * `dna` evaluates the script in closure scope and expects the script to define variable of name specified in configuration's `proto` property.
  * `deferred` your script is not expected to define variable of name specified in `config.proto` property but you are expected to pass object representing `config.proto` to Deferred object stored in `factory` variable.
@@ -310,6 +311,21 @@ dna.push(['MyService', doSomething]);
 dna.push({'proto': 'MyService', 'load': ['my1.js', 'my2.js']});
 ```
 And when DNA is included everything falls in place automatically and `doSomething()` will get executed.
+
+## Settings
+
+You can pass object with settings to ```dna(SETTINGS)``` method. Supported properties are
+
+* `timeout`:`Integer` number of milliseconds to wait before failing when trying to satisfy object requirements. Default: 5000
+* `rewrite`:`object` see [Core Plugin System](#core-plugin-system)
+* `factory`:`object` see [Core Plugin System](#core-plugin-system)
+* `downloader`:`object` see [Core Plugin System](#core-plugin-system)
+
+Exampe:
+
+```javascript
+dna({'timeout': 1000});
+```
 
 ## Core Plugin System
 

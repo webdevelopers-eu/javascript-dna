@@ -12,6 +12,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
 (function($, window) {
     var settings = { // Use dna(SETTINGS) to modify this variable (calls internally dna['core'].set(SETTINGS))
+        'timeout': 5000,
         'rewrite': [
         ],
         'downloader': {
@@ -36,7 +37,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             },
             'config': function(dfd, url, config) {
                 var link = dna['core'].resolveURL(url.replace(/^config:/, '').replace("'", "\\'") + '#dna', config.baseURL);
-                dna(link); // feed the config - we can assume success as DNA will postpone all dependencies automatically
+                dna(link); // feed the config - we assume success as DNA will postpone all dependencies automatically
                 dfd.resolve('/* DNA Config Downloader Dummy */ true;');
             },
             'css': function(dfd, url, config) {
@@ -147,13 +148,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                         return [optsParsed.configs, optsParsed.other];
                     });
 
-                    // Issue warning if not resolved in 10 seconds
-                    var warnings = {};
-                    $.each(opts.required, function(k, name) {
-                        warnings[name] = setTimeout(function() {
-                                $.error("DNA: Failed to satisfy the requirement '" + name + "' in 15 seconds");
-                        }, 15000);
-                    });
+                    // Issue warning if not resolved
+                    setTimeout(function() {
+                        var reason = [];
+                        dna.core.canSatisfy(opts.required, reason);
+                        if (reason.length) {
+                            var err = 'DNA: Failed to satisfy the requirements "' + JSON.stringify(opts.required) + '" in ' + Math.round(settings.timeout / 1000) + ' seconds (' + reason.join(' ') + ')';
+                            reject(err);
+                            $.error(err);
+                        }
+                    }, settings.timeout);
 
                     // insert JSON configs
                     dna(args)
@@ -161,7 +165,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                             dna['core'].whenSatisfied(opts.required) // whenSatisfied checks whole queue
                                 .done(function() {
                                     $.when.apply(this, opts.required.map(function(name) { // Resolve 'require'
-                                        clearTimeout(warnings[name]);
                                         return dna['core'].require(name);
                                     }))
                                         .done(opts.callbacks, function() {
@@ -391,10 +394,15 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNACore.prototype.whenSatisfied = function() {
         var dfd = $.Deferred();
         var newOpts  = dna['core'].getOpts(arguments, [
+            ['jsonURLs', /\//],
             ['requirements', 'string'],
             ['callbacks', 'function'],
             'recursive'
         ]);
+
+        $.each(newOpts, function(url) {
+        });
+
         newOpts._dfd = dfd;
         this.queue.push(newOpts);
         this.checkQueue();
@@ -665,6 +673,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         return config._dfd;
     };
 
+    function requireConfig(url) {
+    }
+
 
     function downloadResources(config) {
         var urls = dna['core'].getOpts(config.load, [['urls', 'string'], 'recursive']).urls;
@@ -836,6 +847,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
             .map(function(url) {
                 return rewriteURL(url, config.baseURL);
             });
+
+        var requirements = dna['core'].getOpts(config.require, [['jsonURLs', /\//], ['require', 'string'], 'recursive']);
+        config.require = requirements.require;
+        if (requirements.jsonURLs.length) {
+            requirements.jsonURLs = requirements.jsonURLs.map(function(url) {return rewriteURL(url, config.baseURL);});
+            console.log('Loading JSON configs specified as an requirement', requirements.jsonURLs, config.baseURL);
+            dna(requirements.jsonURLs);
+        }
 
         if ($.type(config.require) !== 'array') {
             config.require = config.require ? [config.require] : [];
