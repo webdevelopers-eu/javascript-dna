@@ -287,7 +287,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
                 settings[k] = v;
             }
         });
-        console.log('DNA: Settings altered.', settings);
+        // console.log('DNA: Settings altered.', settings);
     };
 
 
@@ -852,7 +852,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         config.require = requirements.require;
         if (requirements.jsonURLs.length) {
             requirements.jsonURLs = requirements.jsonURLs.map(function(url) {return rewriteURL(url, config.baseURL);});
-            console.log('Loading JSON configs specified as an requirement', requirements.jsonURLs, config.baseURL);
+            // console.log('Loading JSON configs specified as an requirement', requirements.jsonURLs, config.baseURL);
             dna(requirements.jsonURLs);
         }
 
@@ -914,7 +914,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     install('Error', DNAError);
     install('core', new DNACore);
-    console.log('DNA: Ready.');
+    console.log('DNA v' + dna.core.version + ' ready.');
 
     var initQueue = window.dna || [];  // replace optional queue of calls with reall object
     window.dna = dna;
