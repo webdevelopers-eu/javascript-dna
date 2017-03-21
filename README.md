@@ -411,6 +411,50 @@ dna({
         'my/script.js'
 }, 'my-test'});
 ```
+
+You can also specify config URL in `require` section:
+
+```javascript
+dna({
+    'id': 'my-test',
+    'require': './other.json'
+}, 'my-test'});
+```
+
+Note: If the configuration object contains only `id` property and
+`require` property that contains URLs of other JSON configurations
+then such configuration can be overriden by other configuration with
+the same `id`.
+
+For example you can have one configuration file
+
+```javascript
+[
+    {
+      'id': 'my-test',
+      'require': './other.json'
+    }
+]
+```
+
+that includes `other.json` file
+
+```javascript
+[
+    {
+      'id': 'my-test',
+      'proto': 'MyTest',
+      'load': './my-test.js'
+    }
+]
+```
+
+and DNA will not complain about duplicate `id` super-identifier and
+the original configuration will be replaced with the one from
+`other.json`. That way you can split large JSON configurations into
+multiple JSON files.
+
+
 #### Inbuilt Remote Scheme
 Inbuilt `remote` sheme downloader allows you to load scripts from third-party domains.
 

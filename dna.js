@@ -320,11 +320,17 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
         [config.id, config.service]
             .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
             .forEach(function (name) {
+                var conflictConfig = dna['core'].getConfig(name);
                 if (name) {
                     if (typeof dna[name] == 'undefined') {
                         dna[name] = null;
+                    } else if (!conflictConfig.proto.length && !conflictConfig.service && !conflictConfig.require.length) { // for the cases of configs {id: "SOMETHING", "require": "./something.json"} that re-declare same "SOMETHING" super ID
+                        dna['core'].configs = dna['core'].configs.filter(function(cfg) {
+                            return cfg.id !== config.id;
+                        });
+                        dna[name] = undefined;
+                        console.log('DNA: Redeclaring ' + config.id /*, 'new', config, 'conflicting', dna['core'].getConfig(name) */);
                     } else {
-                        var conflictConfig = dna['core'].getConfig(name);
                         var msgs =  ['DNA: Conflicting property `dna["' + name + '"]`.'];
                         if (dna[name] && $.inArray(name, installed) == -1) {
                             msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! The existing `dna["' + name + '"]` property was not installed as standard DNA module.');
