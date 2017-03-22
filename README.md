@@ -206,13 +206,22 @@ You can also include other JSON configuration files from withing Configuration O
   {
     "id": "load-big-project",
     "require": "./my/big-project.json"
+  },
+
+  {
+    "proto": "MyObject",
+    "require": ['load-big-project', 'ClassFromBigProject'],
+    "load": "object.js"
   }
 ]
 ```
 
-You can then load additional `big-project.json` just by requiring `load-big-project`. E.g. `dna("load-big-project").done(...);`
+You can then load additional `big-project.json` just by requiring
+`load-big-project`. E.g. `dna("load-big-project").done(...);` or indirectly through `require` statement using `dna("MyObject").done(...);`. That
+way you can confortably break huge projects in multiple JSON
+configurations and set up dependencies between them.
 
-It is also possible to load external JSON using `config` scheme - see more in [Inbuilt Config Scheme][(#inbuilt-config-scheme) section.
+It is also possible to load external JSON using `config` scheme - see more in [Inbuilt Config Scheme](#inbuilt-config-scheme) section.
 
 
 #### Prototype Aliases
