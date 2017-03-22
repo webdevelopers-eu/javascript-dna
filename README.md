@@ -205,13 +205,32 @@ You can also include other JSON configuration files from withing Configuration O
 [
   {
     "id": "load-big-project",
+    "description": "Huge Project included on request.",
     "require": "./my/big-project.json"
   },
 
   {
     "proto": "MyObject",
+    "description": "My code depending on Huge Project using indirect `require`",
     "require": ['load-big-project', 'ClassFromBigProject'],
     "load": "object.js"
+  },
+
+  {
+    "id": "MyObject2",
+    "description": "My code depending on Huge Project using direct `require`",
+    "require": ["./my/big-project.json", "Class2FromBigProject"],
+    "load": "object2.js"
+  },
+
+  {
+    "id": "MyObject2",
+    "description": "My code depending on Huge Project using `load`",
+    "require": [],
+    "load": [
+        "config:./my/big-project.json",
+        "object2.js"
+    ]
   }
 ]
 ```
@@ -434,18 +453,38 @@ dna({
         'config:my/dna.json',
         'my/script.js'
 }, 'my-test'});
+
 ```
 
-You can also specify config URL in `require` section:
+You cannot specify requirement that referre to
+Configuration Object loaded from `load` section using `config`
+scheme. Error example:
 
 ```javascript
-dna({
+{
     'id': 'my-test',
-    'require': './other.json'
-}, 'my-test'});
+    'description': 'ERROR: the requirement to load big-project.json will be never met.'
+    'require': 'ClassInBigProject',
+    'load': [
+        'config:my/big-project.json',
+        'my/script.js'
+    ]
+}
 ```
 
-Note: If the configuration object contains only `id` property and
+If you you want to specify requirement that yet-to-be-loaded from other JSON file you have to put both reference to that JSON file
+and requirement from that file in `require` statement. Correct example:
+
+```javascript
+{
+    'id': 'my-test',
+    'description': 'ERROR: the requirement to load big-project.json will be never met.'
+    'require': ['my/big-project.json', 'ClassInBigProject'],
+    'load': 'my/script.js'
+}
+```
+
+If the configuration object contains only `id` property and
 `require` property that contains URLs of other JSON configurations
 then such configuration can be overriden by other configuration with
 the same `id`.
