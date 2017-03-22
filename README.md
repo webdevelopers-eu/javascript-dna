@@ -478,7 +478,6 @@ and requirement from that file in `require` statement. Correct example:
 ```javascript
 {
     'id': 'my-test',
-    'description': 'ERROR: the requirement to load big-project.json will be never met.'
     'require': ['my/big-project.json', 'ClassInBigProject'],
     'load': 'my/script.js'
 }
