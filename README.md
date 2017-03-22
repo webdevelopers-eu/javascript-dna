@@ -199,6 +199,21 @@ dna(
     [ '/other.json', '/otherother.json' ]
 );
 ```
+You can also include other JSON configuration files from withing Configuration Object.
+
+```javascript
+[
+  {
+    "id": "load-big-project",
+    "require": "./my/big-project.json"
+  }
+]
+```
+
+You can then load additional `big-project.json` just by requiring `load-big-project`. E.g. `dna("load-big-project").done(...);`
+
+It is also possible to load external JSON using `config` scheme - see more in [Inbuilt Config Scheme][(#inbuilt-config-scheme) section.
+
 
 #### Prototype Aliases
 
