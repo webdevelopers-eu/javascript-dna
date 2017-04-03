@@ -1,5 +1,5 @@
 #!/bin/bash
 DIR="`dirname $0`/.."
 echo $DIR
-uglifyjs -m -c --screw-ie8 --preamble "/*! Javascript DNA v1.0 | (c) Daniel Ševčík | www.webdevelopers.eu */" --lint "$DIR/dna.js" -o "$DIR/dna.min.js" --source-map "$DIR/dna.min.map"
-
+pushd $DIR
+uglifyjs -m -c --screw-ie8 --preamble "/*! Javascript DNA v1.0 | (c) Daniel Ševčík | www.webdevelopers.eu */" --lint "dna.js" -o "dna.min.js" --source-map "dna.min.map"
