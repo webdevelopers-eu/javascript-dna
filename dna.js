@@ -143,7 +143,14 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	}
 	try {
 	    opts.configs.forEach(dna['core'].configure.bind(dna['core']));
-	    $.when.apply(this, opts.jsonURLs.map(function(v) {return rewriteURL(v, null);}).map(download)) // Resolve 'jsonURLs': download JSON configs
+	    var fullURLs = opts.jsonURLs
+		    .map(function(v) {
+			return rewriteURL(v, null);
+		    })
+		    .filter(function(url) { // only those not added yet
+			return !dna['core'].resources[url];
+		    });
+	    $.when.apply(this, fullURLs.map(download)) // Resolve 'jsonURLs': download JSON configs
 		.done(function() {
 		    // Format downloaded Configs with added config.baseURL
 		    var args = $.makeArray(arguments).map(function(v, k) {
