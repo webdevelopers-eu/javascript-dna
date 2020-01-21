@@ -273,6 +273,18 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	return url;
     };
 
+
+    /**
+     * Expose rewriteURL method for other.
+     *
+     * Takes URL and applies on it all custom rewrite routines and returns result.
+     *
+     * @access private
+     * @param {string} url
+     * @return {string} rewritten URL by rewritters if any
+     */
+    DNACore.prototype.rewriteURL = rewriteURL;
+
     /**
      * Set various settings. Example:
      *  dna['core'].set({
