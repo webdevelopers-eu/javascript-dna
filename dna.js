@@ -51,7 +51,17 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 			break;
 		    }
 		}
-		dfd.resolve('/* DNA CSS Downloader Dummy */ $(\'<link rel="stylesheet" data-origin="dna" type="text/css" />\').attr(\'href\', \'' + link + '\').appendTo(\'head\');');
+		// debugger;
+		// dfd.resolve('/* DNA CSS Downloader Dummy */ $(\'<link rel="stylesheet" data-origin="dna" type="text/css" />\').attr(\'href\', \'' + link + '\').appendTo(\'head\');');
+		dfd.resolve(function(dfd) {
+		    var onLoad = function() {dfd.resolve(/* must return nothing */);};
+		    var $link = $('<link rel="stylesheet" data-origin="dna" type="text/css" />')
+			    .attr('href', '' + link + '');
+
+		    setTimeout(onLoad, 5000);
+		    $link.get(0).onload=onLoad;
+		    $link.appendTo('head');
+		});
 	    },
 	    '*': function (dfd, url, config) {
 		$.ajax({
@@ -84,16 +94,20 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	    }
 	},
 	'factory': { // Methods to evaluate scripts based on config.eval value
-	    'dna': function(dfd, jString, protoName, config) {
+	    'dna': function(dfd, toEvaluate, protoName, config) {
 		protoName = protoName ? protoName : 'undefined';
 
-		var evalStr = jString + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
 		try {
-		    dfd.resolve(function(context) {
-			return context == window ? window.eval(evalStr) :  (function () {return eval(evalStr);}).call(context);
-		    }(config._context));
+		    if (typeof toEvaluate == 'function') {
+			toEvaluate(dfd, config._context, protoName, config);
+		    } else {
+			var evalStr = toEvaluate + '\n\n/* Javascript DNA: Compat Layer */;\n' + 'typeof ' + protoName + ' == \'undefined\' ? undefined : ' + protoName;
+			dfd.resolve(function(context) {
+			    return context == window ? window.eval(evalStr) :  (function () {return eval(evalStr);}).call(context);
+			}(config._context));
+		    }
 		} catch (e) {
-		    var sourceURL = (jString.match(/\/\/#\s+sourceURL=(.+)$/) || [null, ''])[1]; // preserve sourceURL
+		    var sourceURL = (typeof toEvaluate == 'string' && toEvaluate.match(/\/\/#\s+sourceURL=(.+)$/) || [null, ''])[1]; // preserve sourceURL
 		    dfd.reject(new DNAError('Failed to evaluate the script ' + sourceURL + ' : ' + (e.message || e), 610, e));
 		}
 	    },
@@ -776,16 +790,21 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	var dfd = $.Deferred();
 	var isHTTP = url.match(/^https?:/);
 	var parts = isHTTP ? url.split('#') : [url]; // to support other schemes like 'javascript:'
-	var callback;
+	var extractResource;
 
-	callback = function(string) {
-	    if (parts.length == 1) { // Javascript
-		dfd.resolve(string + (isHTTP ? ' //# sourceURL=' + url + '#dna' : ''));
+	extractResource = function(dlData) {
+	    if (typeof dlData == 'function') {
+		dfd.resolve(dlData);
 		return;
 	    }
+	    if (parts.length == 1) { // Javascript
+		dfd.resolve(dlData + (isHTTP ? ' //# sourceURL=' + url + '#dna' : ''));
+		return;
+	    }
+
 	    // HTML
 	    var doc = document.implementation.createHTMLDocument( 'html', '', '');
-	    doc.childNodes[1].innerHTML = string;
+	    doc.childNodes[1].innerHTML = dlData;
 	    try {
 		var $script = $('#' + parts[1], doc);
 		if (!$script.length) throw 'Bundled resource "#' + parts[1] + '" not found in "' + url + '"';
@@ -801,7 +820,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 		var linkURL = $script.get(0).src || $script.attr('src') ||
 			$script.get(0).href || $script.attr('href');
 		if (!linkURL) {
-		    dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': string, 'url': url}));
+		    dfd.reject(new DNAError('The script "' + url + '" has no contents and no reference to other external resource.', 605, {'script': $script.get(0), 'source': dlData, 'url': url}));
 		} else {
 		    downloadResourcesSingle(dna['core'].resolveURL(linkURL, url), config)
 			.done(function() {
@@ -817,7 +836,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	};
 
 	download(parts[0], config)
-	    .done(callback)
+	    .done(extractResource)
 	    .fail(function() {
 		dfd.reject.apply(this, arguments);
 	    });
