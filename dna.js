@@ -35,6 +35,21 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	    'javascript': function (dfd, url, config) {
 		dfd.resolve(url.replace(/^javascript:/, ''));
 	    },
+	    // Support for {"proto": "MyConfig", "load": "json:somewhere/config.json"}
+	    // dna.MyConfig will contain loaded JSON file.
+	    'json': function(dfd, url, config) {
+		var link = dna['core'].resolveURL(url.replace(/^json:/, '').replace("'", "\\'"), config.baseURL);
+		$.getJSON(link)
+		    .done(function(data) {
+			dfd.resolve(function(dfd) {
+			    dfd.resolve(data);
+			});
+		    })
+		    .fail(function(xhr, status, msg) {
+			console.log("DNA: Failed to download JSON file!", link, arguments);
+			dfd.reject(msg);
+		    });
+	    },
 	    'config': function(dfd, url, config) {
 		var link = dna['core'].resolveURL(url.replace(/^config:/, '').replace("'", "\\'") + '#dna', config.baseURL);
 		dna(link); // feed the config - we assume success as DNA will postpone all dependencies automatically
