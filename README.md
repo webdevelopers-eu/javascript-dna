@@ -1,40 +1,41 @@
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
 - [Javascript DNA / jDNA](#javascript-dna--jdna)
-    - [Motivation](#motivation)
-    - [Features](#features)
-    - [Quick Tutorial](#quick-tutorial)
-    - [Syntax](#syntax)
-        - [Configuration Object](#configuration-object)
-            - [Register Configurations](#register-configurations)
-            - [Prototype Aliases](#prototype-aliases)
-    - [Evaluation Engines](#evaluation-engines)
-        - [Engine `dna`](#engine-dna)
-        - [Engine `deferred`](#engine-deferred)
-    - [Ozone API](#ozone-api)
-    - [Settings](#settings)
-    - [Core Plugin System](#core-plugin-system)
-        - [Custom URL Rewriting](#custom-url-rewriting)
-        - [Downloaders](#downloaders)
-            - [Inbuilt Javascript Scheme](#inbuilt-javascript-scheme)
-            - [Inbuilt CSS Scheme](#inbuilt-css-scheme)
-            - [Inbuilt Config Scheme](#inbuilt-config-scheme)
-            - [Inbuilt Remote Scheme](#inbuilt-remote-scheme)
-            - [Custom](#custom)
-        - [Custom Evaluation Engines](#custom-evaluation-engines)
-    - [Bundled Assets](#bundled-assets)
-    - [Examples](#examples)
-        - [Complete Example #1](#complete-example-1)
-    - [Portable Modules](#portable-modules)
-    - [Tricks](#tricks)
-        - [Call DNA Before It Loads](#call-dna-before-it-loads)
-        - [External Configurations](#external-configurations)
-        - [Load Anything](#load-anything)
-    - [Experimental Features](#experimental-features)
-        - [Named Context](#named-context)
-    - [Troubleshooting](#troubleshooting)
-    - [ToDo](#todo)
+	- [Motivation](#motivation)
+	- [Features](#features)
+	- [Quick Tutorial](#quick-tutorial)
+	- [Syntax](#syntax)
+		- [Configuration Object](#configuration-object)
+			- [Register Configurations](#register-configurations)
+			- [JSON Files](#json-files)
+			- [Prototype Aliases](#prototype-aliases)
+	- [Evaluation Engines](#evaluation-engines)
+		- [Engine `dna`](#engine-dna)
+		- [Engine `deferred`](#engine-deferred)
+	- [Ozone API](#ozone-api)
+	- [Settings](#settings)
+	- [Core Plugin System](#core-plugin-system)
+		- [Custom URL Rewriting](#custom-url-rewriting)
+		- [Downloaders](#downloaders)
+			- [Inbuilt Javascript Scheme](#inbuilt-javascript-scheme)
+			- [Inbuilt CSS Scheme](#inbuilt-css-scheme)
+			- [Inbuilt Config Scheme](#inbuilt-config-scheme)
+			- [Inbuilt Remote Scheme](#inbuilt-remote-scheme)
+			- [Custom](#custom)
+		- [Custom Evaluation Engines](#custom-evaluation-engines)
+	- [Bundled Assets](#bundled-assets)
+	- [Examples](#examples)
+		- [Complete Example #1](#complete-example-1)
+	- [Portable Modules](#portable-modules)
+	- [Tricks](#tricks)
+		- [Call DNA Before It Loads](#call-dna-before-it-loads)
+		- [External Configurations](#external-configurations)
+		- [Load Anything](#load-anything)
+	- [Experimental Features](#experimental-features)
+		- [Named Context](#named-context)
+	- [Troubleshooting](#troubleshooting)
+	- [ToDo](#todo)
 
 <!-- markdown-toc end -->
 # Javascript DNA / jDNA
@@ -56,19 +57,19 @@ Q: Why another AMD solution? We have Dojo Toolkit, RequireJS, and ScriptManJS...
 ```javascript
 // Contents of file /just/anywhere/file.js
 function Point(x, y) {
-    this.coord = [x, y];
+	this.coord = [x, y];
 }
 Point.prototype.toString = function() {
-        return '[' + this.coord.join(' x ') + ']';
+		return '[' + this.coord.join(' x ') + ']';
 };
 ```
 > that can be intuitively required in the code:
 ```javascript
 dna(
-       'Point', // I need the Point prototype
-       function() { // Run this after you load the Point prototype
-           new dna.Point(10, 20);
-       }
+	   'Point', // I need the Point prototype
+	   function() { // Run this after you load the Point prototype
+		   new dna.Point(10, 20);
+	   }
    );
 ```
 > There was nothing like that. Most solutions failed to meet this simple expectation of every programmer by making impractical design choices or implementing unnecessarily complex solutions to achieve simple goal.
@@ -98,12 +99,12 @@ Define locations of your Javascript prototypes and their dependencies
 
 ```javascript
 dna({
-     'proto': 'MyPrototype1', // Prototype name that you use in your code requirements
-     'require': 'MyPrototype2', // It requires also another prototype defined elsewhere
-     'load': '/somewhere/func1.js' // There is MyPrototype1 expected to be defined.
+	 'proto': 'MyPrototype1', // Prototype name that you use in your code requirements
+	 'require': 'MyPrototype2', // It requires also another prototype defined elsewhere
+	 'load': '/somewhere/func1.js' // There is MyPrototype1 expected to be defined.
   }, {
-     'proto': 'MyPrototype2',
-     'load': '/somewhere/func2.js'
+	 'proto': 'MyPrototype2',
+	 'load': '/somewhere/func2.js'
   });
 ```
 
@@ -112,13 +113,13 @@ Create files with your javascript classes:
 File `/somewhere/func1.js`
 ```javascript
 function MyPrototype1() {
-    new dna.MyPrototype2; // we expect DNA to resolve also MyPrototype2 requirement
+	new dna.MyPrototype2; // we expect DNA to resolve also MyPrototype2 requirement
 }
 ```
 File `/somewhere/func2.js`
 ```javascript
 function MyPrototype2() {
-    alert('Hello world!');
+	alert('Hello world!');
 }
 ```
 Execute your function after DNA exports explicitly required `MyPrototype1` and its dependency `MyPrototype2` as `dna` properties:
@@ -149,8 +150,8 @@ Call ```dna.push()``` only if you are not sure if DNA is loaded. See section [Ca
 ```javascript
 var dna = dna || [];
 dna.push(function() { // On DNA load
-    dna(…);
-    …;
+	dna(…);
+	…;
 });
 ```
 
@@ -160,19 +161,21 @@ Configuration Objects are used to define dependencies and requirements.
 
 ```javascript
 {
-    'id': ID,
-    'proto': PROTO,
-    'service': SERVICE,
-    'require': REQUIRE,
-    'load': LOAD,
-    'eval': EVAL,
-    'context': CONTEXT
+	'id': ID,
+	'proto': PROTO,
+	'service': SERVICE,
+	'data': DNAME,
+	'require': REQUIRE,
+	'load': LOAD,
+	'eval': EVAL,
+	'context': CONTEXT
 }
 ```
 Where
 * `ID`:`Identifier` Optional. Unique super-identifier (unique across all `id`, `proto`, `service` identifiers in all configurations).
 * `PROTO`:`Identifier` Optional. A super-identifier. Name of the `Function` javascript object. Must start with an upper-case letter. This object will be available as `dna` property (e.g. `dna[PROTO]`) after successful resolution. See [Prototype Aliases](#prototype-aliases) to see how to load multiple versions of the same script.
-* `SERVICE`:`Identifier` Optional. A super-identifier. Name of the `dna` property. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
+* `SERVICE`:`Identifier` Optional. A super-identifier. Name of the property `dna[SERVICE]`. Must start with a lower-case letter. The `dna[SERVICE]` will be populated with object created using `PROTO` `Function` (in a nutshell it will do `dna[SERVICE]=new dna[PROTO];`).
+* `DNAME`:`Identifier` Optional. A super-identifier. Name of the property `dna.data[DNAME]`. If `require` section contains any JSON URIs, deserialized JSON objects will be merged in that property.
 * `REQUIRE`:`URI|Identifier|Array` Optional. One or  array of `id`, `proto` or `service` identifiers that define dependencies or relative or absolute `CONFIGURATION_URL` of file with additional list of JSON-serialized `CONFIGURATION` objects to be loaded. All dependencies referred by listed super-identifiers will be resolved prior to resolving `load` section of this particular configuration
 * `LOAD`:`URI|Array` Optional. A list of absolute or relative (resolved to a containing `.json` file or current document) URLs of Javascript or HTML (see [Bundled Assets](#bundled-assets)) files to be loaded and parsed/executed. Files are guaranteed to be executed in listed order with required dependencies executed first. Note: Listed URIs will be [rewritten](#custom-url-rewriting) and [downloaded](#custom-downloader) using plugin system.
 * `EVAL`:`String` Optional. Accepted values: `dna` (default) or custom name. See more in [Evaluation Engines](#evaluation-engines) section.
@@ -194,9 +197,9 @@ Just pass the Configuration Object or URL pointing to JSON file with Configurati
 dna( '/dna.json' );
 dna( {'proto': 'Test', 'load': '/file.js'} );
 dna(
-    '/dna.json',
-    {'proto': 'Test', 'load': '/file.js'},
-    [ '/other.json', '/otherother.json' ]
+	'/dna.json',
+	{'proto': 'Test', 'load': '/file.js'},
+	[ '/other.json', '/otherother.json' ]
 );
 ```
 You can also include other JSON configuration files from withing Configuration Object.
@@ -204,33 +207,33 @@ You can also include other JSON configuration files from withing Configuration O
 ```javascript
 [
   {
-    "id": "load-big-project",
-    "description": "Huge Project included on request.",
-    "require": "./my/big-project.json"
+	"id": "load-big-project",
+	"description": "Huge Project included on request.",
+	"require": "./my/big-project.json"
   },
 
   {
-    "proto": "MyObject",
-    "description": "My code depending on Huge Project using indirect `require`",
-    "require": ['load-big-project', 'ClassFromBigProject'],
-    "load": "object.js"
+	"proto": "MyObject",
+	"description": "My code depending on Huge Project using indirect `require`",
+	"require": ['load-big-project', 'ClassFromBigProject'],
+	"load": "object.js"
   },
 
   {
-    "id": "MyObject2",
-    "description": "My code depending on Huge Project using direct `require`",
-    "require": ["./my/big-project.json", "Class2FromBigProject"],
-    "load": "object2.js"
+	"id": "MyObject2",
+	"description": "My code depending on Huge Project using direct `require`",
+	"require": ["./my/big-project.json", "Class2FromBigProject"],
+	"load": "object2.js"
   },
 
   {
-    "id": "MyObject2",
-    "description": "My code depending on Huge Project using `load`",
-    "require": [],
-    "load": [
-        "config:./my/big-project.json",
-        "object2.js"
-    ]
+	"id": "MyObject2",
+	"description": "My code depending on Huge Project using `load`",
+	"require": [],
+	"load": [
+		"config:./my/big-project.json",
+		"object2.js"
+	]
   }
 ]
 ```
@@ -242,6 +245,28 @@ configurations and set up dependencies between them.
 
 It is also possible to load external JSON using `config` scheme - see more in [Inbuilt Config Scheme](#inbuilt-config-scheme) section.
 
+#### JSON Files
+
+You can use DNA to load JSON configuration files. Example of DNA configuration.
+
+```javascript
+{
+	"service": "myService",
+	"proto": "MyClass",
+	"load": ["./myclass.js"],
+	"require": ["myConfig"]
+},
+{
+	"data": "myConfig",
+	"load": ["json:./configs/my.json"]
+}
+```
+
+After running `dna("myService")` following happens:
+* `myclass.js` is fetched and it is expected to contain `MyClass` declaration that will be stored in `dna.MyClass` property.
+* `my.json` is downloaded and deserialized. Resulting object is merged into `dna.data.myConfig` property.
+* `new dna.MyClass` is instantiated and stored in `dna.myService` property
+* promise is resolved
 
 #### Prototype Aliases
 
@@ -251,11 +276,11 @@ In that case you can use prototype alias to export the prototype in different pr
 
 ```javascript
 dna({
-    'proto': 'MyStuff',
-    'load': '/lib/my-stuff-v1.js'
+	'proto': 'MyStuff',
+	'load': '/lib/my-stuff-v1.js'
 }, {
-    'proto': 'MyStuff=MyStuff@2',
-    'load': '/lib/my-stuff-v2.js'
+	'proto': 'MyStuff=MyStuff@2',
+	'load': '/lib/my-stuff-v2.js'
 });
 
 dna('MyStuff@2', newerCodeCallback);
@@ -265,8 +290,8 @@ In this case the class `MyStuff` from the file `my-stuff-v1.js` will be exported
 You can use also multiple aliases:
 ```javascript
 dna({
-    'proto': 'MyStuff=MyStuff@2=webdevelopers.eu:MyStuff@2',
-    'load': '/lib/my-stuff-v2.js'
+	'proto': 'MyStuff=MyStuff@2=webdevelopers.eu:MyStuff@2',
+	'load': '/lib/my-stuff-v2.js'
 });
 ```
 in which case `MyStuff` from `my-stuff-v2.js` will be available as both `dna["MyStuff@2"]` and `dna["webdevelopers.eu:MyStuff@2"]` but not as `dna.MyStuff`.
@@ -285,9 +310,9 @@ Example:
 
 ```javascript
 dna({
-    'proto': 'MyModue',
-    'load': '/mymodule.js',
-    'eval': 'dna' // default
+	'proto': 'MyModue',
+	'load': '/mymodule.js',
+	'eval': 'dna' // default
 });
 ```
 Contents of `/mymodule.js` is expected to define `MyModule` variable holding the Object. For example:
@@ -305,9 +330,9 @@ Example:
 
 ```javascript
 dna({
-    'proto': 'MyModue',
-    'load': '/mymodule.js'
-    'eval': 'deferred'
+	'proto': 'MyModue',
+	'load': '/mymodule.js'
+	'eval': 'deferred'
 });
 ```
 Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your module is ready.
@@ -315,24 +340,24 @@ Contents of `/mymodule.js` is expected to call `factory.resolve(...);` when your
 // variable `factory` is already populated with Deferred object you are expected to resolve/reject.
 doSomeAsyncInit
   .done(function(myProto) {
-        // myProto prototype is the outcome of your module.
-        // It will be passed on to DNA to be registered in dna.MyModule property.
-        factory.resolve(myProto);
+		// myProto prototype is the outcome of your module.
+		// It will be passed on to DNA to be registered in dna.MyModule property.
+		factory.resolve(myProto);
   });
 ```
 
 This Engine will allow you to include other extensive configurations on request. That way you can chain up .json configurations and modules that will be loaded on request or can be specified as dependencies for other modules.
 ```javascript
 dna({
-    'id': 'extensive:module',
-    'load': 'javascript: dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });',
-    'eval': 'deferred'
+	'id': 'extensive:module',
+	'load': 'javascript: dna("/lot-of.json", "extensive:loader", function() { factory.resolve(); });',
+	'eval': 'deferred'
 });
 
 // will load /lot-of.json with additional configuration
 // and initialize service dna['extensive:loader']
 dna('extensive:module', function() {
-    // My extensive module is ready
+	// My extensive module is ready
 });
 ```
 Note: for the trick with `"load": "javascript:..."` see [Custom Downloader](#custom-downloader) section.
@@ -382,9 +407,9 @@ Javascript DNA has core plugin system that allows you to define your own behavio
 To register your plugins pass the plugin configuration object to dna:
 ```javascript
 dna({
-    'rewrite': rewritePlugins,
-    'downloader': downloaderPlugins,
-    'factory': factoryPlugins
+	'rewrite': rewritePlugins,
+	'downloader': downloaderPlugins,
+	'factory': factoryPlugins
 });
 ```
 
@@ -393,18 +418,18 @@ dna({
 To register your own URL rewritting callback use this syntax
 ```javascript
   dna({
-      'rewrite': function(currentURI, originalURI, baseURI) | [ function(currentURI, originalURI, baseURI), ... ]
-    });
+	  'rewrite': function(currentURI, originalURI, baseURI) | [ function(currentURI, originalURI, baseURI), ... ]
+	});
 ```
 
 Example:
 ```javascript
 if (server.development) {
-    dna({
-        'rewrite': function(currentURI, originalURI, baseURI) {
-            return currentURI.replace(/\.min\.js$/, '.js');
-        }
-    });
+	dna({
+		'rewrite': function(currentURI, originalURI, baseURI) {
+			return currentURI.replace(/\.min\.js$/, '.js');
+		}
+	});
 }
 ```
 
@@ -429,8 +454,8 @@ The inbuilt `javascript` scheme hook allows you to embed javascripts into URLs.
 
 ```javascript
 dna({
-    'id': 'my-test',
-    'load': 'javascript: alert("Hello World!");'
+	'id': 'my-test',
+	'load': 'javascript: alert("Hello World!");'
 }, 'my-test'});
 ```
 
@@ -439,8 +464,8 @@ Inbuilt `css` sheme downloader allows you to embed CSS.
 
 ```javascript
 dna({
-    'id': 'my-test',
-    'load': 'css:./my.css'
+	'id': 'my-test',
+	'load': 'css:./my.css'
 }, 'my-test'});
 ```
 #### Inbuilt Config Scheme
@@ -448,10 +473,10 @@ Inbuilt `config` sheme downloader allows you to load additional DNA configuratio
 
 ```javascript
 dna({
-    'id': 'my-test',
-    'load': [
-        'config:my/dna.json',
-        'my/script.js'
+	'id': 'my-test',
+	'load': [
+		'config:my/dna.json',
+		'my/script.js'
 }, 'my-test'});
 
 ```
@@ -462,13 +487,13 @@ scheme. Error example:
 
 ```javascript
 {
-    'id': 'my-test',
-    'description': 'ERROR: the requirement to load big-project.json will be never met.'
-    'require': 'ClassInBigProject',
-    'load': [
-        'config:my/big-project.json',
-        'my/script.js'
-    ]
+	'id': 'my-test',
+	'description': 'ERROR: the requirement to load big-project.json will be never met.'
+	'require': 'ClassInBigProject',
+	'load': [
+		'config:my/big-project.json',
+		'my/script.js'
+	]
 }
 ```
 
@@ -477,9 +502,9 @@ and requirement from that file in `require` statement. Correct example:
 
 ```javascript
 {
-    'id': 'my-test',
-    'require': ['my/big-project.json', 'ClassInBigProject'],
-    'load': 'my/script.js'
+	'id': 'my-test',
+	'require': ['my/big-project.json', 'ClassInBigProject'],
+	'load': 'my/script.js'
 }
 ```
 
@@ -492,10 +517,10 @@ For example you can have one configuration file
 
 ```javascript
 [
-    {
-      'id': 'my-test',
-      'require': './other.json'
-    }
+	{
+	  'id': 'my-test',
+	  'require': './other.json'
+	}
 ]
 ```
 
@@ -503,11 +528,11 @@ that includes `other.json` file
 
 ```javascript
 [
-    {
-      'id': 'my-test',
-      'proto': 'MyTest',
-      'load': './my-test.js'
-    }
+	{
+	  'id': 'my-test',
+	  'proto': 'MyTest',
+	  'load': './my-test.js'
+	}
 ]
 ```
 
@@ -522,10 +547,10 @@ Inbuilt `remote` sheme downloader allows you to load scripts from third-party do
 
 ```javascript
 dna({
-    'id': 'my-test',
-    'load': [
-        'load': 'remote:https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
-        'my/script.js'
+	'id': 'my-test',
+	'load': [
+		'load': 'remote:https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+		'my/script.js'
 }, 'my-test'});
 ```
 
@@ -535,30 +560,30 @@ You can register only one downloader for each URI scheme.
 To register your own downloader use this syntax
 ```javascript
   dna({
-      'downloader': {
-          SCHEME: function(dfd, uri, config),
-          ...
-      }
-    });
+	  'downloader': {
+		  SCHEME: function(dfd, uri, config),
+		  ...
+	  }
+	});
 ```
 Your downloader is expected to call `dfd.reject(ERROR)` or `dfd.resolve(DATA_STRING)` after the download.
 
 Example:
 ```javascript
 dna({
-    'downloader': {
-        'variable': function(dfd, uri, config) {
-            var contents = myCachedContents[uri.replace('variable:', '')];
+	'downloader': {
+		'variable': function(dfd, uri, config) {
+			var contents = myCachedContents[uri.replace('variable:', '')];
 
-            if (contents) dfd.resolve(contents);
-            else dfd.reject(new Error('Cannot download URI "' + uri + '"!'));
-        }
-    }
+			if (contents) dfd.resolve(contents);
+			else dfd.reject(new Error('Cannot download URI "' + uri + '"!'));
+		}
+	}
 });
 
 dna({
-    'proto': 'Test',
-    'load': 'variable:myTest'
+	'proto': 'Test',
+	'load': 'variable:myTest'
 }, 'Test', callback);
 ```
 
@@ -571,10 +596,10 @@ You can specify your own function to execute downloaded scripts. That way you ca
 To specify execution handler use this syntax
 ```javascript
   dna({
-    'factory': {
-      EVAL: function(dfd, jString, protoName, config),
-      ...
-    }
+	'factory': {
+	  EVAL: function(dfd, jString, protoName, config),
+	  ...
+	}
   });
 ```
 Your factory is expected to call `dfd.reject(ERROR)` or `dfd.resolve(FUNCTION)` after resolution.
@@ -582,21 +607,21 @@ Your factory is expected to call `dfd.reject(ERROR)` or `dfd.resolve(FUNCTION)` 
 Example:
 ```javascript
   dna({
-    'factory': {
-      'my-common-js': function(dfd, jString, protoName, config) {
-        var exports = {};
-        (function(exports) {
-           eval(jString);
-        }(exports));
-        dfd.resolve(exports[protoName]); // Return the exported object
-      },
-      'my-other-method': mySuperEvaluator
-    }
+	'factory': {
+	  'my-common-js': function(dfd, jString, protoName, config) {
+		var exports = {};
+		(function(exports) {
+		   eval(jString);
+		}(exports));
+		dfd.resolve(exports[protoName]); // Return the exported object
+	  },
+	  'my-other-method': mySuperEvaluator
+	}
   });
   dna({
-    'proto': 'MyModule',
-    'load': '/lib/my.js',
-    'eval': 'my-common-js'
+	'proto': 'MyModule',
+	'load': '/lib/my.js',
+	'eval': 'my-common-js'
   });
 ```
 
@@ -623,8 +648,8 @@ Just create a document (e.g. `my-bundle.html`) and put standard `script` tags wi
 When specifying `load` property of the DNA Configuration object use the URL pointing to HTML file with hash part specifying the element ID.
 ```javascript
 {
-    'proto': 'MyObject',
-    'load': ['/my-bundle.html#myScript', '/my-unbundled.js']
+	'proto': 'MyObject',
+	'load': ['/my-bundle.html#myScript', '/my-unbundled.js']
 }
 ```
 DNA will download the `my-bundle.html` file only once (and reuse it later for other included scripts) and then it will extract and execute script with the attribute `id="myScript"`.
@@ -640,28 +665,28 @@ For production site you can populate the HTML with embeded scripts or use the we
 
 Load jQuery plugins
 ```javascript
-    dna('/dna-configs/my.json', 'jquery:my');
+	dna('/dna-configs/my.json', 'jquery:my');
 ```
 
 Contents of `my.json` (note the [CSS scheme](#inbuilt-css-scheme) trick)
 ```javascript
 [
-    {
-        "id": "jquery:my",
-        "load": ["css:js/jquery.my.css", "js/jquery.my.js"]
-    }
+	{
+		"id": "jquery:my",
+		"load": ["css:js/jquery.my.css", "js/jquery.my.js"]
+	}
 ]
 ```
 
 Mixed confugration using JSON file and inline Configuration Objects + requiring service `dna.svc2` and prototype `dna.Svc1`:
 ```javascript
 dna(
-      'Svc1', 'svc2',
-      '/configs/svcs.json',
-      {'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']}
-    )
-        .done(run)
-        .fail(ups);
+	  'Svc1', 'svc2',
+	  '/configs/svcs.json',
+	  {'service': 'svc2', 'proto': 'Svc2', 'load': ['/js/base.js', '/js/svc2.js']}
+	)
+		.done(run)
+		.fail(ups);
 ```
 
 Out-of-order calls (O₃ API): first require `dna.Svc1` and `dna.svc2` to run your callback `run` and then later on load required configurations.
@@ -690,14 +715,14 @@ Contents of `index.html`:
 
 ```html
 <script>
-    var dna = dna || [];
-    dna.push(function() { // on DNA load
+	var dna = dna || [];
+	dna.push(function() { // on DNA load
 
-      dna('/app/config.json', 'myApp', function() { // load and start my app
-        dna.myApp.start();
-      });
+	  dna('/app/config.json', 'myApp', function() { // load and start my app
+		dna.myApp.start();
+	  });
 
-    });
+	});
 </script>
 ...
 <script src="/dna.js" async></script>
@@ -707,16 +732,16 @@ Contents of `/app/config.json` (relative paths are resolved relatively to JSON's
 
 ```javascript
 [
-    {
-        'service': 'myApp',
-        'proto': 'MyApplication',
-        'require': 'app:base',
-        'load': './my.js'
-    }, {
-        'id': 'app:base',
-        'load': ['./base/jquery.js', '/lib/bootstrap.js'],
-        'context': 'window'
-    }
+	{
+		'service': 'myApp',
+		'proto': 'MyApplication',
+		'require': 'app:base',
+		'load': './my.js'
+	}, {
+		'id': 'app:base',
+		'load': ['./base/jquery.js', '/lib/bootstrap.js'],
+		'context': 'window'
+	}
 ]
 ```
 
@@ -724,11 +749,11 @@ Contents of `/app/my.js`:
 
 ```javascript
 function MyApplication() {
-    this.version = '0.1';
+	this.version = '0.1';
 }
 
 MyApplication.prototype.start = function() {
-    alert('Hello world!');
+	alert('Hello world!');
 }
 ```
 
@@ -741,19 +766,19 @@ Good idea is to prefix your super-identifiers with your domain name.
 Example of your `config.json` file:
 ```javascript
 [
-    {
-        'proto': 'Example=example.com:Example',
-        'require': ['example.com:Main', 'example.com:service'],
-        'load': './example.js'
-    }, {
-        'service': 'example.com:service',
-        'proto': 'ServiceProto=example.com:ServiceProto',
-        'require': 'example.com:Main',
-        'load': './service.js'
-    }, {
-        'proto': 'Main=example.com:Main',
-        'load': './main.js'
-    }
+	{
+		'proto': 'Example=example.com:Example',
+		'require': ['example.com:Main', 'example.com:service'],
+		'load': './example.js'
+	}, {
+		'service': 'example.com:service',
+		'proto': 'ServiceProto=example.com:ServiceProto',
+		'require': 'example.com:Main',
+		'load': './service.js'
+	}, {
+		'proto': 'Main=example.com:Main',
+		'load': './main.js'
+	}
 ]
 ```
 Code in the example will result in exports into `dna["example.com:..."]` properties.
@@ -789,9 +814,9 @@ There is one limitation though, the ```dna.push()``` method does not return the 
 Store your configurations in JSON file and load it, don't forget that `dna()` always returns the jQuery [Promise](https://api.jquery.com/category/deferred-object/) object.
 ```javascript
 dna('/my-defs.json', 'MyObject1', 'MyObject2', myCallback)
-    .done(myOtherCallback)
-    .done(myOtherOtherCallback, oneMoreCallback)
-    .fail(myWTF);
+	.done(myOtherCallback)
+	.done(myOtherOtherCallback, oneMoreCallback)
+	.fail(myWTF);
 ```
 
 ### Load Anything
@@ -799,15 +824,15 @@ dna('/my-defs.json', 'MyObject1', 'MyObject2', myCallback)
 You can use `dna()` to load any script that was not directly written for DNA.
 ```javascript
 dna({
-        'id': 'jquery',
-        'load': '/libs/jquery.min.js',
-        'context': 'window'
-    }, {
-        'id': 'jquery:iPop',
-        'require': 'jquery',
-        'load': '/libs/jquery.ipop.js',
-        'context': 'window'
-    });
+		'id': 'jquery',
+		'load': '/libs/jquery.min.js',
+		'context': 'window'
+	}, {
+		'id': 'jquery:iPop',
+		'require': 'jquery',
+		'load': '/libs/jquery.ipop.js',
+		'context': 'window'
+	});
 
 dna('jquery:iPop', callback);
 ```
@@ -823,15 +848,15 @@ With DNA you can use the experimental named contexts. Scripts sharing the same n
 
 ```javascript
 dna({
-        'id': 'test:1',
-        'load': 'javascript: context.myVar1 = "var 1"; console.log("Script 1", context.myVar1, context.myVar2);',
-        'context': 'my-private'
-    }, {
-        'id': 'test:2',
-        'load': 'javascript: context.myVar2 = "var 2"; console.log("Script 2", context.myVar1, context.myVar2);',
-        'context': 'my-private'
-    },
-    'test:1', 'test:2');
+		'id': 'test:1',
+		'load': 'javascript: context.myVar1 = "var 1"; console.log("Script 1", context.myVar1, context.myVar2);',
+		'context': 'my-private'
+	}, {
+		'id': 'test:2',
+		'load': 'javascript: context.myVar2 = "var 2"; console.log("Script 2", context.myVar1, context.myVar2);',
+		'context': 'my-private'
+	},
+	'test:1', 'test:2');
 ```
 If named context is not specified then with `dna` eval mode each configuration has its own private Object set as context automatically.
 

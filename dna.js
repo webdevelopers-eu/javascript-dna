@@ -161,7 +161,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	    {'recursive': true, 'match': 'array'},
 	    ['jsonURLs', /\//],
 	    ['required', 'string'],
-	    ['settings', function(arg) {return $.isPlainObject(arg) && !arg.proto && !arg.id;}],
+	    ['settings', function(arg) {return $.isPlainObject(arg) && !arg.proto && !arg.id && !arg.data;}],
 	    ['configs', 'plainObject'],
 	    ['callbacks', 'function']
 	]);
@@ -366,15 +366,16 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	if (config.id) idOK = validateString(config.id, /^[a-zA-Z0-9_:@#$*.-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
 	if (config.service) idOK = validateString(config.service, /^[a-zA-Z0-9_:@#$*.-]*$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
 	if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_]*(=[a-zA-Z0-9_:@#$*.-]+)*$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
+	if (config.data) idOK = true;
 
-	if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` in Config ' + JSON.stringify(config));
+	if (!idOK) $.error('At least one must be specified `id` or `service` or `proto` or `data` in Config ' + JSON.stringify(config));
 	if (config.service && !config.proto) $.error('Service "' + config.service + '" requires the `proto` property: ' + JSON.stringify(config));
 
 	// Only minimal fast cleaning of IDs so we can find the config.
 	// Thorough cleanup is done when downloading
 	cleanConfigFast(config);
 
-	[config.id, config.service]
+	[config.id, config.service, config.data]
 	    .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
 	    .forEach(function (name) {
 		var conflictConfig = dna['core'].getConfig(name);
@@ -498,7 +499,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
     DNACore.prototype.getConfig = function (name) {
 	for (var i = 0; i < this.configs.length; i++) {
 	    var c = this.configs[i];
-	    if (c.id == name || c.service == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
+	    if (c.id == name || c.service == name || c.data == name || $.inArray(name, c.proto, c.proto.length > 1 ? 1 : 0) !== -1) {
 		return readyConfig(c);
 	    }
 	}
@@ -713,6 +714,10 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 		    }
 		    if (proto && config.service) {
 			install(config.service, new proto);
+		    }
+		    if (config.data && typeof proto == 'object') {
+			dna.data[config.data] = $.extend(dna.data[config.data], proto);
+			val = true;
 		    }
 		    if (config.id == name) {
 			val = config;
@@ -982,6 +987,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 
     install('Error', DNAError);
     install('core', new DNACore);
+    install('data', {});
     console.log('DNA v' + dna.core.version + ' ready.');
 
     var initQueue = window.dna || [];  // replace optional queue of calls with reall object
