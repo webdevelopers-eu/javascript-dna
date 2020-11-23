@@ -353,16 +353,23 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
      *      [ "id": ID, ] // required if `service` AND `proto` was not specified
      *      [ "service": QNAME, ] // requires `proto` specified
      *      [ "proto": QNAME, ]
+     *	    [ "data": DNAME, ]
      *      [ "require": QNAME | ID | [ QNAME | ID, ... ], ]
      *      [ "load": URL | URL#ID | [ URL | URL#ID, ... ], ]
      *      [ "eval": "dna" | "window" ]
      *  }
+     *
+     * DNAME: Can be duplicate and all json:... files will be merged into existing one.
+     *
+     * You can use links: {id: "SOMETHING", "require": "./something.json"}
+     * where the same id: "SOMETHING" is in full declared in ./soomething.json
      */
     DNACore.prototype.configure = function(config) {
 	var idOK = false;
 	config = $.extend({}, config); // clone it so later modification to the object does not do mass
 
 	// IDs must not contain [/] because we recognize dna()'s JSON URLs by those characters
+	if (config.data && (config.id || config.proto || config.service)) $.error('The Data Config ' + config.data + ' must not have `id`, `proto`, or `service` properties defined: ' + JSON.stringify(config));
 	if (config.id) idOK = validateString(config.id, /^[a-zA-Z0-9_:@#$*.-]+$/i, 'Invalid `id` name in ' + JSON.stringify(config) + '.');
 	if (config.service) idOK = validateString(config.service, /^[a-zA-Z0-9_:@#$*.-]*$/, 'Invalid `service` name in ' + JSON.stringify(config) + '.');
 	if (config.proto) idOK = validateString(config.proto, /^[A-Z][a-zA-Z0-9_]*(=[a-zA-Z0-9_:@#$*.-]+)*$/, 'Invalid `proto` name in ' + JSON.stringify(config) + '.');
@@ -376,35 +383,44 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	cleanConfigFast(config);
 
 	[config.id, config.service, config.data]
+	    .filter(function(name) {return !!name;})
 	    .concat(config.proto.slice(config.proto.length > 1 ? 1 : 0))
 	    .forEach(function (name) {
 		var conflictConfig = dna['core'].getConfig(name);
-		if (name) {
-		    if (typeof dna[name] == 'undefined') {
-			dna[name] = null;
-		    } else if (!conflictConfig.proto.length && !conflictConfig.service && !conflictConfig.require.length) { // for the cases of configs {id: "SOMETHING", "require": "./something.json"} that re-declare same "SOMETHING" super ID
-			dna['core'].configs = dna['core'].configs.filter(function(cfg) {
-			    return cfg.id !== config.id;
-			});
-			dna[name] = undefined;
-			console.log('DNA: Redeclaring ' + config.id /*, 'new', config, 'conflicting', dna['core'].getConfig(name) */);
+
+		if (typeof dna[name] == 'undefined') {
+		    dna[name] = null;
+		} else if (config.data && conflictConfig) { // data config - merge
+		    config.load = conflictConfig.load.concat(config.load); // merge old into new
+		    dna['core'].configs = dna['core'].configs.filter(function(cfg) { // remove old
+			return cfg.data !== name;
+		    });
+		} else if (!conflictConfig.proto.length && !conflictConfig.service && !conflictConfig.require.length) { // for the cases of configs {id: "SOMETHING", "require": "./something.json"} that re-declare same "SOMETHING" super ID
+		    dna['core'].configs = dna['core'].configs.filter(function(cfg) {
+			return cfg.id !== config.id;
+		    });
+		    dna[name] = undefined;
+		    console.log('DNA: Redeclaring ' + config.id /*, 'new', config, 'conflicting', dna['core'].getConfig(name) */);
+		} else {
+		    var msgs =  ['DNA: Conflicting property `dna["' + name + '"]`.'];
+		    if (dna[name] && $.inArray(name, installed) == -1) {
+			msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! The existing `dna["' + name + '"]` property was not installed as standard DNA module.');
 		    } else {
-			var msgs =  ['DNA: Conflicting property `dna["' + name + '"]`.'];
-			if (dna[name] && $.inArray(name, installed) == -1) {
-			    msgs.push('YOU MUST NOT MODIFY `dna` PROPERTIES DIRECTLY! The existing `dna["' + name + '"]` property was not installed as standard DNA module.');
+			if (conflictConfig) {
+			    msgs.push('Conflicting config exists: ' + JSON.stringify(conflictConfig) + '.\nNote: All `id`, `proto` and `service` names must be unique accross the board.');
 			} else {
-			    if (conflictConfig) {
-				msgs.push('Conflicting config exists: ' + JSON.stringify(conflictConfig) + '.\nNote: All `id`, `proto` and `service` names must be unique accross the board.');
-			    } else {
-				msgs.push('Conflicting special DNA core property: dna["' + name + '"]. Name `' + name + '` is reserved.');
-			    }
+			    msgs.push('Conflicting special DNA core property: dna["' + name + '"]. Name `' + name + '` is reserved.');
 			}
-			$.error(msgs.join('\n'));
 		    }
+		    $.error(msgs.join('\n'));
 		}
 	    });
 
 	this.configs.push(config);
+
+	if (config.data && dna.data[config.data]) { // Data object that was already required so merge in new config right away
+	    dna(config.data);
+	}
     };
 
     /**
@@ -716,7 +732,13 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 			install(config.service, new proto);
 		    }
 		    if (config.data && typeof proto == 'object') {
-			dna.data[config.data] = $.extend(dna.data[config.data], proto);
+			if (typeof dna.data[config.data] == 'undefined') {
+			    dna.data[config.data] = proto;
+			} else if ($.isArray(dna.data[config.data])) {
+			    dna.data[config.data] = dna.data[config.data].concat(proto);
+			} else {
+			    dna.data[config.data] = $.extend(dna.data[config.data], proto);
+			}
 			val = true;
 		    }
 		    if (config.id == name) {
