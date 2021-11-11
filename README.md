@@ -25,6 +25,9 @@
 			- [Custom](#custom)
 		- [Custom Evaluation Engines](#custom-evaluation-engines)
 	- [Bundled Assets](#bundled-assets)
+	- [Events and Integrations](#events-and-integrations)
+		- [Accessing List of Configurations](#accessing-list-of-configurations)
+		- [Notifying of New Configurations](#notifying-of-new-configurations)
 	- [Examples](#examples)
 		- [Complete Example #1](#complete-example-1)
 	- [Portable Modules](#portable-modules)
@@ -660,6 +663,62 @@ For developement you can have empty `script` tags linking to external javascript
 DNA will figure out that the content of `script` tag is missing and will use linked resource instead.
 
 For production site you can populate the HTML with embeded scripts or use the web server [PageSpeed Module](https://developers.google.com/speed/pagespeed/module/) or other tools to do it automatically for you.
+
+
+## Events and Integrations
+
+### Accessing List of Configurations
+
+```dna.core.configs``` exposes the list of all known configurations.
+
+If your configuration contains custom data you may search for them in ```dna.core.configs```.
+
+Example: Some configurations have property ```startup``` set to true
+and we want to run all configs marked that way.
+
+Your startup service in your `dna.json` config may look like this:
+
+```javascript
+{
+	"service": "MyBootstrap",
+	"startup": true,
+	"load": "mybootstrap.js"
+}
+```
+
+
+```javascript
+// Find all existing services that should be ran on start up
+dna.core.configs
+	.filter((config) => config.startup) // filter only startup=true props
+	.forEach((config) => dna(config.service)); // start all services
+```
+
+Thanks to the nature of DNA configs may be loaded later after the code
+above was executed. To watch for newly added configs you may want to
+leverage [Notifying of New Configurations](#Notifying of New Configurations):
+
+```javascript
+const channel = new BroadcastChannel("dna:config:new");
+channel.onmessage = function (message) {
+	const config = message.data;
+	if (config.service && config.startup) {
+		dna(config.service);
+	}
+};
+```
+
+### Notifying of New Configurations
+
+The DNA uses [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel) to transmit information about newly
+added configuration objects. To listen for newly added configuartions use this code:
+
+```javascript
+const channel = new BroadcastChannel("dna:config:new");
+channel.onmessage = function (message) {
+	alert('New DNA config added: ' + JSON.stringify(message.data));
+}
+```
 
 ## Examples
 
