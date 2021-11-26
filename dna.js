@@ -172,6 +172,9 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	}
 	try {
 	    opts.configs.forEach(dna['core'].configure.bind(dna['core']));
+	    if (opts.required.length && $('html').is('.debug')) {
+		console.log("DNA: Satisfying requirements: %o", opts.required);
+	    }
 	    var fullURLs = opts.jsonURLs
 		    .map(function(v) {
 			return rewriteURL(v, null);
