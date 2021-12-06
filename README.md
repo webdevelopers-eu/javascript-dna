@@ -699,25 +699,22 @@ above was executed. To watch for newly added configs you may want to
 leverage [Notifying of New Configurations](#Notifying of New Configurations):
 
 ```javascript
-const channel = new BroadcastChannel("dna:config:new");
-channel.onmessage = function (message) {
-	const config = message.data;
+$(window).on("dna:config:new", function (ev, config) {
 	if (config.service && config.startup) {
 		dna(config.service);
 	}
-};
+});
 ```
 
 ### Notifying of New Configurations
 
-The DNA uses [BroadcastChannel](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel) to transmit information about newly
-added configuration objects. To listen for newly added configuartions use this code:
+The ```dna:config:new``` event is fired on ```window``` object on each newsly
+added configuration object. To listen for newly added configuartions use this code:
 
 ```javascript
-const channel = new BroadcastChannel("dna:config:new");
-channel.onmessage = function (message) {
+$('window').on("dna:config:new", function (message) {
 	alert('New DNA config added: ' + JSON.stringify(message.data));
-}
+});
 ```
 
 ## Examples

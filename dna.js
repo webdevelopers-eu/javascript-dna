@@ -257,9 +257,6 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	this.queue = [];
 	this.configs = [];
 	this.resources = {};
-	this.broadcasters = { // to allow integrations
-	    "dna:config:new": new BroadcastChannel("dna:config:new")
-	};
     };
 
     /** @type {string} */
@@ -423,7 +420,7 @@ if (typeof jQuery != 'function') throw new Error('DNA requires jQuery');
 	    });
 
 	this.configs.push(config);
-	this.broadcasters["dna:config:new"].postMessage(config);
+	$(window).trigger("dna:config:new", config);
 
 	if (config.data && dna.data[config.data]) { // Data object that was already required so merge in new config right away
 	    dna(config.data);
